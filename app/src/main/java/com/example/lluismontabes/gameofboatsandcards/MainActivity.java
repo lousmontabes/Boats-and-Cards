@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.activity_main);
 
         joystick = (Joystick) findViewById(R.id.joystick);
+        IslandDomain iD = new IslandDomain(this);
+        layout.addView(iD);
 
         // Start game loop
         startRefreshTimer();

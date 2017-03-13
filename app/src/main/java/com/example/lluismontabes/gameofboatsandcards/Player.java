@@ -23,6 +23,7 @@ public class Player extends ImageView{
         this.velocity = 10;
     }
 
+
     // SETTERS
     public void setVelocity(float v){
         this.velocity = v;
