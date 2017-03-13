@@ -41,7 +41,8 @@
         android:layout_height="100dp"
         android:id="@+id/joystick"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_margin="10dp">
 
     </com.example.lluismontabes.gameofboatsandcards.Joystick>
 

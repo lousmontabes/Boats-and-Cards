@@ -4,21 +4,18 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ImageView;
 
 /**
  * Created by lmontaga7.alumnes on 13/03/17.
  */
 
-public class Projectile extends View {
+public class Trace extends View {
 
-    Paint projectilePaint;
-    private float damage, velocity;
+    Paint tracePaint;
     private float originX, originY;
 
-    public Projectile(Context context, float originX, float originY) {
+    public Trace(Context context, float originX, float originY) {
         super(context);
         this.originX = originX;
         this.originY = originY;
@@ -26,17 +23,18 @@ public class Projectile extends View {
     }
 
     private Paint styleDefine(){
-        this.projectilePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        projectilePaint.setColor(Color.WHITE);
-        projectilePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        return projectilePaint;
+        this.tracePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        tracePaint.setColor(Color.WHITE);
+        tracePaint.setAlpha(20);
+        tracePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        return tracePaint;
     }
 
     @Override
     protected void onDraw(Canvas canvas){
         int canvasHeight = canvas.getHeight();
         int canvasWidth = canvas.getWidth();
-        canvas.drawCircle(originX, originY, 10, projectilePaint);
+        canvas.drawCircle(originX, originY, 50, tracePaint);
         System.out.println("hi");
     }
 

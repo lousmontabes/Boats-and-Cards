@@ -1,6 +1,7 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
 import android.content.DialogInterface;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -57,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
     // Main characters
     Player player;
 
+    //Layout
+    static RelativeLayout layout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,18 +69,25 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        layout = (RelativeLayout) findViewById(R.id.activity_main);
         log = (TextView) findViewById(R.id.log);
-        player = (Player) findViewById(R.id.player);
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.activity_main);
-
         joystick = (Joystick) findViewById(R.id.joystick);
-        IslandDomain iD = new IslandDomain(this);
-        layout.addView(iD);
+
+        player = (Player) findViewById(R.id.player);
+
+        IslandDomain islandDomain = new IslandDomain(this);
+        //layout.addView(islandDomain);
 
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                moveObjectTo(player, event.getX(), event.getY());
+                log("Firing");
+                float pW = player.getWidth();
+                float pH = player.getHeight();
+                float oX = player.getX() + pW / 2;
+                float oY = player.getY() + pH / 2;
+                Projectile projectile = new Projectile(MainActivity.this, oX, oY);
+                layout.addView(projectile);
                 return false;
             }
         });
@@ -122,8 +133,15 @@ public class MainActivity extends AppCompatActivity {
                 if(downPressed) player.moveDown();
 
                 // Joystick
-                log(Float.toString(joystick.getCurrentDistance()));
+                //log(Float.toString(joystick.getCurrentIntensity()));
                 player.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                float pW = player.getWidth();
+                float pH = player.getHeight();
+                float oX = player.getX() + pW / 2;
+                float oY = player.getY() + pH / 2;
+                Trace trace = new Trace(MainActivity.this, oX, oY);
+                layout.addView(trace);
+                //trace.setAlpha(0.5f);
 
             }
         });
