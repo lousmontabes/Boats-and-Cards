@@ -42,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean rightPressed = false;
     private boolean downPressed = false;
 
+    // Point-and-click control variables
+    private boolean moving = false;
+    private float destX, destY;
+
     /** VIEWS **/
     // Control buttons
     Button bttnUp;
@@ -69,6 +73,14 @@ public class MainActivity extends AppCompatActivity {
         IslandDomain iD = new IslandDomain(this);
         layout.addView(iD);
 
+        layout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                moveObjectTo(player, event.getX(), event.getY());
+                return false;
+            }
+        });
+
         // Start game loop
         startRefreshTimer();
 
@@ -77,84 +89,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setControlsTouchListeners(){
-        /*bttnUp.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    // Button has been pressed
-                    log("Pressing up");
-                    MainActivity.this.upPressed = true;
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    // Button has been released
-                    MainActivity.this.upPressed = false;
-                }
-                return true;
-            }
-
-        });
-
-        bttnLeft.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    // Button has been pressed
-                    log("Pressing left");
-                    MainActivity.this.leftPressed = true;
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    // Button has been released
-                    MainActivity.this.leftPressed = false;
-                }
-                return true;
-            }
-
-        });
-
-        bttnRight.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    // Button has been pressed
-                    log("Pressing right");
-                    MainActivity.this.rightPressed = true;
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    // Button has been released
-                    MainActivity.this.rightPressed = false;
-                }
-                return true;
-            }
-
-        });
-
-        bttnDown.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    // Button has been pressed
-                    log("Pressing down");
-                    MainActivity.this.downPressed = true;
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    // Button has been released
-                    MainActivity.this.downPressed = false;
-                }
-                return true;
-            }
-
-        });*/
-    }
-
     // Displays a message on the game log
     private void log(String message){
         this.log.setText(Float.toString(this.logIndex) + ": " + message);
         this.logIndex++;
+    }
+
+    private void moveObjectTo(View object, float x, float y){
+        this.destX = x;
+        this.destY = y;
+        this.moving = true;
     }
 
     private void startRefreshTimer(){
@@ -167,6 +111,9 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             public void run()
             {
+                // Point-and-click controls
+                if (player.getX() == destX && player.getY() == destY) moving = false;
+                if (moving) player.moveTo(destX, destY);
 
                 // Control buttons
                 if(upPressed) player.moveUp();
