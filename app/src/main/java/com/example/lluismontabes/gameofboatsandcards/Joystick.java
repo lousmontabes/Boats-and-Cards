@@ -9,10 +9,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-/**
- * Created by lluismontabes on 6/3/17.
- */
-
 public class Joystick extends RelativeLayout {
 
     /** UI REFERENCES **/
@@ -60,7 +56,7 @@ public class Joystick extends RelativeLayout {
 
                         // Calculate the current distance using Pythagoras' theorem:
                         // (Distance is limited to 90)
-                        Joystick.this.currentDistance = Math.min(10 + (float) Math.sqrt(Math.pow(y - centerY, 2) + Math.pow(x - centerX, 2)), 90);
+                        Joystick.this.currentDistance = 10 + (float) Math.sqrt(Math.pow(y - centerY, 2) + Math.pow(x - centerX, 2));
 
                         // Animate the joystick view:
                         Joystick.this.image.animate()
@@ -101,6 +97,11 @@ public class Joystick extends RelativeLayout {
 
     public float getCurrentDistance(){
         return this.currentDistance;
+    }
+
+    // Returns the intensity with which the joystick is being pulled.
+    public float getCurrentIntensity(){
+        return Math.min(this.currentDistance / this.area.getWidth(), 1.0f);
     }
 
 }

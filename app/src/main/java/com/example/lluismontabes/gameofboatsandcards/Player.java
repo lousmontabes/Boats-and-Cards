@@ -15,7 +15,7 @@ import android.widget.ImageView;
 
 public class Player extends ImageView{
 
-    private float velocity;
+    private float velocity, idleVelocity;
     private float x, y, angle;
 
     public Player(Context context, AttributeSet attrs) {
@@ -54,7 +54,7 @@ public class Player extends ImageView{
         this.setX(x + velocity);
     }
 
-    public void move(float angle, float distance){
+    public void move(float angle, float intensity){
 
         x = this.getX();
         y = this.getY();
@@ -62,8 +62,8 @@ public class Player extends ImageView{
         float scaleX = (float) Math.cos(angle);
         float scaleY = (float) Math.sin(angle);
 
-        float velocityX = scaleX * this.velocity * (distance / 90);
-        float velocityY = scaleY * this.velocity * (distance / 90);
+        float velocityX = scaleX * this.velocity * intensity;
+        float velocityY = scaleY * this.velocity * intensity;
 
         this.setX(x + velocityX);
         this.setY(y + velocityY);

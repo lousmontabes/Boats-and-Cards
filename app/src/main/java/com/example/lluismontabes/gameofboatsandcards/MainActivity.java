@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** GAME LOOP **/
     Timer refreshTimer;
-    static int fps = 30; // Frames per second
+    static int fps = 60; // Frames per second
     private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
 
     /** DEBUGGING **/
@@ -70,80 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setControlsTouchListeners(){
-        /*bttnUp.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    // Button has been pressed
-                    log("Pressing up");
-                    MainActivity.this.upPressed = true;
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    // Button has been released
-                    MainActivity.this.upPressed = false;
-                }
-                return true;
-            }
-
-        });
-
-        bttnLeft.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    // Button has been pressed
-                    log("Pressing left");
-                    MainActivity.this.leftPressed = true;
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    // Button has been released
-                    MainActivity.this.leftPressed = false;
-                }
-                return true;
-            }
-
-        });
-
-        bttnRight.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    // Button has been pressed
-                    log("Pressing right");
-                    MainActivity.this.rightPressed = true;
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    // Button has been released
-                    MainActivity.this.rightPressed = false;
-                }
-                return true;
-            }
-
-        });
-
-        bttnDown.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    // Button has been pressed
-                    log("Pressing down");
-                    MainActivity.this.downPressed = true;
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    // Button has been released
-                    MainActivity.this.downPressed = false;
-                }
-                return true;
-            }
-
-        });*/
-    }
-
     // Displays a message on the game log
     private void log(String message){
         this.log.setText(Float.toString(this.logIndex) + ": " + message);
@@ -169,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Joystick
                 log(Float.toString(joystick.getCurrentDistance()));
-                player.move(joystick.getCurrentAngle(), joystick.getCurrentDistance());
+                player.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
 
             }
         });
