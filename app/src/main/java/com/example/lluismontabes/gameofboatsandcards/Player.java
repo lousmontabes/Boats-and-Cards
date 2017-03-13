@@ -16,7 +16,18 @@ import android.widget.ImageView;
 public class Player extends ImageView{
 
     private float velocity, idleVelocity;
-    private float x, y, angle;
+    private float x;
+    private float y;
+
+    public float getAngle() {
+        return angle;
+    }
+
+    public void setAngle(float angle) {
+        this.angle = angle;
+    }
+
+    private float angle;
 
     public Player(Context context, AttributeSet attrs) {
         super(context, attrs);
