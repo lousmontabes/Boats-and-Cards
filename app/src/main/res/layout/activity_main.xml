@@ -25,15 +25,6 @@
         android:layout_alignParentEnd="true"
         android:id="@+id/frameLog" />
 
-    <com.example.lluismontabes.gameofboatsandcards.Joystick
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/joystick">
-
-    </com.example.lluismontabes.gameofboatsandcards.Joystick>
-
     <com.example.lluismontabes.gameofboatsandcards.Player
         app:srcCompat="@drawable/basicboat"
         android:src="@drawable/basicboat"
@@ -42,6 +33,16 @@
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="47dp" />
+
+    ></com.example.lluismontabes.gameofboatsandcards.Player>
+
+    <com.example.lluismontabes.gameofboatsandcards.Joystick
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/joystick"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+    </com.example.lluismontabes.gameofboatsandcards.Joystick>
 
 </RelativeLayout>
