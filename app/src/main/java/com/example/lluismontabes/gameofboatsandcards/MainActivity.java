@@ -65,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
         // Start game loop
         startRefreshTimer();
 
+        layout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return false;
+            }
+        });
+
         // Link controls to buttons
         //setControlsTouchListeners();
 
