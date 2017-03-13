@@ -64,13 +64,15 @@ public class Joystick extends RelativeLayout {
 
                         // Animate the joystick view:
                         Joystick.this.image.animate()
-                                .x(centerX + Math.max(
-                                        Math.min(x, centerX * (float) Math.cos(currentAngle)),
-                                        centerX * (float) Math.cos(currentAngle)
+                                .x(Math.max(
+                                        Math.min(x,
+                                                centerX + Math.abs(centerX * (float) Math.cos(currentAngle))),
+                                        centerX - Math.abs(centerX * (float) Math.cos(currentAngle))
                                 ))
-                                .y(centerY + Math.max(
-                                        Math.min(y, centerY * (float) Math.sin(currentAngle)),
-                                        centerY * (float) Math.sin(currentAngle)
+                                .y(Math.max(
+                                        Math.min(y,
+                                                centerY + Math.abs(centerY * (float) Math.sin(currentAngle))),
+                                        centerY - Math.abs(centerY * (float) Math.sin(currentAngle))
                                 ))
                                 .setDuration(0)
                                 .start();
@@ -88,7 +90,6 @@ public class Joystick extends RelativeLayout {
                         break;
 
                 }
-
                 return true;
             }
         });
