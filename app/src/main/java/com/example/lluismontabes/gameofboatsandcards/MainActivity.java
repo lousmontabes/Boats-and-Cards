@@ -65,16 +65,83 @@ public class MainActivity extends AppCompatActivity {
         // Start game loop
         startRefreshTimer();
 
-        layout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return false;
-            }
-        });
-
         // Link controls to buttons
         //setControlsTouchListeners();
 
+    }
+
+    private void setControlsTouchListeners(){
+        /*bttnUp.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    // Button has been pressed
+                    log("Pressing up");
+                    MainActivity.this.upPressed = true;
+                }
+                if(event.getAction() == MotionEvent.ACTION_UP){
+                    // Button has been released
+                    MainActivity.this.upPressed = false;
+                }
+                return true;
+            }
+
+        });
+
+        bttnLeft.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    // Button has been pressed
+                    log("Pressing left");
+                    MainActivity.this.leftPressed = true;
+                }
+                if(event.getAction() == MotionEvent.ACTION_UP){
+                    // Button has been released
+                    MainActivity.this.leftPressed = false;
+                }
+                return true;
+            }
+
+        });
+
+        bttnRight.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    // Button has been pressed
+                    log("Pressing right");
+                    MainActivity.this.rightPressed = true;
+                }
+                if(event.getAction() == MotionEvent.ACTION_UP){
+                    // Button has been released
+                    MainActivity.this.rightPressed = false;
+                }
+                return true;
+            }
+
+        });
+
+        bttnDown.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    // Button has been pressed
+                    log("Pressing down");
+                    MainActivity.this.downPressed = true;
+                }
+                if(event.getAction() == MotionEvent.ACTION_UP){
+                    // Button has been released
+                    MainActivity.this.downPressed = false;
+                }
+                return true;
+            }
+
+        });*/
     }
 
     // Displays a message on the game log
