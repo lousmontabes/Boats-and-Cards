@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -58,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
     // Main characters
     Player player;
 
+    // Props
+    ArrayList<Trace> activeTraces = new ArrayList<>();
+    ArrayList<Projectile> activeProjectiles = new ArrayList<>();
+
     //Layout
     static RelativeLayout layout;
 
@@ -81,14 +86,21 @@ public class MainActivity extends AppCompatActivity {
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
                 log("Firing");
+
                 float pW = player.getWidth();
                 float pH = player.getHeight();
                 float oX = player.getX() + pW / 2;
                 float oY = player.getY() + pH / 2;
-                Projectile projectile = new Projectile(MainActivity.this, oX, oY);
+
+                System.out.println(oX + ", " + oY);
+                Projectile projectile = new Projectile(MainActivity.this, joystick.getCurrentAngle(), oX, oY);
+                MainActivity.this.activeProjectiles.add(projectile);
+
                 layout.addView(projectile);
                 return false;
+
             }
         });
 
@@ -122,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             public void run()
             {
+
                 // Point-and-click controls
                 if (player.getX() == destX && player.getY() == destY) moving = false;
                 if (moving) player.moveTo(destX, destY);
@@ -132,16 +145,33 @@ public class MainActivity extends AppCompatActivity {
                 if(rightPressed) player.moveRight();
                 if(downPressed) player.moveDown();
 
-                // Joystick
+                // Joystick controls
                 //log(Float.toString(joystick.getCurrentIntensity()));
                 player.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+
+                // Projectile movement
+                if(!activeProjectiles.isEmpty()){
+                    for (Projectile p:activeProjectiles){
+                        p.move();
+                    }
+                }
+
+                // Boat trace
                 float pW = player.getWidth();
                 float pH = player.getHeight();
                 float oX = player.getX() + pW / 2;
                 float oY = player.getY() + pH / 2;
                 Trace trace = new Trace(MainActivity.this, oX, oY);
+                //trace.setRotation((float) Math.toDegrees(joystick.getCurrentAngle()));
+                activeTraces.add(trace);
                 layout.addView(trace);
-                //trace.setAlpha(0.5f);
+
+                if(activeTraces.size() > 20){
+                    layout.removeView(activeTraces.get(0));
+                    activeTraces.remove(0);
+                }
+
+                player.bringToFront();
 
             }
         });
@@ -151,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             refresh();
-            //postInvalidate();
+            layout.postInvalidate();
         }
     }
 
