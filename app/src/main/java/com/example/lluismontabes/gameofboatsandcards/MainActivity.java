@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 if (player.getX() == destX && player.getY() == destY) moving = false;
                 if (moving) player.moveTo(destX, destY);
 
-                // Control buttons
+                // Control buttons (currently unused)
                 if(upPressed) player.moveUp();
                 if(leftPressed) player.moveLeft();
                 if(rightPressed) player.moveRight();
@@ -150,19 +150,18 @@ public class MainActivity extends AppCompatActivity {
                 player.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
 
                 // Projectile movement
-                if(!activeProjectiles.isEmpty()){
-                    for (Projectile p:activeProjectiles){
-                        p.move();
-                    }
-                }
+                for (Projectile p:activeProjectiles) p.move();
 
                 // Boat trace
                 float pW = player.getWidth();
                 float pH = player.getHeight();
-                float oX = player.getX() + pW / 2;
-                float oY = player.getY() + pH / 2;
-                Trace trace = new Trace(MainActivity.this, oX, oY);
-                //trace.setRotation((float) Math.toDegrees(joystick.getCurrentAngle()));
+                float oX = player.getX() + 30; // Compensem per l'espai buit de l'imatge
+                float oY = player.getY() + 76; // Compensem per l'espai buit de l'imatge
+
+                log(Float.toString((float) Math.toDegrees(joystick.getCurrentAngle())));
+                float angle = (float) Math.toDegrees(joystick.getCurrentAngle()) + 90;
+
+                Trace trace = new Trace(MainActivity.this, oX, oY, angle);
                 activeTraces.add(trace);
                 layout.addView(trace);
 
@@ -171,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                     activeTraces.remove(0);
                 }
 
-                player.bringToFront();
+                //player.bringToFront();
 
             }
         });

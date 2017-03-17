@@ -14,33 +14,36 @@ import android.view.ViewGroup;
 public class Trace extends View {
 
     Paint tracePaint;
-    private float originX, originY;
+    float angle;
 
-    public Trace(Context context, float originX, float originY) {
+    public Trace(Context context, float originX, float originY, float angle) {
         super(context);
-        this.originX = originX;
-        this.originY = originY;
+
+        this.setX(originX);
+        this.setY(originY);
+        this.angle = angle;
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(100,150);
+
         styleDefine();
     }
 
     private Paint styleDefine(){
         this.tracePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         tracePaint.setColor(Color.WHITE);
-        tracePaint.setAlpha(2);
+        tracePaint.setAlpha(2); // 2
         tracePaint.setStyle(Paint.Style.FILL_AND_STROKE);
         return tracePaint;
     }
 
     @Override
     protected void onDraw(Canvas canvas){
-        canvas.drawRect(originX - 45, originY - 45, originX + 45, originY + 45, tracePaint);
-    }
 
-    public void fade(){
-        if(this.getAlpha() > 0){
-            this.setAlpha((float) (this.getAlpha() - 0.05));
-            System.out.println(this.getAlpha());
-        }
+        canvas.rotate(this.angle);
+
+        canvas.drawRect(0, 0, 90, 90, tracePaint);  // Estela principal
+        canvas.drawRect(0, 0, 20, 90, tracePaint);  // Estela esquerra
+        canvas.drawRect(70, 0, 90, 90, tracePaint); // Estela dreta
+
     }
 
 }

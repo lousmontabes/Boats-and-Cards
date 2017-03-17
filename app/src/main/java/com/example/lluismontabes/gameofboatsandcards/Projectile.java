@@ -46,7 +46,7 @@ public class Projectile extends View {
     protected void onDraw(Canvas canvas){
         int canvasHeight = canvas.getHeight();
         int canvasWidth = canvas.getWidth();
-        canvas.drawCircle(0, 0, this.getWidth()/2, projectilePaint);
+        canvas.drawCircle(this.getWidth()/2, this.getWidth()/2, this.getWidth()/4, projectilePaint);
         System.out.println(this.getX() + ", " + this.getY());
     }
 
