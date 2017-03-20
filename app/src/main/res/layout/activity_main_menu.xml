@@ -46,7 +46,8 @@
             android:layout_height="25pt"
             android:layout_below="@+id/buttonSet"
             android:layout_centerHorizontal="true"
-            android:id="@+id/buttonCred" />
+            android:id="@+id/buttonCred"
+            android:onClick="openCreditsActivity" />
 
         <Button
             android:text="@string/menuExit"
