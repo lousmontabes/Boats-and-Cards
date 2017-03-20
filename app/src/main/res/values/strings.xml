@@ -6,4 +6,6 @@
     <string name="menuSettings">Settings</string>
     <string name="menuCredits">Credits</string>
     <string name="menuExit">Exit</string>
+    <string name="menuTitle">Boats and Cards</string>
+    <string name="menuDisclaimer">©2017 Projecte Integrat de Software UB\nAll rights reserved</string>
 </resources>

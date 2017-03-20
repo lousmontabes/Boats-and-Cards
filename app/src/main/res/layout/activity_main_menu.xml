@@ -17,7 +17,7 @@
             android:textSize="11pt"
             android:layout_width="100pt"
             android:layout_height="25pt"
-            android:id="@+id/button11"
+            android:id="@+id/buttonSet"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
@@ -26,17 +26,17 @@
             android:textSize="11pt"
             android:layout_width="100pt"
             android:layout_height="25pt"
-            android:layout_above="@+id/button11"
+            android:layout_above="@+id/buttonSet"
             android:layout_centerHorizontal="true"
-            android:id="@+id/button12" />
+            android:id="@+id/buttonMP" />
 
         <Button
             android:text="@string/menuSinglePlayer"
             android:textSize="11pt"
             android:layout_width="100pt"
             android:layout_height="25pt"
-            android:id="@+id/button13"
-            android:layout_above="@+id/button12"
+            android:id="@+id/buttonSP"
+            android:layout_above="@+id/buttonMP"
             android:layout_centerHorizontal="true" />
 
         <Button
@@ -44,18 +44,37 @@
             android:textSize="11pt"
             android:layout_width="100pt"
             android:layout_height="25pt"
-            android:layout_below="@+id/button11"
+            android:layout_below="@+id/buttonSet"
             android:layout_centerHorizontal="true"
-            android:id="@+id/button14" />
+            android:id="@+id/buttonCred" />
 
         <Button
             android:text="@string/menuExit"
             android:textSize="11pt"
             android:layout_width="100pt"
             android:layout_height="25pt"
-            android:id="@+id/button15"
-            android:layout_below="@+id/button14"
+            android:id="@+id/buttonExit"
+            android:layout_below="@+id/buttonCred"
             android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:text="@string/menuTitle"
+            android:textSize="11pt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="42dp"
+            android:id="@+id/textView" />
+
+        <TextView
+            android:text="@string/menuDisclaimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/buttonExit"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="56dp"
+            android:id="@+id/textView2" />
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>
