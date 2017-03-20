@@ -75,6 +75,11 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
+    public void openCreditsActivity(View view){
+        Intent i = new Intent(MainMenuActivity.this,CreditsActivity.class);
+
+    }
+
 }
 
 
