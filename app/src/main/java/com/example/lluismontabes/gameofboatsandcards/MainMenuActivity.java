@@ -41,11 +41,7 @@ public class MainMenuActivity extends AppCompatActivity {
         buto.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v) {
-                // create an Intent using the current Activity
-                // and the Class to be created
-                Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
-                // pass the Intent to the Activity,
-                // using the specified action defined in StartPage
+                Intent i = new Intent(MainMenuActivity.this,SettingsActivity.class);
                 startActivity(i);
             }
         });
