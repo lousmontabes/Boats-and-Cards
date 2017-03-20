@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_mainMenu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.example.lluismontabes.gameofboatsandcards.MainMenuActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:text="@string/menuSettings"
+            android:textSize="11pt"
+            android:layout_width="100pt"
+            android:layout_height="25pt"
+            android:id="@+id/button11"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:text="@string/menuMultiPlayer"
+            android:textSize="11pt"
+            android:layout_width="100pt"
+            android:layout_height="25pt"
+            android:layout_above="@+id/button11"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/button12" />
+
+        <Button
+            android:text="@string/menuSinglePlayer"
+            android:textSize="11pt"
+            android:layout_width="100pt"
+            android:layout_height="25pt"
+            android:id="@+id/button13"
+            android:layout_above="@+id/button12"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:text="@string/menuCredits"
+            android:textSize="11pt"
+            android:layout_width="100pt"
+            android:layout_height="25pt"
+            android:layout_below="@+id/button11"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/button14" />
+
+        <Button
+            android:text="@string/menuExit"
+            android:textSize="11pt"
+            android:layout_width="100pt"
+            android:layout_height="25pt"
+            android:id="@+id/button15"
+            android:layout_below="@+id/button14"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

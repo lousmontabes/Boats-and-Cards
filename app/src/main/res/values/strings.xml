@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">GameOfBoatsAndCards</string>
+    <string name="title_activity_main_menu">MainMenuActivity</string>
+    <string name="menuSinglePlayer">Single Player</string>
+    <string name="menuMultiPlayer">Online Match</string>
+    <string name="menuSettings">Settings</string>
+    <string name="menuCredits">Credits</string>
+    <string name="menuExit">Exit</string>
 </resources>
