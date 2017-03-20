@@ -13,14 +13,14 @@ import android.widget.ImageView;
  * Created by lmontaga7.alumnes on 13/03/17.
  */
 
-public class Projectile extends View {
+public class Projectile extends Collider {
 
     Paint projectilePaint;
     private float damage, velocity;
     private float angle, originX, originY;
 
     public Projectile(Context context, float angle, float originX, float originY) {
-        super(context);
+        super(context, 20);
 
         this.velocity = 30;
         this.angle = angle;

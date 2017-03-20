@@ -10,12 +10,13 @@ import android.view.View;
  * Created by jtomebla14.alumnes on 13/03/17.
  */
 
-class IslandDomain extends View {
+class IslandDomain extends Collider {
 
     Paint islandArea;
+    private float radius;
 
-    public IslandDomain(Context context) {
-        super(context);
+    public IslandDomain(Context context, float radius) {
+        super(context, radius);
         styleDefine();
     }
 

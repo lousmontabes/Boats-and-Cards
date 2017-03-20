@@ -92,15 +92,27 @@ public class Joystick extends RelativeLayout {
 
     }
 
+    /**
+     * Returns the current angle from the center the joystick is moving to.
+     * When the joystick is not moving, the last recorded angle will be returned.
+     * @return float
+     */
     public float getCurrentAngle(){
         return this.currentAngle;
     }
 
+    /**
+     * Returns the current distance from the center the user is pulling the joystick to.
+     * @return float
+     */
     public float getCurrentDistance(){
         return this.currentDistance;
     }
 
-    // Returns the intensity with which the joystick is being pulled.
+    /**
+     * Returns the intensity with which the joystick is being pulled.
+     * @return float
+     */
     public float getCurrentIntensity(){
         return Math.min(this.currentDistance / this.area.getWidth(), 1.0f);
     }

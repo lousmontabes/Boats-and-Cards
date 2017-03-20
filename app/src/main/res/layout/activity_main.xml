@@ -36,6 +36,17 @@
 
     ></com.example.lluismontabes.gameofboatsandcards.Player>
 
+    <com.example.lluismontabes.gameofboatsandcards.Player
+        app:srcCompat="@drawable/basicboat"
+        android:src="@drawable/basicboat"
+        android:id="@+id/player2"
+        android:layout_width="50dp"
+        android:layout_height="80dp"
+
+        android:layout_below="@+id/log"
+        android:layout_alignStart="@+id/player"
+        android:layout_marginTop="58dp"></com.example.lluismontabes.gameofboatsandcards.Player>
+
     <com.example.lluismontabes.gameofboatsandcards.Joystick
         android:layout_width="100dp"
         android:layout_height="100dp"

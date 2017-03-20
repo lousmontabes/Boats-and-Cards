@@ -1,12 +1,17 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
+import android.content.DialogInterface;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -53,10 +58,12 @@ public class GameActivity extends AppCompatActivity {
 
     // Main characters
     Player player;
+    Player player2;
 
     // Props
     ArrayList<Trace> activeTraces = new ArrayList<>();
     ArrayList<Projectile> activeProjectiles = new ArrayList<>();
+    ArrayList<Collider> activeColliders = new ArrayList<>();
 
     //Layout
     static RelativeLayout layout;
@@ -74,8 +81,9 @@ public class GameActivity extends AppCompatActivity {
         joystick = (Joystick) findViewById(R.id.joystick);
 
         player = (Player) findViewById(R.id.player);
+        player2 = (Player) findViewById(R.id.player2);
 
-        IslandDomain islandDomain = new IslandDomain(this);
+        IslandDomain islandDomain = new IslandDomain(this, 500);
         //layout.addView(islandDomain);
 
         layout.setOnTouchListener(new View.OnTouchListener() {
@@ -92,6 +100,7 @@ public class GameActivity extends AppCompatActivity {
                 System.out.println(oX + ", " + oY);
                 Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY);
                 GameActivity.this.activeProjectiles.add(projectile);
+                GameActivity.this.activeColliders.add(projectile);
 
                 layout.addView(projectile);
                 return false;
@@ -165,7 +174,18 @@ public class GameActivity extends AppCompatActivity {
                     activeTraces.remove(0);
                 }
 
-                //player.bringToFront();
+                player.bringToFront();
+
+                // Collisions
+                for (Collider c1:activeColliders){
+
+                    for (Collider c2:activeColliders){
+
+                        if (c1.isColliding(c2) && !c1.equals(c2)) System.out.println("Collision detected");
+
+                    }
+
+                }
 
             }
         });
