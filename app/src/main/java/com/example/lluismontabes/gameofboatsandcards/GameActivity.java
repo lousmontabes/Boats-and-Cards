@@ -1,17 +1,12 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
-import android.content.DialogInterface;
-import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -19,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity {
 
     /** GAME LOOP **/
     Timer refreshTimer;
@@ -95,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
                 float oY = player.getY() + pH / 2;
 
                 System.out.println(oX + ", " + oY);
-                Projectile projectile = new Projectile(MainActivity.this, joystick.getCurrentAngle(), oX, oY);
-                MainActivity.this.activeProjectiles.add(projectile);
+                Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY);
+                GameActivity.this.activeProjectiles.add(projectile);
 
                 layout.addView(projectile);
                 return false;
@@ -161,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 log(Float.toString((float) Math.toDegrees(joystick.getCurrentAngle())));
                 float angle = (float) Math.toDegrees(joystick.getCurrentAngle()) + 90;
 
-                Trace trace = new Trace(MainActivity.this, oX, oY, angle);
+                Trace trace = new Trace(GameActivity.this, oX, oY, angle);
                 activeTraces.add(trace);
                 layout.addView(trace);
 
