@@ -2,13 +2,8 @@ package com.example.lluismontabes.gameofboatsandcards;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -29,7 +24,7 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // create an Intent using the current Activity
                 // and the Class to be created
-                Intent i = new Intent(MainMenuActivity.this,MainActivity.class);
+                Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
                 // pass the Intent to the Activity,
                 // using the specified action defined in StartPage
                 startActivity(i);
@@ -48,7 +43,7 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // create an Intent using the current Activity
                 // and the Class to be created
-                Intent i = new Intent(MainMenuActivity.this,MainActivity.class);
+                Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
                 // pass the Intent to the Activity,
                 // using the specified action defined in StartPage
                 startActivity(i);
@@ -60,7 +55,7 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // create an Intent using the current Activity
                 // and the Class to be created
-                Intent i = new Intent(MainMenuActivity.this,MainActivity.class);
+                Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
                 // pass the Intent to the Activity,
                 // using the specified action defined in StartPage
                 startActivity(i);
