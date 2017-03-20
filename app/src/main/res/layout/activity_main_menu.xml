@@ -59,7 +59,7 @@
 
         <TextView
             android:text="@string/menuTitle"
-            android:textSize="11pt"
+            android:textSize="16pt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
