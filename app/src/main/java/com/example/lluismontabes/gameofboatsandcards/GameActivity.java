@@ -65,6 +65,7 @@ public class GameActivity extends AppCompatActivity {
     ArrayList<Trace> activeTraces = new ArrayList<>();
     ArrayList<Projectile> activeProjectiles = new ArrayList<>();
     ArrayList<Collider> activeColliders = new ArrayList<>();
+    ArrayList<Player> activePlayers = new ArrayList<>();
 
     //Layout
     static RelativeLayout layout;
@@ -129,6 +130,9 @@ public class GameActivity extends AppCompatActivity {
         player.setLayoutParams(playerParams);
         player2.setLayoutParams(playerParams);
 
+        activePlayers.add(player);
+        activePlayers.add(player2);
+
         layout.addView(player);
         layout.addView(player2);
     }
@@ -191,8 +195,18 @@ public class GameActivity extends AppCompatActivity {
 
                 // Collisions
                 for (Projectile p:activeProjectiles){
-                    if (p.isColliding(player2)) player2.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
+                    if (p.isColliding(player2)){
+                        activeProjectiles.remove(p);
+                        layout.removeView(p);
+                        player2.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
+                        player2.damage(20);
+                    }
                     else player2.setColorFilter(null);
+                }
+
+                // Health
+                for (Player pl:activePlayers){
+                    if (pl.getHealth() <= 0) pl.die();
                 }
 
             }

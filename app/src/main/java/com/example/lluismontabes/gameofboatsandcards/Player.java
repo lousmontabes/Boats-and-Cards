@@ -16,6 +16,7 @@ import android.widget.ImageView;
 public class Player extends Collider{
 
     private float velocity, idleVelocity;
+    private int health;
     private float x;
     private float y;
 
@@ -24,16 +25,18 @@ public class Player extends Collider{
     public Player(Context context, AttributeSet attrs) {
         super(context, 70);
         this.velocity = 10;
+        this.health = 100;
     }
 
 
     // SETTERS
-    public void setAngle(float angle) {
-        this.angle = angle;
+    public void setAngle(float a) {
+        this.angle = a;
     }
     public void setVelocity(float v){
         this.velocity = v;
     }
+    public void setHealth(int h) { this.health = h; };
 
     // GETTERS
     public float getAngle() {
@@ -42,6 +45,7 @@ public class Player extends Collider{
     public float getVelocity(){
         return this.velocity;
     }
+    public int getHealth() { return this.health; };
 
     // MOVEMENT METHODS
     public void moveUp(){
@@ -101,6 +105,16 @@ public class Player extends Collider{
         this.setY(y + velocityY);
         this.setRotation((float) Math.toDegrees(angle) + 90);
 
+    }
+
+    // USER INTERACTION
+    public void damage(int d){
+        this.health -= d;
+    }
+
+    public void die(){
+        System.out.println("Player died");
+        this.setAlpha(0);
     }
 
 }
