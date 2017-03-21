@@ -1,9 +1,12 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -23,6 +26,7 @@ public class Trace extends View {
         this.setY(originY);
         this.angle = angle;
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(100,150);
+        this.setLayoutParams(params);
 
         styleDefine();
     }

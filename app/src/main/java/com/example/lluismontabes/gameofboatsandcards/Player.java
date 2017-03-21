@@ -22,7 +22,7 @@ public class Player extends Collider{
     private float angle;
 
     public Player(Context context, AttributeSet attrs) {
-        super(context, 100);
+        super(context, 70);
         this.velocity = 10;
     }
 

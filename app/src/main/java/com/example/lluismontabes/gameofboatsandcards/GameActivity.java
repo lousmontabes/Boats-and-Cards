@@ -173,8 +173,6 @@ public class GameActivity extends AppCompatActivity {
                 for (Projectile p:activeProjectiles) p.move();
 
                 // Boat trace
-                float pW = player.getWidth();
-                float pH = player.getHeight();
                 float oX = player.getX() + 30; // Compensem per l'espai buit de l'imatge
                 float oY = player.getY() + 76; // Compensem per l'espai buit de l'imatge
 
