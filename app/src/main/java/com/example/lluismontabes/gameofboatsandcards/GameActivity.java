@@ -1,11 +1,12 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
+import android.app.Activity;
 import android.content.DialogInterface;
-import android.support.annotation.MainThread;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -80,8 +81,7 @@ public class GameActivity extends AppCompatActivity {
         log = (TextView) findViewById(R.id.log);
         joystick = (Joystick) findViewById(R.id.joystick);
 
-        player = (Player) findViewById(R.id.player);
-        player2 = (Player) findViewById(R.id.player2);
+        spawnPlayers();
 
         IslandDomain islandDomain = new IslandDomain(this, 500);
         //layout.addView(islandDomain);
@@ -89,8 +89,6 @@ public class GameActivity extends AppCompatActivity {
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
-                log("Firing");
 
                 float pW = player.getWidth();
                 float pH = player.getHeight();
@@ -114,6 +112,25 @@ public class GameActivity extends AppCompatActivity {
         // Link controls to buttons
         //setControlsTouchListeners();
 
+    }
+
+    private void spawnPlayers(){
+        player = new Player(this, null);
+        player2 = new Player(this, null);
+
+        player.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
+        player2.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
+
+        final float scale = this.getResources().getDisplayMetrics().density;
+
+        ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) (50 * scale + 0.5f),
+                                                                         (int) (80 * scale + 0.5f));
+
+        player.setLayoutParams(playerParams);
+        player2.setLayoutParams(playerParams);
+
+        layout.addView(player);
+        layout.addView(player2);
     }
 
     // Displays a message on the game log
@@ -150,7 +167,6 @@ public class GameActivity extends AppCompatActivity {
                 if(downPressed) player.moveDown();
 
                 // Joystick controls
-                //log(Float.toString(joystick.getCurrentIntensity()));
                 player.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
 
                 // Projectile movement
@@ -162,7 +178,6 @@ public class GameActivity extends AppCompatActivity {
                 float oX = player.getX() + 30; // Compensem per l'espai buit de l'imatge
                 float oY = player.getY() + 76; // Compensem per l'espai buit de l'imatge
 
-                log(Float.toString((float) Math.toDegrees(joystick.getCurrentAngle())));
                 float angle = (float) Math.toDegrees(joystick.getCurrentAngle()) + 90;
 
                 Trace trace = new Trace(GameActivity.this, oX, oY, angle);
@@ -177,14 +192,9 @@ public class GameActivity extends AppCompatActivity {
                 player.bringToFront();
 
                 // Collisions
-                for (Collider c1:activeColliders){
-
-                    for (Collider c2:activeColliders){
-
-                        if (c1.isColliding(c2) && !c1.equals(c2)) System.out.println("Collision detected");
-
-                    }
-
+                for (Projectile p:activeProjectiles){
+                    if (p.isColliding(player2)) player2.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
+                    else player2.setColorFilter(null);
                 }
 
             }

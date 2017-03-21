@@ -13,7 +13,7 @@ import android.widget.ImageView;
  *
  */
 
-public class Player extends ImageView{
+public class Player extends Collider{
 
     private float velocity, idleVelocity;
     private float x;
@@ -22,7 +22,7 @@ public class Player extends ImageView{
     private float angle;
 
     public Player(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        super(context, 100);
         this.velocity = 10;
     }
 

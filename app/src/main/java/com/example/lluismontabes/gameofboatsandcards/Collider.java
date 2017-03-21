@@ -3,17 +3,17 @@ package com.example.lluismontabes.gameofboatsandcards;
 import android.content.Context;
 
 import android.view.View;
+import android.widget.ImageView;
 
 /**
  * Created by lluismontabes on 17/3/17.
  */
 
-public abstract class Collider extends View {
+public abstract class Collider extends ImageView {
 
     private boolean isRound;
     private float radius;
     private float x, y, w, h;
-    private float centerX, centerY;
 
     /**
      * Round collider constructor
@@ -24,8 +24,6 @@ public abstract class Collider extends View {
         super(context);
         this.isRound = true;
         this.radius = r;
-        this.centerX = this.getX() + radius;
-        this.centerY = this.getY() + radius;
     }
 
     /**
@@ -43,8 +41,6 @@ public abstract class Collider extends View {
         this.y = y;
         this.w = w;
         this.h = h;
-        this.centerX = x + w / 2;
-        this.centerY = y + h / 2;
     }
 
     public boolean isRound(){
@@ -56,17 +52,17 @@ public abstract class Collider extends View {
     }
 
     public float getCenterX(){
-        return this.centerX;
+        return this.getX() + radius;
     }
 
     public float getCenterY(){
-        return this.centerY;
+        return this.getY() + radius;
     }
 
-    public float getDistance(Collider collider){
+    public float getDistance(Collider c){
 
-        float distX = collider.getCenterX() - this.getCenterX();
-        float distY = collider.getCenterY() - this.getCenterY();
+        float distX = c.getCenterX() - this.getCenterX();
+        float distY = c.getCenterY() - this.getCenterY();
 
         float dist = (float) Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
 
@@ -76,7 +72,7 @@ public abstract class Collider extends View {
 
     public boolean isColliding(Collider c){
 
-        return (this.getDistance(c) <= this.getRadius());
+        return (this.getDistance(c) <= c.getRadius());
 
     }
 
