@@ -1,13 +1,16 @@
 <resources>
     <string name="app_name">GameOfBoatsAndCards</string>
     <string name="title_activity_main_menu">MainMenuActivity</string>
-    <string name="menuSinglePlayer">Single Player</string>
-    <string name="menuMultiPlayer">Online Match</string>
-    <string name="menuSettings">Settings</string>
-    <string name="menuCredits">Credits</string>
-    <string name="menuExit">Exit</string>
-    <string name="menuTitle">Boats and Cards</string>
-    <string name="menuDisclaimer">©2017 Projecte Integrat de Software UB\nAll rights reserved</string>
+
+    <string name="gameTitle">Rule the\nTreasure Island!</string>
+
+    <string name="playButtonText">Play</string>
+    <string name="multiplayerButtonText">Online Match</string>
+    <string name="settingsButtonText">Settings</string>
+    <string name="creditsButtonText">Credits</string>
+    <string name="exitButtonText">Exit</string>
+
+    <string name="copyrightDisclaimer">©2017 Projecte Integrat de Software UB\nAll rights reserved</string>
     <string name="comingSoon">Soon™</string>
     <string name="credits">Jo\n(i algunes persones més)</string>
     <string name="title_activity_settings">Settings</string>

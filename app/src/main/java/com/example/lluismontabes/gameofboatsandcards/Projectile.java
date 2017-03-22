@@ -67,4 +67,11 @@ public class Projectile extends Collider {
 
     }
 
+    public void explode(){
+
+        this.setScaleX(2);
+        this.setScaleY(2);
+
+    }
+
 }
