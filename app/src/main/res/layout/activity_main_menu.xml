@@ -10,73 +10,50 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <Button
-            android:text="@string/menuSettings"
-            android:textSize="11pt"
-            android:layout_width="100pt"
-            android:layout_height="25pt"
-            android:id="@+id/buttonSet"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
-
-        <Button
-            android:text="@string/menuMultiPlayer"
-            android:textSize="11pt"
-            android:layout_width="100pt"
-            android:layout_height="25pt"
-            android:layout_above="@+id/buttonSet"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/buttonMP" />
-
-        <Button
-            android:text="@string/menuSinglePlayer"
-            android:textSize="11pt"
-            android:layout_width="100pt"
-            android:layout_height="25pt"
-            android:id="@+id/buttonSP"
-            android:layout_above="@+id/buttonMP"
-            android:layout_centerHorizontal="true" />
-
-        <Button
-            android:text="@string/menuCredits"
-            android:textSize="11pt"
-            android:layout_width="100pt"
-            android:layout_height="25pt"
-            android:layout_below="@+id/buttonSet"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/buttonCred"
-            android:onClick="openCreditsActivity" />
-
-        <Button
-            android:text="@string/menuExit"
-            android:textSize="11pt"
-            android:layout_width="100pt"
-            android:layout_height="25pt"
-            android:id="@+id/buttonExit"
-            android:layout_below="@+id/buttonCred"
-            android:layout_centerHorizontal="true" />
+        android:layout_height="match_parent"
+        android:background="@drawable/sea">
 
         <TextView
-            android:text="@string/menuTitle"
+            android:text="@string/gameTitle"
             android:textSize="16pt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="42dp"
-            android:id="@+id/textView" />
+            android:id="@+id/textView"
+            android:gravity="center_horizontal" />
 
         <TextView
-            android:text="@string/menuDisclaimer"
+            android:text="@string/copyrightDisclaimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/buttonExit"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="56dp"
             android:id="@+id/textView2"
-            android:gravity="center" />
+            android:gravity="center"
+            android:layout_marginBottom="24dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignEnd="@+id/textView" />
+
+        <Button
+            android:text="@string/playButtonText"
+            android:textSize="11pt"
+            android:layout_width="100pt"
+            android:layout_height="25pt"
+            android:id="@+id/playButton"
+            android:layout_marginBottom="74dp"
+            android:layout_alignBottom="@+id/textView2"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:text="@string/settingsButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/settingsTextView"
+            android:layout_alignTop="@+id/playButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="53dp"
+            android:padding="10dp" />
+
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>
