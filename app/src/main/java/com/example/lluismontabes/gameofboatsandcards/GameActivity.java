@@ -49,6 +49,7 @@ public class GameActivity extends AppCompatActivity {
     private boolean moving = false;
     private float destX, destY;
 
+
     /** VIEWS **/
     // Control buttons
     Button bttnUp;
@@ -69,6 +70,10 @@ public class GameActivity extends AppCompatActivity {
     //Layout
     static RelativeLayout layout;
 
+    //Island Domain
+    IslandDomain islandDomain;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,8 +87,9 @@ public class GameActivity extends AppCompatActivity {
         joystick = (Joystick) findViewById(R.id.joystick);
 
         spawnPlayers();
+        spawnIslandDomain(300);
 
-        IslandDomain islandDomain = new IslandDomain(this, 500);
+        //IslandDomain islandDomain = new IslandDomain(GameActivity.this, 300);
         //layout.addView(islandDomain);
 
         layout.setOnTouchListener(new View.OnTouchListener() {
@@ -106,12 +112,18 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
+
         // Start game loop
         startRefreshTimer();
 
         // Link controls to buttons
         //setControlsTouchListeners();
 
+    }
+
+    private void spawnIslandDomain(float radius){
+        islandDomain = new IslandDomain(this,radius);
+        layout.addView(islandDomain);
     }
 
     private void spawnPlayers(){
@@ -150,6 +162,7 @@ public class GameActivity extends AppCompatActivity {
         refreshTimer.schedule(new RefreshTask(), 0, refreshPeriod);
     }
 
+    boolean player_inside = false;
     // Method that gets called every frame.
     public void refresh(){
         runOnUiThread(new Runnable() {
@@ -193,6 +206,20 @@ public class GameActivity extends AppCompatActivity {
                 for (Projectile p:activeProjectiles){
                     if (p.isColliding(player2)) player2.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
                     else player2.setColorFilter(null);
+                }
+
+                //Collision player - domain island
+                if (player.isColliding(islandDomain,"islandDomain")){
+                    System.out.println("Estic dins de l'area de domini de la illa!!!");
+                    if (player_inside == false) {
+                        islandDomain.changeStatus();
+                        player_inside = true;
+                    }
+                }else{
+                    if (player_inside){
+                        islandDomain.changeStatus();
+                        player_inside = false;
+                    }
                 }
 
             }
