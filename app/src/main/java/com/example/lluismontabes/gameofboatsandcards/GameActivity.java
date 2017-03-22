@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,8 +25,8 @@ public class GameActivity extends AppCompatActivity {
 
     /** GAME LOOP **/
     Timer refreshTimer;
-    static int fps = 60; // Frames per second
-    private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
+    final static int fps = 60; // Frames per second
+    final private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
 
     /** DEBUGGING **/
     // Log index and TextView
@@ -149,13 +150,53 @@ public class GameActivity extends AppCompatActivity {
         this.moving = true;
     }
 
+    private void showBoatTrace(){
+        float oX = player.getX() + 30; // Compensem per l'espai buit de l'imatge
+        float oY = player.getY() + 76; // Compensem per l'espai buit de l'imatge
+
+        float angle = (float) Math.toDegrees(joystick.getCurrentAngle()) + 90;
+
+        Trace trace = new Trace(GameActivity.this, oX, oY, angle);
+        activeTraces.add(trace);
+        layout.addView(trace);
+
+        if(activeTraces.size() > 20){
+            layout.removeView(activeTraces.get(0));
+            activeTraces.remove(0);
+        }
+
+        player.bringToFront();
+    }
+
+    private void checkProjectileCollisions(){
+        Iterator<Projectile> projectileIterator = activeProjectiles.iterator();
+
+        while (projectileIterator.hasNext()) {
+
+            Projectile p = projectileIterator.next();
+
+            if (p.isColliding(player2)){
+
+                player2.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
+                player2.damage(20);
+
+                layout.removeView(p);
+                projectileIterator.remove();
+
+            }
+
+            else player2.setColorFilter(null);
+
+        }
+    }
+
     private void startRefreshTimer(){
         this.refreshTimer = new Timer();
         refreshTimer.schedule(new RefreshTask(), 0, refreshPeriod);
     }
 
     // Method that gets called every frame.
-    public void refresh(){
+    private void refresh(){
         runOnUiThread(new Runnable() {
             public void run()
             {
@@ -177,32 +218,10 @@ public class GameActivity extends AppCompatActivity {
                 for (Projectile p:activeProjectiles) p.move();
 
                 // Boat trace
-                float oX = player.getX() + 30; // Compensem per l'espai buit de l'imatge
-                float oY = player.getY() + 76; // Compensem per l'espai buit de l'imatge
-
-                float angle = (float) Math.toDegrees(joystick.getCurrentAngle()) + 90;
-
-                Trace trace = new Trace(GameActivity.this, oX, oY, angle);
-                activeTraces.add(trace);
-                layout.addView(trace);
-
-                if(activeTraces.size() > 20){
-                    layout.removeView(activeTraces.get(0));
-                    activeTraces.remove(0);
-                }
-
-                player.bringToFront();
+                showBoatTrace();
 
                 // Collisions
-                for (Projectile p:activeProjectiles){
-                    if (p.isColliding(player2)){
-                        activeProjectiles.remove(p);
-                        layout.removeView(p);
-                        player2.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
-                        player2.damage(20);
-                    }
-                    else player2.setColorFilter(null);
-                }
+                checkProjectileCollisions();
 
                 // Health
                 for (Player pl:activePlayers){
