@@ -237,15 +237,15 @@ public class GameActivity extends AppCompatActivity {
                 }
 
                 //Collision player - domain island
-                if (player.isColliding(islandDomain,"islandDomain")){
+                if (player.isColliding(islandDomain, "islandDomain")){
                     System.out.println("Estic dins de l'area de domini de la illa!!!");
                     if (player_inside == false) {
-                        islandDomain.changeStatus();
+                        islandDomain.toggleInvadedStatus();
                         player_inside = true;
                     }
                 }else{
                     if (player_inside){
-                        islandDomain.changeStatus();
+                        islandDomain.toggleInvadedStatus();
                         player_inside = false;
                     }
                 }

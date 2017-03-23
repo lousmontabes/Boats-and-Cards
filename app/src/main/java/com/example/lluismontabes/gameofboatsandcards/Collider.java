@@ -75,7 +75,7 @@ public abstract class Collider extends ImageView {
         System.out.println("Mi collider es island domain -----------------------"+(msg));
         System.out.println("this.getCenterX(): "+(this.getCenterX()));
         System.out.println("this.getCenterY(): "+(this.getCenterY()));
-        IslandDomain islandDomain = (IslandDomain)c;
+        IslandDomain islandDomain = (IslandDomain) c;
         Point p = islandDomain.getPosition();
         System.out.println("POSITION OF ISLAND DOMAIN CENTER: "+p.toString());
         float distX = Math.abs(p.x - this.getCenterX());

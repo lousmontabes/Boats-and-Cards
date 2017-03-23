@@ -16,16 +16,16 @@ import android.widget.RelativeLayout;
 
 class IslandDomain extends Collider {
 
-    private Paint islandArea;
-    private float radius;
+    private Paint islandPaint;
     private float positionX,positionY;
-    private boolean status;
+    private boolean isInvaded;
 
 
     public IslandDomain(Context context, float radius) {
+
         super(context, radius);
-        this.radius = radius;
-        this.status = false; //It is being invaded
+
+        this.isInvaded = false; //It is not being invaded
         setVisibility(VISIBLE);
 
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
@@ -46,36 +46,42 @@ class IslandDomain extends Collider {
     }
 
     private Paint styleDefine(){
-        this.islandArea = new Paint(Paint.ANTI_ALIAS_FLAG);
-        islandArea.setColor(Color.GREEN);
-        islandArea.setStyle(Paint.Style.FILL_AND_STROKE);
-        return islandArea;
+
+        this.islandPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        islandPaint.setColor(getResources().getColor(R.color.uninvadedIsland));
+        islandPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        return islandPaint;
+
     }
 
     @Override
     protected void onDraw(Canvas canvas){
+
         System.out.println("S'ha pintat islandArea ------------------------------------------------------");
         int canvasHeight = canvas.getHeight();
         int canvasWidth = canvas.getWidth();
-        canvas.drawCircle(this.positionX,this.positionY, this.radius, islandArea);
+        canvas.drawCircle(this.positionX, this.positionY, this.getRadius(), islandPaint);
+
     }
 
     public Point getPosition(){
+
         Point p = new Point();
         p.set((int)this.positionX,(int)this.positionY);
+
         return p;
 
     }
 
-    public void changeStatus(){
-        if (this.status){
-            this.islandArea.setColor(Color.GREEN);
-            this.status = false;
-        }else{
-            this.islandArea.setColor(Color.RED);
-            this.status = true;
-        }
+    public void toggleInvadedStatus(){
+
+        this.isInvaded = !isInvaded;
+
+        if (this.isInvaded) this.islandPaint.setColor(getResources().getColor(R.color.invadedIsland));
+        else this.islandPaint.setColor(getResources().getColor(R.color.uninvadedIsland));
+
         this.invalidate();
+
     }
 
 
