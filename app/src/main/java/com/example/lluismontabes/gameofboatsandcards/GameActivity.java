@@ -7,9 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,6 +68,8 @@ public class GameActivity extends AppCompatActivity {
     //Island Domain
     IslandDomain islandDomain;
 
+    //Chronometer
+    ChronometerPausable chronometerPausable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +82,17 @@ public class GameActivity extends AppCompatActivity {
         layout = (RelativeLayout) findViewById(R.id.activity_main);
         log = (TextView) findViewById(R.id.log);
         joystick = (Joystick) findViewById(R.id.joystick);
+
+        //test
+        chronometerPausable = new ChronometerPausable(this);
+        layout.addView(chronometerPausable);
+
+
+
+
+
+
+
 
         spawnPlayers();
         spawnIslandDomain(300);
@@ -124,7 +135,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void spawnPlayers(){
-        player = new Player(this, null);
+        //player = new Player(this, null);
+        //test with chronometer
+        player = new Player(this,null,chronometerPausable);
         player2 = new Player(this, null);
 
         player.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
@@ -242,11 +255,13 @@ public class GameActivity extends AppCompatActivity {
                     if (player_inside == false) {
                         islandDomain.toggleInvadedStatus();
                         player_inside = true;
+                        player.getChronometer().start_remember();
                     }
                 }else{
                     if (player_inside){
                         islandDomain.toggleInvadedStatus();
                         player_inside = false;
+                        player.getChronometer().stop_remember();
                     }
                 }
 
