@@ -36,7 +36,11 @@
         <activity android:name=".CreditsActivity" />
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".GameEndActivity"
+            android:label="@string/title_activity_game_end"
+            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
     </application>
 
 </manifest>
