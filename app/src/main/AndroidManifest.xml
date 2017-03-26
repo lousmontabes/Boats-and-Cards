@@ -40,7 +40,14 @@
         <activity
             android:name=".GameEndActivity"
             android:label="@string/title_activity_game_end"
-            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+        </activity>
     </application>
 
 </manifest>
