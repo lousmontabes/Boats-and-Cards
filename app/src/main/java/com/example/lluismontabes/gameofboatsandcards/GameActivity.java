@@ -9,6 +9,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Timer;
@@ -18,13 +20,14 @@ public class GameActivity extends AppCompatActivity {
 
     /** GAME LOOP **/
     Timer refreshTimer;
-    final static int fps = 60; // Frames per second
-    final private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
+    final static private int fps = 60; // Frames per second
+    final static private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
 
     /** DEBUGGING **/
     // Log index and TextView
     int logIndex = 0;
     TextView log;
+    TextView frameLog;
 
     /** GAME DATA **/
     Data data = new Data();
@@ -56,11 +59,22 @@ public class GameActivity extends AppCompatActivity {
     Player player1;
     Player player2;
 
+    // Timer and scoreboard
+    TextView timer;
+    TextView score1;
+    TextView score2;
+
     // Statistics
-    int counter1 = 100;
-    int counter2 = 100;
+    int counter1 = 0;
+    int counter2 = 0;
+
+    int currentFrame = 0;
+    int seconds = 0;
+    int secondsLeft = 120;
+
     byte framesUntilTick1 = fps;
     byte framesUntilTick2 = fps;
+
     boolean player1Inside = false;
     boolean player2Inside = false;
 
@@ -88,12 +102,15 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
         layout = (RelativeLayout) findViewById(R.id.gameLayout);
+
         log = (TextView) findViewById(R.id.log);
+        frameLog = (TextView) findViewById(R.id.frameLog);
+
         joystick = (Joystick) findViewById(R.id.joystick);
 
-        //test
-        chronometerPausable = new ChronometerPausable(this);
-        layout.addView(chronometerPausable);
+        timer = (TextView) findViewById(R.id.timer);
+        score1 = (TextView) findViewById(R.id.textViewScore1);
+        score2 = (TextView) findViewById(R.id.textViewScore2);
 
         spawnPlayers();
         spawnIslandDomain(100);
@@ -245,6 +262,9 @@ public class GameActivity extends AppCompatActivity {
             public void run()
             {
 
+                // Advance current frame
+                currentFrame++;
+
                 // Point-and-click controls
                 if (player1.getX() == destX && player1.getY() == destY) moving = false;
                 if (moving) player1.moveTo(destX, destY);
@@ -272,37 +292,74 @@ public class GameActivity extends AppCompatActivity {
                     if (pl.getHealth() <= 0) pl.die();
                 }
 
-                //Collision player1 - domain island
+                // islandDomain collisions
                 checkIslandDomainCollisions();
 
+                // Scoreboard and timer counter
                 advanceCounter();
 
             }
         });
     }
 
+    private void finishGame(){
+
+        if (counter1 > counter2) log("You win!");
+        else if (counter1 < counter2) log("You lose");
+        else if (counter1 == counter2) log("Draw!");
+
+    }
+
     private void advanceCounter() {
 
-        TextView tv = (TextView) findViewById(R.id.textViewScore1);
+        frameLog.setText(Integer.toString(currentFrame));
+
+        if (currentFrame % 60 == 0){
+
+            seconds++;
+            secondsLeft--;
+
+            if(secondsLeft >= 0){
+
+                int m = secondsLeft / 60;
+                int s = secondsLeft % 60;
+
+                timer.setText(Integer.toString(m) + ":" + String.format("%02d", s));
+
+            }else{
+
+                // Time ran out.
+                finishGame();
+
+            }
+
+        }
 
         if (player1Inside) {
 
-            log("Player inside");
-
             if (--framesUntilTick1 == 0) {
-                counter1--;
-                framesUntilTick1 = fps / 2;
-                tv.setText(Integer.toString(counter1));
+
+                if (counter1 < 100){
+
+                    counter1++;
+                    framesUntilTick1 = fps / 2;
+                    score1.setText(Integer.toString(counter1) + "%");
+
+                }else{
+
+                    // Player 1 reached 100% score.
+                    finishGame();
+
+                }
+
             }
 
-            tv.setTextColor(getResources().getColor(R.color.counterTicking));
+            score1.setTextColor(getResources().getColor(R.color.counterTicking));
 
         } else {
 
-            log("Player outside");
-
             framesUntilTick1 = fps / 2;
-            tv.setTextColor(getResources().getColor(R.color.counterStopped));
+            score1.setTextColor(getResources().getColor(R.color.counterStopped));
 
         }
     }

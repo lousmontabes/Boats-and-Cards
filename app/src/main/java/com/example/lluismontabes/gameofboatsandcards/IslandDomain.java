@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
  * Created by jtomebla14.alumnes on 13/03/17.
  */
 
-class IslandDomain extends Collider {
+public class IslandDomain extends Collider {
 
     private Paint islandPaint;
     private boolean isInvaded;
