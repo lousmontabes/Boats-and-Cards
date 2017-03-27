@@ -12,4 +12,5 @@ public class CardView extends ImageView {
     public CardView(Context context) {
         super(context);
     }
+
 }
