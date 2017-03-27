@@ -81,15 +81,15 @@
             android:layout_marginEnd="12dp" />
     </RelativeLayout>
 
-    <LinearLayout
+    <com.example.lluismontabes.gameofboatsandcards.CardView
         android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="100dp"
         android:layout_height="match_parent"
         android:id="@+id/cardLayout"
-        android:layout_toEndOf="@+id/joystick"
-        android:layout_below="@+id/gameLayout"
-        android:weightSum="1">
-    </LinearLayout>
+        android:background="@color/colorPrimary"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/gameLayout">
+    </com.example.lluismontabes.gameofboatsandcards.CardView>
 
     <com.example.lluismontabes.gameofboatsandcards.Joystick
         android:layout_width="120dp"
