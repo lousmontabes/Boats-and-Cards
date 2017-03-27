@@ -55,6 +55,10 @@ public class GameActivity extends AppCompatActivity {
     // Main characters
     Player player;
     Player player2;
+    int counter1 = 100;
+    int counter2 = 100;
+    int framesUntilTick1 = fps;
+    int framesUntilTick2 = fps;
 
     // Props
     ArrayList<Trace> activeTraces = new ArrayList<>();
@@ -79,7 +83,7 @@ public class GameActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_game);
 
-        layout = (RelativeLayout) findViewById(R.id.activity_main);
+        layout = (RelativeLayout) findViewById(R.id.gameLayout);
         log = (TextView) findViewById(R.id.log);
         joystick = (Joystick) findViewById(R.id.joystick);
 
@@ -95,7 +99,7 @@ public class GameActivity extends AppCompatActivity {
 
 
         spawnPlayers();
-        spawnIslandDomain(300);
+        spawnIslandDomain(100);
 
         //IslandDomain islandDomain = new IslandDomain(GameActivity.this, 300);
         //layout.addView(islandDomain);
@@ -257,16 +261,33 @@ public class GameActivity extends AppCompatActivity {
                         player_inside = true;
                         player.getChronometer().start_remember();
                     }
+
                 }else{
                     if (player_inside){
                         islandDomain.toggleInvadedStatus();
                         player_inside = false;
                         player.getChronometer().stop_remember();
                     }
-                }
 
+                }
+                advanceCounter();
             }
         });
+    }
+
+    private void advanceCounter() {
+        TextView tv = (TextView) findViewById(R.id.textViewScore1);
+        if (player_inside) {
+            if (--framesUntilTick1 == 0) {
+                counter1--;
+                framesUntilTick1 = fps/2;
+                tv.setText(Integer.toString(counter1));
+            }
+            tv.setTextColor(getResources().getColor(R.color.counterTicking));
+        } else {
+            framesUntilTick1 = fps/2;
+            tv.setTextColor(getResources().getColor(R.color.counterStopped));
+        }
     }
 
     public class RefreshTask extends TimerTask {

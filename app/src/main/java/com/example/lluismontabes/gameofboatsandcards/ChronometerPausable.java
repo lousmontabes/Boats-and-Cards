@@ -24,8 +24,8 @@ public class ChronometerPausable extends Chronometer {
         this.timeWhenStopped = 0;
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(1400,2400);
-        this.setX(1300);
-        this.setY(2330);
+        this.setX(context.getResources().getDisplayMetrics().widthPixels - 30);
+        this.setY(context.getResources().getDisplayMetrics().heightPixels - 30);
         this.setLayoutParams(layoutParams);
         this.setOnChronometerTickListener(new OnChronometerTickListener() {
             @Override

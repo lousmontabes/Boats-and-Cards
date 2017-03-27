@@ -6,4 +6,6 @@
     <color name="red">#FF0000</color>
     <color name="uninvadedIsland">#64ffffff</color>
     <color name="invadedIsland">#6400ff2a</color>
+    <color name="counterTicking">#44FF44</color>
+    <color name="counterStopped">#FFFFFF</color>
 </resources>

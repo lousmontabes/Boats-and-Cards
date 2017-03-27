@@ -11,57 +11,98 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/log"
-        android:text="Starting" />
-
-    <TextView
-        android:text="0"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/frameLog" />
-
-    <com.example.lluismontabes.gameofboatsandcards.Player
-        app:srcCompat="@drawable/basicboat"
-        android:src="@drawable/basicboat"
-        android:id="@+id/player"
-        android:layout_width="50dp"
-        android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-
-        />
-
-    <com.example.lluismontabes.gameofboatsandcards.Player
-        app:srcCompat="@drawable/basicboat"
-        android:src="@drawable/basicboat"
-        android:id="@+id/player2"
-        android:layout_width="50dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="48dp"
-        android:layout_below="@+id/log"
-        android:layout_alignEnd="@+id/player"
-        android:layout_marginEnd="12dp" />
-
-    <com.example.lluismontabes.gameofboatsandcards.Joystick
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:id="@+id/joystick"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_margin="10dp">
-
-    </com.example.lluismontabes.gameofboatsandcards.Joystick>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/textView4"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textView4"
+        android:id="@+id/textViewScore2"
+        android:text="100"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:text="100"
+        android:textColor="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewScore1"
+        android:layout_above="@+id/textViewScore2"
+        android:layout_alignParentEnd="true" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/gameLayout"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/joystick">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/log"
+            android:text="Starting" />
+
+        <TextView
+            android:text="0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/frameLog" />
+
+        <com.example.lluismontabes.gameofboatsandcards.Player
+            app:srcCompat="@drawable/basicboat"
+            android:src="@drawable/basicboat"
+            android:id="@+id/player"
+            android:layout_width="50dp"
+            android:layout_height="80dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+
+            />
+
+        <com.example.lluismontabes.gameofboatsandcards.Player
+            app:srcCompat="@drawable/basicboat"
+            android:src="@drawable/basicboat"
+            android:id="@+id/player2"
+            android:layout_width="50dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="48dp"
+            android:layout_below="@+id/log"
+            android:layout_alignEnd="@+id/player"
+            android:layout_marginEnd="12dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/cardLayout"
+        android:layout_toEndOf="@+id/joystick"
+        android:layout_below="@+id/gameLayout"
+        android:weightSum="1">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/carta"
+            android:id="@+id/imageButtonCarta1" />
+    </LinearLayout>
+
+    <com.example.lluismontabes.gameofboatsandcards.Joystick
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:id="@+id/joystick"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+    </com.example.lluismontabes.gameofboatsandcards.Joystick>
 
 </RelativeLayout>

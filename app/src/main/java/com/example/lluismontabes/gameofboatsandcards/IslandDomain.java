@@ -34,8 +34,8 @@ class IslandDomain extends Collider {
         this.positionX = width/2;
         this.positionY = height/2;
 
-        System.out.println("relativeLayout.getHeight():"+height);
-        System.out.println("relativeLayout.getWidth(): "+width);
+        System.out.println("relativeLayout.getHeight():" + height);
+        System.out.println("relativeLayout.getWidth(): " + width);
 
         //final float scale = getContext().getResources().getDisplayMetrics().density;
         //int pixels = (int) (20 * scale + 0.5f);
