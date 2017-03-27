@@ -287,6 +287,8 @@ public class GameActivity extends AppCompatActivity {
 
         if (player1Inside) {
 
+            log("Player inside");
+
             if (--framesUntilTick1 == 0) {
                 counter1--;
                 framesUntilTick1 = fps / 2;
@@ -296,6 +298,8 @@ public class GameActivity extends AppCompatActivity {
             tv.setTextColor(getResources().getColor(R.color.counterTicking));
 
         } else {
+
+            log("Player outside");
 
             framesUntilTick1 = fps / 2;
             tv.setTextColor(getResources().getColor(R.color.counterStopped));

@@ -13,7 +13,7 @@ import android.widget.ImageView;
 public abstract class Collider extends ImageView {
 
     private boolean isRound;
-    private float radius;
+    private float radius, radiusPixels;
     private float x, y, w, h;
 
     /**
@@ -23,8 +23,13 @@ public abstract class Collider extends ImageView {
      */
     public Collider(Context context, float r){
         super(context);
+
+        final float scale = getContext().getResources().getDisplayMetrics().density;
+        int rp = (int) (r * scale + 0.5f);
+
         this.isRound = true;
         this.radius = r;
+        this.radiusPixels = rp;
     }
 
     /**
@@ -51,6 +56,8 @@ public abstract class Collider extends ImageView {
     public float getRadius(){
         return this.radius;
     }
+
+    public float getRadiusPixels() { return this.radiusPixels; }
 
     public float getCenterX(){
         return this.getX() + radius;
@@ -81,7 +88,7 @@ public abstract class Collider extends ImageView {
 
     public boolean isColliding(Collider c){
 
-        return (this.getDistance(c) <= c.getRadius());
+        return (this.getDistance(c) <= c.getRadiusPixels());
 
     }
 

@@ -17,7 +17,6 @@ import android.widget.RelativeLayout;
 class IslandDomain extends Collider {
 
     private Paint islandPaint;
-    private float positionX, positionY;
     private boolean isInvaded;
 
     public IslandDomain(Context context, float radius) {
@@ -30,10 +29,12 @@ class IslandDomain extends Collider {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         int width = metrics.widthPixels;
         int height = metrics.heightPixels;
-        this.positionX = width / 2;
-        this.positionY = height / 2;
-        this.setX(positionX - this.getRadius());
-        this.setY(positionY - this.getRadius());
+
+        float screenCenterX = width / 2;
+        float screenCenterY = height / 2;
+
+        this.setX(screenCenterX - this.getRadiusPixels());
+        this.setY(screenCenterY - this.getRadiusPixels());
 
         this.setLayoutParams(new ViewGroup.LayoutParams(width, height));
 
@@ -51,7 +52,7 @@ class IslandDomain extends Collider {
 
     @Override
     protected void onDraw(Canvas canvas){
-        canvas.drawCircle(this.getRadius(), this.getRadius(), this.getRadius(), islandPaint);
+        canvas.drawCircle(this.getRadiusPixels(), this.getRadiusPixels(), this.getRadiusPixels(), islandPaint);
     }
 
     public void toggleInvadedStatus(){
