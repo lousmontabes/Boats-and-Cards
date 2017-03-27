@@ -55,6 +55,8 @@ public class GameActivity extends AppCompatActivity {
     // Main characters
     Player player;
     Player player2;
+
+    // Statistics
     int counter1 = 100;
     int counter2 = 100;
     int framesUntilTick1 = fps;

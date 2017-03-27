@@ -88,12 +88,6 @@
         android:layout_toEndOf="@+id/joystick"
         android:layout_below="@+id/gameLayout"
         android:weightSum="1">
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/carta"
-            android:id="@+id/imageButtonCarta1" />
     </LinearLayout>
 
     <com.example.lluismontabes.gameofboatsandcards.Joystick
