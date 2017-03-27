@@ -18,7 +18,7 @@ public class GameActivity extends AppCompatActivity {
 
     /** GAME LOOP **/
     Timer refreshTimer;
-    final static int fps = 60; // Frames per second
+    final static byte fps = 60; // Frames per second
     final private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
 
     /** DEBUGGING **/
@@ -57,10 +57,10 @@ public class GameActivity extends AppCompatActivity {
     Player player2;
 
     // Statistics
-    int counter1 = 100;
-    int counter2 = 100;
-    byte framesUntilTick1 = fps;
-    byte framesUntilTick2 = fps;
+    byte counter1 = 100;
+    byte counter2 = 100;
+    byte framesUntilTick1 = fps / 2;
+    byte framesUntilTick2 = fps / 2;
     boolean player1Inside = false;
     boolean player2Inside = false;
 
