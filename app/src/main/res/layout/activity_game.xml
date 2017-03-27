@@ -20,7 +20,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="40dp">
 
             <TextView
                 android:text="2:00"
@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/timer"
                 android:gravity="center"
-                android:textSize="32dp" />
+                android:textSize="48dp" />
 
             <LinearLayout
                 android:orientation="horizontal"

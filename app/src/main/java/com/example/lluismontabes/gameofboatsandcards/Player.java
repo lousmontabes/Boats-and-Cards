@@ -27,7 +27,7 @@ public class Player extends Collider{
 
 
     public Player(Context context, AttributeSet attrs) {
-        super(context, 70);
+        super(context, 50);
         this.velocity = 10;
         this.health = 100;
     }
