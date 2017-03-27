@@ -60,6 +60,14 @@ public abstract class Collider extends ImageView {
         return this.getY() + radius;
     }
 
+    public Point getPosition() {
+
+        Point p = new Point();
+        p.set((int)this.getX(),(int)this.getY());
+
+        return p;
+    }
+
     public float getDistance(Collider c){
 
         float distX = c.getCenterX() - this.getCenterX();
@@ -70,33 +78,10 @@ public abstract class Collider extends ImageView {
         return dist;
 
     }
-    public float getDistance(Collider c,String msg){
-
-        System.out.println("Mi collider es island domain -----------------------"+(msg));
-        System.out.println("this.getCenterX(): "+(this.getCenterX()));
-        System.out.println("this.getCenterY(): "+(this.getCenterY()));
-        IslandDomain islandDomain = (IslandDomain) c;
-        Point p = islandDomain.getPosition();
-        System.out.println("POSITION OF ISLAND DOMAIN CENTER: "+p.toString());
-        float distX = Math.abs(p.x - this.getCenterX());
-        float distY = Math.abs(p.y - this.getCenterY());
-        System.out.println("Dist X: "+(distX));
-        System.out.println("Dist Y: "+(distY));
-        float dist = (float) Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
-        System.out.println("DIST from getDistance(Collinder c): "+(dist));
-        return dist;
-
-    }
-
 
     public boolean isColliding(Collider c){
 
         return (this.getDistance(c) <= c.getRadius());
-
-    }
-    public boolean isColliding(Collider c,String msg){
-
-        return (this.getDistance(c,msg) <= c.getRadius());
 
     }
 

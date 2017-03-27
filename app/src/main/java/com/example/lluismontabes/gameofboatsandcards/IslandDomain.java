@@ -17,30 +17,25 @@ import android.widget.RelativeLayout;
 class IslandDomain extends Collider {
 
     private Paint islandPaint;
-    private float positionX,positionY;
+    private float positionX, positionY;
     private boolean isInvaded;
-
 
     public IslandDomain(Context context, float radius) {
 
         super(context, radius);
 
-        this.isInvaded = false; //It is not being invaded
+        this.isInvaded = false; // It is not being invaded
         setVisibility(VISIBLE);
 
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         int width = metrics.widthPixels;
         int height = metrics.heightPixels;
-        this.positionX = width/2;
-        this.positionY = height/2;
+        this.positionX = width / 2;
+        this.positionY = height / 2;
+        this.setX(positionX - this.getRadius());
+        this.setY(positionY - this.getRadius());
 
-        System.out.println("relativeLayout.getHeight():" + height);
-        System.out.println("relativeLayout.getWidth(): " + width);
-
-        //final float scale = getContext().getResources().getDisplayMetrics().density;
-        //int pixels = (int) (20 * scale + 0.5f);
         this.setLayoutParams(new ViewGroup.LayoutParams(width, height));
-        //this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
 
         styleDefine();
     }
@@ -56,21 +51,7 @@ class IslandDomain extends Collider {
 
     @Override
     protected void onDraw(Canvas canvas){
-
-        System.out.println("S'ha pintat islandArea ------------------------------------------------------");
-        int canvasHeight = canvas.getHeight();
-        int canvasWidth = canvas.getWidth();
-        canvas.drawCircle(this.positionX, this.positionY, this.getRadius(), islandPaint);
-
-    }
-
-    public Point getPosition(){
-
-        Point p = new Point();
-        p.set((int)this.positionX,(int)this.positionY);
-
-        return p;
-
+        canvas.drawCircle(this.getRadius(), this.getRadius(), this.getRadius(), islandPaint);
     }
 
     public void toggleInvadedStatus(){

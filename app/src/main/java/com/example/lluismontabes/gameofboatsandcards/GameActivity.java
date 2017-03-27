@@ -52,15 +52,17 @@ public class GameActivity extends AppCompatActivity {
     Button bttnDown;
     Joystick joystick;
 
-    // Main characters
-    Player player;
+    // Players
+    Player player1;
     Player player2;
 
     // Statistics
     int counter1 = 100;
     int counter2 = 100;
-    int framesUntilTick1 = fps;
-    int framesUntilTick2 = fps;
+    byte framesUntilTick1 = fps;
+    byte framesUntilTick2 = fps;
+    boolean player1Inside = false;
+    boolean player2Inside = false;
 
     // Props
     ArrayList<Trace> activeTraces = new ArrayList<>();
@@ -93,27 +95,17 @@ public class GameActivity extends AppCompatActivity {
         chronometerPausable = new ChronometerPausable(this);
         layout.addView(chronometerPausable);
 
-
-
-
-
-
-
-
         spawnPlayers();
         spawnIslandDomain(100);
-
-        //IslandDomain islandDomain = new IslandDomain(GameActivity.this, 300);
-        //layout.addView(islandDomain);
 
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-                float pW = player.getWidth();
-                float pH = player.getHeight();
-                float oX = player.getX() + pW / 2;
-                float oY = player.getY() + pH / 2;
+                float pW = player1.getWidth();
+                float pH = player1.getHeight();
+                float oX = player1.getX() + pW / 2;
+                float oY = player1.getY() + pH / 2;
 
                 System.out.println(oX + ", " + oY);
                 Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY);
@@ -141,12 +133,11 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void spawnPlayers(){
-        //player = new Player(this, null);
-        //test with chronometer
-        player = new Player(this,null,chronometerPausable);
+
+        player1 = new Player(this, null);
         player2 = new Player(this, null);
 
-        player.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
+        player1.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
         player2.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
 
         final float scale = this.getResources().getDisplayMetrics().density;
@@ -154,14 +145,15 @@ public class GameActivity extends AppCompatActivity {
         ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) (50 * scale + 0.5f),
                                                                          (int) (80 * scale + 0.5f));
 
-        player.setLayoutParams(playerParams);
+        player1.setLayoutParams(playerParams);
         player2.setLayoutParams(playerParams);
 
-        activePlayers.add(player);
+        activePlayers.add(player1);
         activePlayers.add(player2);
 
-        layout.addView(player);
+        layout.addView(player1);
         layout.addView(player2);
+
     }
 
     // Displays a message on the game log
@@ -177,8 +169,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void showBoatTrace(){
-        float oX = player.getX() + 30; // Compensem per l'espai buit de l'imatge
-        float oY = player.getY() + 76; // Compensem per l'espai buit de l'imatge
+        float oX = player1.getX() + 30; // Compensem per l'espai buit de l'imatge
+        float oY = player1.getY() + 76; // Compensem per l'espai buit de l'imatge
 
         float angle = (float) Math.toDegrees(joystick.getCurrentAngle()) + 90;
 
@@ -191,7 +183,7 @@ public class GameActivity extends AppCompatActivity {
             activeTraces.remove(0);
         }
 
-        player.bringToFront();
+        player1.bringToFront();
     }
 
     private void checkProjectileCollisions(){
@@ -216,12 +208,37 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    private void checkIslandDomainCollisions(){
+
+        if (player1.isColliding(islandDomain)) {
+            // Player 1 is colliding with islandDomain.
+
+            if (!player1Inside){
+                // Player 1 was not inside before this collision.
+
+                islandDomain.toggleInvadedStatus();
+                player1Inside = !player1Inside;
+            }
+
+        }else{
+            // Player 1 is not colliding with islandDomain.
+
+            if (player1Inside){
+                // Player 1 was inside before this collision.
+
+                islandDomain.toggleInvadedStatus();
+                player1Inside = !player1Inside;
+            }
+
+        }
+
+    }
+
     private void startRefreshTimer(){
         this.refreshTimer = new Timer();
         refreshTimer.schedule(new RefreshTask(), 0, refreshPeriod);
     }
 
-    boolean player_inside = false;
     // Method that gets called every frame.
     private void refresh(){
         runOnUiThread(new Runnable() {
@@ -229,17 +246,17 @@ public class GameActivity extends AppCompatActivity {
             {
 
                 // Point-and-click controls
-                if (player.getX() == destX && player.getY() == destY) moving = false;
-                if (moving) player.moveTo(destX, destY);
+                if (player1.getX() == destX && player1.getY() == destY) moving = false;
+                if (moving) player1.moveTo(destX, destY);
 
                 // Control buttons (currently unused)
-                if(upPressed) player.moveUp();
-                if(leftPressed) player.moveLeft();
-                if(rightPressed) player.moveRight();
-                if(downPressed) player.moveDown();
+                if(upPressed) player1.moveUp();
+                if(leftPressed) player1.moveLeft();
+                if(rightPressed) player1.moveRight();
+                if(downPressed) player1.moveDown();
 
                 // Joystick controls
-                player.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                player1.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
 
                 // Projectile movement
                 for (Projectile p:activeProjectiles) p.move();
@@ -255,40 +272,34 @@ public class GameActivity extends AppCompatActivity {
                     if (pl.getHealth() <= 0) pl.die();
                 }
 
-                //Collision player - domain island
-                if (player.isColliding(islandDomain, "islandDomain")){
-                    System.out.println("Estic dins de l'area de domini de la illa!!!");
-                    if (player_inside == false) {
-                        islandDomain.toggleInvadedStatus();
-                        player_inside = true;
-                        player.getChronometer().start_remember();
-                    }
+                //Collision player1 - domain island
+                checkIslandDomainCollisions();
 
-                }else{
-                    if (player_inside){
-                        islandDomain.toggleInvadedStatus();
-                        player_inside = false;
-                        player.getChronometer().stop_remember();
-                    }
-
-                }
                 advanceCounter();
+
             }
         });
     }
 
     private void advanceCounter() {
+
         TextView tv = (TextView) findViewById(R.id.textViewScore1);
-        if (player_inside) {
+
+        if (player1Inside) {
+
             if (--framesUntilTick1 == 0) {
                 counter1--;
-                framesUntilTick1 = fps/2;
+                framesUntilTick1 = fps / 2;
                 tv.setText(Integer.toString(counter1));
             }
+
             tv.setTextColor(getResources().getColor(R.color.counterTicking));
+
         } else {
-            framesUntilTick1 = fps/2;
+
+            framesUntilTick1 = fps / 2;
             tv.setTextColor(getResources().getColor(R.color.counterStopped));
+
         }
     }
 

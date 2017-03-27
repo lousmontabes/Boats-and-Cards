@@ -18,8 +18,6 @@ import android.widget.TextView;
 
 public class Player extends Collider{
 
-    private ChronometerPausable chronometer;
-
     private float velocity, idleVelocity;
     private int health;
     private float x;
@@ -32,21 +30,7 @@ public class Player extends Collider{
         super(context, 70);
         this.velocity = 10;
         this.health = 100;
-        //for the moment in this case
-        this.chronometer = null;
     }
-
-    //Other constructor to simplify test player with chronometer pausable
-    public Player(Context context, AttributeSet attrs, ChronometerPausable chronometer){
-        super(context,70);
-        this.velocity = 10;
-        this.health = 100;
-        this.chronometer = chronometer;
-    }
-
-
-
-
 
     // SETTERS
     public void setAngle(float a) {
@@ -56,8 +40,6 @@ public class Player extends Collider{
         this.velocity = v;
     }
     public void setHealth(int h) { this.health = h; };
-    public void setChronometer(ChronometerPausable chronometer) { this.chronometer = chronometer; }
-
 
     // GETTERS
     public float getAngle() {
@@ -67,8 +49,6 @@ public class Player extends Collider{
         return this.velocity;
     }
     public int getHealth() { return this.health; };
-    public ChronometerPausable getChronometer() { return this.chronometer; }
-
 
     // MOVEMENT METHODS
     public void moveUp(){
