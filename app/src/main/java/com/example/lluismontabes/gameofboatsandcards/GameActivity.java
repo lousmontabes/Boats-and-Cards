@@ -1,7 +1,11 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +15,16 @@ import android.widget.*;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -33,8 +43,9 @@ public class GameActivity extends AppCompatActivity {
     Data data = new Data();
 
     /** LOGIC VARIABLES **/
-    // Game values
-    //float velocity = 10; // Pixel units per frame
+    // Gameplay
+    boolean player1Inside = false;
+    boolean player2Inside = false;
 
     // Control button boolean variables
     private boolean upPressed = false;
@@ -46,52 +57,46 @@ public class GameActivity extends AppCompatActivity {
     private boolean moving = false;
     private float destX, destY;
 
-
     /** VIEWS **/
-    // Control buttons
-    Button bttnUp;
-    Button bttnLeft;
-    Button bttnRight;
-    Button bttnDown;
+    // Controls
     Joystick joystick;
 
     // Players
     Player player1;
     Player player2;
 
+    //Island Domain
+    IslandDomain islandDomain;
+
     // Timer and scoreboard
     TextView timer;
     TextView textViewCounter1;
     TextView textViewCounter2;
 
-    // Statistics
+    /** STATISTICS **/
+    // Scores
     int score1 = 0;
     int score2 = 0;
 
+    // Time
     int currentFrame = 0;
     int seconds = 0;
     int secondsLeft = 120;
 
+    // Counters
     byte framesUntilTick1 = fps;
     byte framesUntilTick2 = fps;
 
-    boolean player1Inside = false;
-    boolean player2Inside = false;
-
+    /** COLLECTIONS **/
     // Props
     ArrayList<Trace> activeTraces = new ArrayList<>();
     ArrayList<Projectile> activeProjectiles = new ArrayList<>();
     ArrayList<Collider> activeColliders = new ArrayList<>();
     ArrayList<Player> activePlayers = new ArrayList<>();
 
-    //Layout
+    /** LAYOUT **/
+    // Layout
     static RelativeLayout layout;
-
-    //Island Domain
-    IslandDomain islandDomain;
-
-    //Chronometer
-    ChronometerPausable chronometerPausable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,13 +149,17 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    private void startRefreshTimer(){
+        this.refreshTimer = new Timer();
+        refreshTimer.schedule(new RefreshTask(), 0, refreshPeriod);
+    }
+
     private void spawnIslandDomain(float radius){
         islandDomain = new IslandDomain(this,radius);
         layout.addView(islandDomain);
     }
 
     private void spawnPlayers(){
-
         player1 = new Player(this, null);
         player2 = new Player(this, null);
 
@@ -170,7 +179,6 @@ public class GameActivity extends AppCompatActivity {
 
         layout.addView(player1);
         layout.addView(player2);
-
     }
 
     // Displays a message on the game log
@@ -251,9 +259,61 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void startRefreshTimer(){
-        this.refreshTimer = new Timer();
-        refreshTimer.schedule(new RefreshTask(), 0, refreshPeriod);
+    private void finishGame(){
+
+        if (score1 > score2) log("You win!");
+        else if (score1 < score2) log("You lose");
+        else if (score1 == score2) log("Draw!");
+
+    }
+
+    private void advanceCounter() {
+
+        frameLog.setText(Integer.toString(currentFrame));
+
+        if (currentFrame % 60 == 0){
+            seconds++;
+
+            if(secondsLeft > 0){
+                secondsLeft--;
+
+                int m = secondsLeft / 60;
+                int s = secondsLeft % 60;
+
+                timer.setText(Integer.toString(m) + ":" + String.format("%02d", s));
+
+            }else{
+                // Time ran out.
+                finishGame();
+            }
+        }
+
+        if (player1Inside) {
+
+            if (--framesUntilTick1 == 0) {
+
+                if (score1 < 100){
+                    score1++;
+                    framesUntilTick1 = fps / 2;
+                    textViewCounter1.setText(Integer.toString(score1) + "%");
+
+                }else{
+                    // Player 1 reached 100% score.
+                    finishGame();
+                }
+            }
+
+            textViewCounter1.setTextColor(getResources().getColor(R.color.counterTicking));
+
+        } else {
+            framesUntilTick1 = fps / 2;
+            textViewCounter1.setTextColor(getResources().getColor(R.color.counterStopped));
+        }
+    }
+
+    // Retrieve online player's last action.
+    private void retrieveRemoteAction(){
+
     }
 
     // Method that gets called every frame.
@@ -277,6 +337,9 @@ public class GameActivity extends AppCompatActivity {
 
                 // Joystick controls
                 player1.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+
+                // Player 2 controls
+                retrieveRemoteAction();
 
                 // Projectile movement
                 for (Projectile p:activeProjectiles) p.move();
@@ -302,75 +365,34 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
-    private void finishGame(){
+    /** BACKGROUND TASKS **/
 
-        if (score1 > score2) log("You win!");
-        else if (score1 < score2) log("You lose");
-        else if (score1 == score2) log("Draw!");
-
-    }
-
-    private void advanceCounter() {
-
-        frameLog.setText(Integer.toString(currentFrame));
-
-        if (currentFrame % 60 == 0){
-
-            seconds++;
-
-            if(secondsLeft > 0){
-
-                secondsLeft--;
-
-                int m = secondsLeft / 60;
-                int s = secondsLeft % 60;
-
-                timer.setText(Integer.toString(m) + ":" + String.format("%02d", s));
-
-            }else{
-
-                // Time ran out.
-                finishGame();
-
-            }
-
-        }
-
-        if (player1Inside) {
-
-            if (--framesUntilTick1 == 0) {
-
-                if (score1 < 100){
-
-                    score1++;
-                    framesUntilTick1 = fps / 2;
-                    textViewCounter1.setText(Integer.toString(score1) + "%");
-
-                }else{
-
-                    // Player 1 reached 100% score.
-                    finishGame();
-
-                }
-
-            }
-
-            textViewCounter1.setTextColor(getResources().getColor(R.color.counterTicking));
-
-        } else {
-
-            framesUntilTick1 = fps / 2;
-            textViewCounter1.setTextColor(getResources().getColor(R.color.counterStopped));
-
-        }
-    }
-
+    // Timer
     public class RefreshTask extends TimerTask {
         @Override
         public void run() {
             refresh();
             layout.postInvalidate();
         }
+    }
+
+    // Asynchronous task that retrieves the remote player's actions
+    public class MyAsyncTask extends AsyncTask<String, String, Void> {
+
+        private ProgressDialog progressDialog = new ProgressDialog(GameActivity.this);
+        InputStream inputStream = null;
+        String result = "";
+
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            return null;
+        }
+
     }
 
 }
