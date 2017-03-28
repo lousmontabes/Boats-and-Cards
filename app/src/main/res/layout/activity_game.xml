@@ -20,7 +20,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp">
+            android:layout_marginTop="20dp">
 
             <TextView
                 android:text="2:00"
@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/timer"
                 android:gravity="center"
-                android:textSize="48dp" />
+                android:textSize="36sp" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -40,24 +40,24 @@
                     android:textColor="@color/colorAccent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textViewScore1"
-                    android:layout_above="@+id/textViewScore2"
+                    android:id="@+id/textViewCounter1"
+                    android:layout_above="@+id/textViewCounter2"
                     android:layout_alignParentEnd="true"
                     android:layout_weight="1"
                     android:textAlignment="textEnd"
                     android:textSize="18sp"
-                    android:padding="10dp" />
+                    android:paddingRight="10dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_above="@+id/textView4"
-                    android:id="@+id/textViewScore2"
+                    android:id="@+id/textViewCounter2"
                     android:text="0%"
                     android:layout_alignParentEnd="true"
                     android:layout_weight="1"
                     android:textSize="18sp"
-                    android:padding="10dp" />
+                    android:paddingLeft="10dp" />
 
             </LinearLayout>
         </LinearLayout>

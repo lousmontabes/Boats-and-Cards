@@ -61,12 +61,12 @@ public class GameActivity extends AppCompatActivity {
 
     // Timer and scoreboard
     TextView timer;
-    TextView score1;
-    TextView score2;
+    TextView textViewCounter1;
+    TextView textViewCounter2;
 
     // Statistics
-    int counter1 = 0;
-    int counter2 = 0;
+    int score1 = 0;
+    int score2 = 0;
 
     int currentFrame = 0;
     int seconds = 0;
@@ -109,8 +109,8 @@ public class GameActivity extends AppCompatActivity {
         joystick = (Joystick) findViewById(R.id.joystick);
 
         timer = (TextView) findViewById(R.id.timer);
-        score1 = (TextView) findViewById(R.id.textViewScore1);
-        score2 = (TextView) findViewById(R.id.textViewScore2);
+        textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
+        textViewCounter2 = (TextView) findViewById(R.id.textViewCounter2);
 
         spawnPlayers();
         spawnIslandDomain(100);
@@ -304,9 +304,9 @@ public class GameActivity extends AppCompatActivity {
 
     private void finishGame(){
 
-        if (counter1 > counter2) log("You win!");
-        else if (counter1 < counter2) log("You lose");
-        else if (counter1 == counter2) log("Draw!");
+        if (score1 > score2) log("You win!");
+        else if (score1 < score2) log("You lose");
+        else if (score1 == score2) log("Draw!");
 
     }
 
@@ -317,9 +317,10 @@ public class GameActivity extends AppCompatActivity {
         if (currentFrame % 60 == 0){
 
             seconds++;
-            secondsLeft--;
 
-            if(secondsLeft >= 0){
+            if(secondsLeft > 0){
+
+                secondsLeft--;
 
                 int m = secondsLeft / 60;
                 int s = secondsLeft % 60;
@@ -339,11 +340,11 @@ public class GameActivity extends AppCompatActivity {
 
             if (--framesUntilTick1 == 0) {
 
-                if (counter1 < 100){
+                if (score1 < 100){
 
-                    counter1++;
+                    score1++;
                     framesUntilTick1 = fps / 2;
-                    score1.setText(Integer.toString(counter1) + "%");
+                    textViewCounter1.setText(Integer.toString(score1) + "%");
 
                 }else{
 
@@ -354,12 +355,12 @@ public class GameActivity extends AppCompatActivity {
 
             }
 
-            score1.setTextColor(getResources().getColor(R.color.counterTicking));
+            textViewCounter1.setTextColor(getResources().getColor(R.color.counterTicking));
 
         } else {
 
             framesUntilTick1 = fps / 2;
-            score1.setTextColor(getResources().getColor(R.color.counterStopped));
+            textViewCounter1.setTextColor(getResources().getColor(R.color.counterStopped));
 
         }
     }
