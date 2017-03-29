@@ -39,7 +39,7 @@ public class GameActivity extends AppCompatActivity {
 
     /** GAME LOOP **/
     Timer refreshTimer;
-    final static private int fps = 60; // Frames per second
+    final static private int fps = 30; // Frames per second
     final static private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
 
     /** ONLINE **/
@@ -47,6 +47,8 @@ public class GameActivity extends AppCompatActivity {
     boolean connectionActive = true;
     float remoteX = 0;
     float remoteY = 0;
+    float localX = 0;
+    float localY = 0;
 
     /** DEBUGGING **/
     // Log index and TextView
@@ -163,7 +165,7 @@ public class GameActivity extends AppCompatActivity {
         startRefreshTimer();
 
         // Link controls to buttons
-        //setControlsTouchListeners();
+        // setControlsTouchListeners();
 
     }
 
@@ -342,8 +344,8 @@ public class GameActivity extends AppCompatActivity {
                 currentFrame++;
 
                 // Point-and-click controls
-                if (player1.getX() == destX && player1.getY() == destY) moving = false;
-                if (moving) player1.moveTo(destX, destY);
+                if (player2.getX() == destX && player2.getY() == destY) moving = false;
+                if (moving) player2.moveTo(destX, destY);
 
                 // Control buttons (currently unused)
                 if(upPressed) player1.moveUp();
@@ -377,16 +379,18 @@ public class GameActivity extends AppCompatActivity {
                 // Scoreboard and timer counter
                 advanceCounter();
 
-                // Apply remote data to remote player
-                player2.setX(remoteX);
-                player2.setY(remoteY);
+                // Prepare local data to send to server
+                localX = player1.getX();
+                localY = player1.getY();
+
+                // Apply remote data to player2
+                moveObjectTo(player2, remoteX, remoteY);
 
             }
         });
     }
 
     /** BACKGROUND TASKS **/
-
     // Timer
     public class RefreshTask extends TimerTask {
         @Override
@@ -407,14 +411,15 @@ public class GameActivity extends AppCompatActivity {
 
             while(connectionActive){
 
+                /* SEND DATA */
+                getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?x=" + localX + "&y=" + localY, 2000);
+
+                /* RETRIEVE DATA */
                 // This returns a JSON object with a {"x": x,"y": y} pattern.
                 String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php", 2000);
 
                 // Parse the JSON information into a Point object.
                 Point p = new Gson().fromJson(data, Point.class);
-
-                // Debug print
-                System.out.println(p);
 
                 // Set X and Y coordinates retrieved from JSON to the remoteX and remoteY global
                 // variables. These variables will be used to position player2 on the next frame.
