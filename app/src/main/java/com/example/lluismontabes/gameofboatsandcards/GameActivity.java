@@ -2,6 +2,7 @@ package com.example.lluismontabes.gameofboatsandcards;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,16 +14,24 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 
+import com.google.gson.Gson;
+
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 
@@ -32,6 +41,12 @@ public class GameActivity extends AppCompatActivity {
     Timer refreshTimer;
     final static private int fps = 60; // Frames per second
     final static private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
+
+    /** ONLINE **/
+    RemoteDataTask remoteTask;
+    boolean connectionActive = true;
+    float remoteX = 0;
+    float remoteY = 0;
 
     /** DEBUGGING **/
     // Log index and TextView
@@ -140,6 +155,9 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
+        // Create asynchronous online data gatherer task
+        remoteTask = new RemoteDataTask();
+        remoteTask.execute();
 
         // Start game loop
         startRefreshTimer();
@@ -260,11 +278,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void finishGame(){
-
         if (score1 > score2) log("You win!");
         else if (score1 < score2) log("You lose");
         else if (score1 == score2) log("Draw!");
-
     }
 
     private void advanceCounter() {
@@ -361,6 +377,10 @@ public class GameActivity extends AppCompatActivity {
                 // Scoreboard and timer counter
                 advanceCounter();
 
+                // Apply remote data to remote player
+                player2.setX(remoteX);
+                player2.setY(remoteY);
+
             }
         });
     }
@@ -377,22 +397,85 @@ public class GameActivity extends AppCompatActivity {
     }
 
     // Asynchronous task that retrieves the remote player's actions
-    public class MyAsyncTask extends AsyncTask<String, String, Void> {
-
-        private ProgressDialog progressDialog = new ProgressDialog(GameActivity.this);
-        InputStream inputStream = null;
-        String result = "";
+    public class RemoteDataTask extends AsyncTask<String, String, Void> {
 
         protected void onPreExecute() {
-
+            super.onPreExecute();
         }
 
-        @Override
         protected Void doInBackground(String... params) {
 
+            while(connectionActive){
+
+                // This returns a JSON object with a {"x": x,"y": y} pattern.
+                String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php", 2000);
+
+                // Parse the JSON information into a Point object.
+                Point p = new Gson().fromJson(data, Point.class);
+
+                // Debug print
+                System.out.println(p);
+
+                // Set X and Y coordinates retrieved from JSON to the remoteX and remoteY global
+                // variables. These variables will be used to position player2 on the next frame.
+                remoteX = p.x;
+                remoteY = p.y;
+
+            }
+
             return null;
+
         }
 
+    }
+
+    /**
+     * Get JSON response as String from URL.
+     * @param url URL to retrieve JSON from.
+     * @param timeout Time available to establish connection.
+     * @return JSON response as String.
+     */
+    public String getJSON(String url, int timeout) {
+        HttpURLConnection c = null;
+        try {
+            URL u = new URL(url);
+            c = (HttpURLConnection) u.openConnection();
+            c.setRequestMethod("GET");
+            c.setRequestProperty("Content-length", "0");
+            c.setUseCaches(false);
+            c.setAllowUserInteraction(false);
+            c.setConnectTimeout(timeout);
+            c.setReadTimeout(timeout);
+            c.connect();
+            int status = c.getResponseCode();
+
+            switch (status) {
+                case 200:
+                case 201:
+                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line+"\n");
+                    }
+                    br.close();
+                    return sb.toString();
+            }
+
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (c != null) {
+                try {
+                    c.disconnect();
+                } catch (Exception ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return null;
     }
 
 }
