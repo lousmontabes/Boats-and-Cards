@@ -2,6 +2,7 @@ package com.example.lluismontabes.gameofboatsandcards;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -49,6 +50,7 @@ public class GameActivity extends AppCompatActivity {
     float remoteY = 0;
     float localX = 0;
     float localY = 0;
+    int matchId;
 
     /** DEBUGGING **/
     // Log index and TextView
@@ -121,6 +123,11 @@ public class GameActivity extends AppCompatActivity {
 
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        Intent intent = getIntent();
+        this.matchId = intent.getIntExtra("matchId", -1);
+
+        System.out.println("Match id: " + matchId);
 
         setContentView(R.layout.activity_game);
 
@@ -290,7 +297,7 @@ public class GameActivity extends AppCompatActivity {
 
         frameLog.setText(Integer.toString(currentFrame));
 
-        if (currentFrame % 60 == 0){
+        if (currentFrame % fps == 0){
             seconds++;
 
             if(secondsLeft > 0){
@@ -442,7 +449,7 @@ public class GameActivity extends AppCompatActivity {
      * @param timeout Time available to establish connection.
      * @return JSON response as String.
      */
-    public String getJSON(String url, int timeout) {
+    private String getJSON(String url, int timeout) {
         HttpURLConnection c = null;
         try {
             URL u = new URL(url);
@@ -484,5 +491,4 @@ public class GameActivity extends AppCompatActivity {
         }
         return null;
     }
-
 }
