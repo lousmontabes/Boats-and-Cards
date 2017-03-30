@@ -52,6 +52,7 @@ public class GameActivity extends AppCompatActivity {
     float localY = 0;
     int matchId;
     int assignedPlayer;
+    int oppositePlayer;
 
     /** DEBUGGING **/
     // Log index and TextView
@@ -128,6 +129,9 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         this.matchId = intent.getIntExtra("matchId", -1);
         this.assignedPlayer = intent.getIntExtra("assignedPlayer", -1);
+
+        if (assignedPlayer == 1) this.oppositePlayer = 2;
+        else if (assignedPlayer == 2) this.oppositePlayer = 1;
 
         System.out.println("Match ID: " + matchId);
         System.out.println("Assigned player: " + assignedPlayer);
@@ -423,11 +427,15 @@ public class GameActivity extends AppCompatActivity {
             while(connectionActive){
 
                 /* SEND DATA */
-                getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?x=" + localX + "&y=" + localY, 2000);
+                getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?matchId=" + matchId
+                                                                           + "&player=" + assignedPlayer
+                                                                           + "&x=" + localX
+                                                                           + "&y=" + localY, 2000);
 
                 /* RETRIEVE DATA */
                 //This returns a JSON object with a {"x": x,"y": y} pattern.
-                String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php", 2000);
+                String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php?matchId=" + matchId
+                                                                                              + "&player=" + oppositePlayer , 2000);
 
                 // Parse the JSON information into a Point object.
                 Point p = new Gson().fromJson(data, Point.class);
