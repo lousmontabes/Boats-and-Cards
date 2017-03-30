@@ -24,8 +24,8 @@ public class MainMenuActivity extends AppCompatActivity {
         {
             public void onClick(View v) {
 
-                // Start GameActivity
-                Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
+                // Start MatchmakingActivity
+                Intent i = new Intent(MainMenuActivity.this, MatchmakingActivity.class);
                 startActivity(i);
 
             }
