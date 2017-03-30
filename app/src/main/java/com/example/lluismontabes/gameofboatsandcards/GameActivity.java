@@ -400,7 +400,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    // Asynchronous task that retrieves the remote player's actions
+    Asynchronous task that retrieves the remote player's actions
     public class RemoteDataTask extends AsyncTask<String, String, Void> {
 
         protected void onPreExecute() {
@@ -415,7 +415,7 @@ public class GameActivity extends AppCompatActivity {
                 getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?x=" + localX + "&y=" + localY, 2000);
 
                 /* RETRIEVE DATA */
-                // This returns a JSON object with a {"x": x,"y": y} pattern.
+                //This returns a JSON object with a {"x": x,"y": y} pattern.
                 String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php", 2000);
 
                 // Parse the JSON information into a Point object.
@@ -425,8 +425,8 @@ public class GameActivity extends AppCompatActivity {
                 // variables. These variables will be used to position player2 on the next frame.
                 remoteX = p.x;
                 remoteY = p.y;
-
             }
+
 
             return null;
 
