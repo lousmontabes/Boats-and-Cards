@@ -51,6 +51,7 @@ public class GameActivity extends AppCompatActivity {
     float localX = 0;
     float localY = 0;
     int matchId;
+    int assignedPlayer;
 
     /** DEBUGGING **/
     // Log index and TextView
@@ -81,8 +82,8 @@ public class GameActivity extends AppCompatActivity {
     Joystick joystick;
 
     // Players
-    Player player1;
-    Player player2;
+    Player localPlayer;
+    Player remotePlayer;
 
     //Island Domain
     IslandDomain islandDomain;
@@ -126,8 +127,10 @@ public class GameActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         this.matchId = intent.getIntExtra("matchId", -1);
+        this.assignedPlayer = intent.getIntExtra("assignedPlayer", -1);
 
-        System.out.println("Match id: " + matchId);
+        System.out.println("Match ID: " + matchId);
+        System.out.println("Assigned player: " + assignedPlayer);
 
         setContentView(R.layout.activity_game);
 
@@ -149,10 +152,10 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-                float pW = player1.getWidth();
-                float pH = player1.getHeight();
-                float oX = player1.getX() + pW / 2;
-                float oY = player1.getY() + pH / 2;
+                float pW = localPlayer.getWidth();
+                float pH = localPlayer.getHeight();
+                float oX = localPlayer.getX() + pW / 2;
+                float oY = localPlayer.getY() + pH / 2;
 
                 System.out.println(oX + ", " + oY);
                 Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY);
@@ -188,25 +191,25 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void spawnPlayers(){
-        player1 = new Player(this, null);
-        player2 = new Player(this, null);
+        localPlayer = new Player(this, null);
+        remotePlayer = new Player(this, null);
 
-        player1.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
-        player2.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
+        localPlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
+        remotePlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
 
         final float scale = this.getResources().getDisplayMetrics().density;
 
         ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) (50 * scale + 0.5f),
                                                                          (int) (80 * scale + 0.5f));
 
-        player1.setLayoutParams(playerParams);
-        player2.setLayoutParams(playerParams);
+        localPlayer.setLayoutParams(playerParams);
+        remotePlayer.setLayoutParams(playerParams);
 
-        activePlayers.add(player1);
-        activePlayers.add(player2);
+        activePlayers.add(localPlayer);
+        activePlayers.add(remotePlayer);
 
-        layout.addView(player1);
-        layout.addView(player2);
+        layout.addView(localPlayer);
+        layout.addView(remotePlayer);
     }
 
     // Displays a message on the game log
@@ -222,8 +225,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void showBoatTrace(){
-        float oX = player1.getX() + 30; // Compensem per l'espai buit de l'imatge
-        float oY = player1.getY() + 76; // Compensem per l'espai buit de l'imatge
+        float oX = localPlayer.getX() + 30; // Compensem per l'espai buit de l'imatge
+        float oY = localPlayer.getY() + 76; // Compensem per l'espai buit de l'imatge
 
         float angle = (float) Math.toDegrees(joystick.getCurrentAngle()) + 90;
 
@@ -236,7 +239,7 @@ public class GameActivity extends AppCompatActivity {
             activeTraces.remove(0);
         }
 
-        player1.bringToFront();
+        localPlayer.bringToFront();
     }
 
     private void checkProjectileCollisions(){
@@ -246,24 +249,24 @@ public class GameActivity extends AppCompatActivity {
 
             Projectile p = projectileIterator.next();
 
-            if (p.isColliding(player2)){
+            if (p.isColliding(remotePlayer)){
 
-                player2.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
-                player2.damage(20);
+                remotePlayer.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
+                remotePlayer.damage(20);
 
                 layout.removeView(p);
                 projectileIterator.remove();
 
             }
 
-            else player2.setColorFilter(null);
+            else remotePlayer.setColorFilter(null);
 
         }
     }
 
     private void checkIslandDomainCollisions(){
 
-        if (player1.isColliding(islandDomain)) {
+        if (localPlayer.isColliding(islandDomain)) {
             // Player 1 is colliding with islandDomain.
 
             if (!player1Inside){
@@ -352,17 +355,17 @@ public class GameActivity extends AppCompatActivity {
                 currentFrame++;
 
                 // Point-and-click controls
-                if (player2.getX() == destX && player2.getY() == destY) moving = false;
-                if (moving) player2.moveTo(destX, destY);
+                if (remotePlayer.getX() == destX && remotePlayer.getY() == destY) moving = false;
+                if (moving) remotePlayer.moveTo(destX, destY);
 
                 // Control buttons (currently unused)
-                if(upPressed) player1.moveUp();
-                if(leftPressed) player1.moveLeft();
-                if(rightPressed) player1.moveRight();
-                if(downPressed) player1.moveDown();
+                if(upPressed) localPlayer.moveUp();
+                if(leftPressed) localPlayer.moveLeft();
+                if(rightPressed) localPlayer.moveRight();
+                if(downPressed) localPlayer.moveDown();
 
                 // Joystick controls
-                player1.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
 
                 // Player 2 controls
                 //retrieveRemoteAction();
@@ -388,11 +391,11 @@ public class GameActivity extends AppCompatActivity {
                 advanceCounter();
 
                 // Prepare local data to send to server
-                localX = player1.getX();
-                localY = player1.getY();
+                localX = localPlayer.getX();
+                localY = localPlayer.getY();
 
-                // Apply remote data to player2
-                moveObjectTo(player2, remoteX, remoteY);
+                // Apply remote data to remotePlayer
+                moveObjectTo(remotePlayer, remoteX, remoteY);
 
             }
         });
@@ -430,7 +433,7 @@ public class GameActivity extends AppCompatActivity {
                 Point p = new Gson().fromJson(data, Point.class);
 
                 // Set X and Y coordinates retrieved from JSON to the remoteX and remoteY global
-                // variables. These variables will be used to position player2 on the next frame.
+                // variables. These variables will be used to position remotePlayer on the next frame.
                 remoteX = p.x;
                 remoteY = p.y;
 

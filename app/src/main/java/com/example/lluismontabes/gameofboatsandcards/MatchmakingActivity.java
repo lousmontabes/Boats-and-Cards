@@ -211,6 +211,7 @@ public class MatchmakingActivity extends AppCompatActivity {
         // Start GameActivity
         Intent i = new Intent(MatchmakingActivity.this, GameActivity.class);
         i.putExtra("matchId", matchId);
+        i.putExtra("assignedPlayer", assignedPlayer);
         startActivity(i);
 
     }
