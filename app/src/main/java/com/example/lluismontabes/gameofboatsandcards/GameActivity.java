@@ -358,7 +358,7 @@ public class GameActivity extends AppCompatActivity {
                 player1.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
 
                 // Player 2 controls
-                retrieveRemoteAction();
+                //retrieveRemoteAction();
 
                 // Projectile movement
                 for (Projectile p:activeProjectiles) p.move();
@@ -401,7 +401,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    Asynchronous task that retrieves the remote player's actions
+    // Asynchronous task that retrieves the remote player's actions
     public class RemoteDataTask extends AsyncTask<String, String, Void> {
 
         protected void onPreExecute() {
@@ -426,6 +426,7 @@ public class GameActivity extends AppCompatActivity {
                 // variables. These variables will be used to position player2 on the next frame.
                 remoteX = p.x;
                 remoteY = p.y;
+
             }
 
 

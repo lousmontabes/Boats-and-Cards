@@ -25,7 +25,7 @@ public class Player extends Collider{
 
     private float angle;
 
-    private CardZone cardZone; //Its own card zone, each player must to have one
+    //private CardZone cardZone; //Its own card zone, each player must to have one
 
 
     public Player(Context context, AttributeSet attrs) {
@@ -42,8 +42,9 @@ public class Player extends Collider{
         this.velocity = v;
     }
     public void setHealth(int h) { this.health = h; };
+
     //cardZone test
-    public void setCardZone(CardZone cardZone) { this.cardZone = cardZone; }
+    //public void setCardZone(CardZone cardZone) { this.cardZone = cardZone; }
 
     // GETTERS
     public float getAngle() {
@@ -53,8 +54,9 @@ public class Player extends Collider{
         return this.velocity;
     }
     public int getHealth() { return this.health; };
+
     //cardZone test
-    public CardZone getCardZone() { return this.cardZone; }
+    //public CardZone getCardZone() { return this.cardZone; }
 
     // MOVEMENT METHODS
     public void moveUp(){
@@ -125,13 +127,9 @@ public class Player extends Collider{
         System.out.println("Player died");
         this.setAlpha(0);
     }
-    public void improveVisibilityCardZone(float maxDistance,float minDistance,int minAlpha){
+
+    /*public void improveVisibilityCardZone(float maxDistance,float minDistance,int minAlpha){
         this.cardZone.improveVisibility(this,maxDistance,minDistance,minAlpha);
-    }
-
-
-
-
-
+    }*/
 
 }
