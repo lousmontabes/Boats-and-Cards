@@ -2,6 +2,7 @@ package com.example.lluismontabes.gameofboatsandcards;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,16 +14,24 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 
+import com.google.gson.Gson;
+
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 
@@ -30,8 +39,16 @@ public class GameActivity extends AppCompatActivity {
 
     /** GAME LOOP **/
     Timer refreshTimer;
-    final static private int fps = 60; // Frames per second
+    final static private int fps = 30; // Frames per second
     final static private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
+
+    /** ONLINE **/
+    RemoteDataTask remoteTask;
+    boolean connectionActive = true;
+    float remoteX = 0;
+    float remoteY = 0;
+    float localX = 0;
+    float localY = 0;
 
     /** DEBUGGING **/
     // Log index and TextView
@@ -97,15 +114,6 @@ public class GameActivity extends AppCompatActivity {
     /** LAYOUT **/
     // Layout
     static RelativeLayout layout;
-    static LinearLayout layout_cards;
-
-    //ContainerCards player1
-    ImageButton containerCard1;
-    ImageButton containerCard2;
-    ImageButton containerCard3;
-    //CardZone player1
-    CardZone cardZonePlayer1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +124,6 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
         layout = (RelativeLayout) findViewById(R.id.gameLayout);
-        layout_cards = (LinearLayout) findViewById(R.id.cardLayout);
 
         log = (TextView) findViewById(R.id.log);
         frameLog = (TextView) findViewById(R.id.frameLog);
@@ -126,13 +133,6 @@ public class GameActivity extends AppCompatActivity {
         timer = (TextView) findViewById(R.id.timer);
         textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
         textViewCounter2 = (TextView) findViewById(R.id.textViewCounter2);
-
-        //test start
-        containerCard1 = (ImageButton) findViewById(R.id.card1);
-        containerCard2 = (ImageButton) findViewById(R.id.card2);
-        containerCard3 = (ImageButton) findViewById(R.id.card3);
-        cardZonePlayer1 = new CardZone(layout_cards,containerCard1,containerCard2,containerCard3);
-        //test end
 
         spawnPlayers();
         spawnIslandDomain(100);
@@ -157,12 +157,15 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
+        // Create asynchronous online data gatherer task
+        remoteTask = new RemoteDataTask();
+        remoteTask.execute();
 
         // Start game loop
         startRefreshTimer();
 
         // Link controls to buttons
-        //setControlsTouchListeners();
+        // setControlsTouchListeners();
 
     }
 
@@ -178,8 +181,6 @@ public class GameActivity extends AppCompatActivity {
 
     private void spawnPlayers(){
         player1 = new Player(this, null);
-        //test card zone
-        player1.setCardZone(cardZonePlayer1);
         player2 = new Player(this, null);
 
         player1.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
@@ -279,11 +280,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void finishGame(){
-
         if (score1 > score2) log("You win!");
         else if (score1 < score2) log("You lose");
         else if (score1 == score2) log("Draw!");
-
     }
 
     private void advanceCounter() {
@@ -345,8 +344,8 @@ public class GameActivity extends AppCompatActivity {
                 currentFrame++;
 
                 // Point-and-click controls
-                if (player1.getX() == destX && player1.getY() == destY) moving = false;
-                if (moving) player1.moveTo(destX, destY);
+                if (player2.getX() == destX && player2.getY() == destY) moving = false;
+                if (moving) player2.moveTo(destX, destY);
 
                 // Control buttons (currently unused)
                 if(upPressed) player1.moveUp();
@@ -380,15 +379,18 @@ public class GameActivity extends AppCompatActivity {
                 // Scoreboard and timer counter
                 advanceCounter();
 
-                //test improveVisibility
-                player1.improveVisibilityCardZone(500,80,153);
+                // Prepare local data to send to server
+                localX = player1.getX();
+                localY = player1.getY();
+
+                // Apply remote data to player2
+                moveObjectTo(player2, remoteX, remoteY);
 
             }
         });
     }
 
     /** BACKGROUND TASKS **/
-
     // Timer
     public class RefreshTask extends TimerTask {
         @Override
@@ -398,25 +400,87 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-
     // Asynchronous task that retrieves the remote player's actions
-    public class MyAsyncTask extends AsyncTask<String, String, Void> {
-
-        private ProgressDialog progressDialog = new ProgressDialog(GameActivity.this);
-        InputStream inputStream = null;
-        String result = "";
+    public class RemoteDataTask extends AsyncTask<String, String, Void> {
 
         protected void onPreExecute() {
-
+            super.onPreExecute();
         }
 
-        @Override
         protected Void doInBackground(String... params) {
 
+            while(connectionActive){
+
+                /* SEND DATA */
+                getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?x=" + localX + "&y=" + localY, 2000);
+
+                /* RETRIEVE DATA */
+                // This returns a JSON object with a {"x": x,"y": y} pattern.
+                String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php", 2000);
+
+                // Parse the JSON information into a Point object.
+                Point p = new Gson().fromJson(data, Point.class);
+
+                // Set X and Y coordinates retrieved from JSON to the remoteX and remoteY global
+                // variables. These variables will be used to position player2 on the next frame.
+                remoteX = p.x;
+                remoteY = p.y;
+
+            }
+
             return null;
+
         }
 
+    }
 
+    /**
+     * Get JSON response as String from URL.
+     * @param url URL to retrieve JSON from.
+     * @param timeout Time available to establish connection.
+     * @return JSON response as String.
+     */
+    public String getJSON(String url, int timeout) {
+        HttpURLConnection c = null;
+        try {
+            URL u = new URL(url);
+            c = (HttpURLConnection) u.openConnection();
+            c.setRequestMethod("GET");
+            c.setRequestProperty("Content-length", "0");
+            c.setUseCaches(false);
+            c.setAllowUserInteraction(false);
+            c.setConnectTimeout(timeout);
+            c.setReadTimeout(timeout);
+            c.connect();
+            int status = c.getResponseCode();
+
+            switch (status) {
+                case 200:
+                case 201:
+                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line+"\n");
+                    }
+                    br.close();
+                    return sb.toString();
+            }
+
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (c != null) {
+                try {
+                    c.disconnect();
+                } catch (Exception ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return null;
     }
 
 }
