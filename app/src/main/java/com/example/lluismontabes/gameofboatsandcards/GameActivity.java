@@ -97,6 +97,15 @@ public class GameActivity extends AppCompatActivity {
     /** LAYOUT **/
     // Layout
     static RelativeLayout layout;
+    static LinearLayout layout_cards;
+
+    //ContainerCards player1
+    ImageButton containerCard1;
+    ImageButton containerCard2;
+    ImageButton containerCard3;
+    //CardZone player1
+    CardZone cardZonePlayer1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +116,7 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
         layout = (RelativeLayout) findViewById(R.id.gameLayout);
+        layout_cards = (LinearLayout) findViewById(R.id.cardLayout);
 
         log = (TextView) findViewById(R.id.log);
         frameLog = (TextView) findViewById(R.id.frameLog);
@@ -116,6 +126,13 @@ public class GameActivity extends AppCompatActivity {
         timer = (TextView) findViewById(R.id.timer);
         textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
         textViewCounter2 = (TextView) findViewById(R.id.textViewCounter2);
+
+        //test start
+        containerCard1 = (ImageButton) findViewById(R.id.card1);
+        containerCard2 = (ImageButton) findViewById(R.id.card2);
+        containerCard3 = (ImageButton) findViewById(R.id.card3);
+        cardZonePlayer1 = new CardZone(layout_cards,containerCard1,containerCard2,containerCard3);
+        //test end
 
         spawnPlayers();
         spawnIslandDomain(100);
@@ -161,6 +178,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void spawnPlayers(){
         player1 = new Player(this, null);
+        //test card zone
+        player1.setCardZone(cardZonePlayer1);
         player2 = new Player(this, null);
 
         player1.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
@@ -361,6 +380,9 @@ public class GameActivity extends AppCompatActivity {
                 // Scoreboard and timer counter
                 advanceCounter();
 
+                //test improveVisibility
+                player1.improveVisibilityCardZone(500,80,153);
+
             }
         });
     }
@@ -375,6 +397,7 @@ public class GameActivity extends AppCompatActivity {
             layout.postInvalidate();
         }
     }
+
 
     // Asynchronous task that retrieves the remote player's actions
     public class MyAsyncTask extends AsyncTask<String, String, Void> {
@@ -392,6 +415,7 @@ public class GameActivity extends AppCompatActivity {
 
             return null;
         }
+
 
     }
 
