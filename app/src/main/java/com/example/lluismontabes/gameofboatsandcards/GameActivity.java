@@ -365,6 +365,7 @@ public class GameActivity extends AppCompatActivity {
                 // Point-and-click controls
                 if ((remotePlayer.getX() - destX) < 10 && (remotePlayer.getY() - destY) < 10) moving = false;
                 if (moving) remotePlayer.moveTo(destX, destY);
+                remotePlayer.postInvalidate();
 
                 // Control buttons (currently unused)
                 if(upPressed) localPlayer.moveUp();
@@ -404,7 +405,11 @@ public class GameActivity extends AppCompatActivity {
                 localY = localPlayer.getY();
 
                 // Apply remote data to remotePlayer
-                moveObjectTo(remotePlayer, remoteX, remoteY);
+                //moveObjectTo(remotePlayer, remoteX, remoteY); // This seems to work sometimes
+                remotePlayer.setX(remoteX); // Rough animation, but works always.
+                remotePlayer.setY(remoteY);
+
+                layout.postInvalidate();
 
             }
         });
@@ -441,6 +446,8 @@ public class GameActivity extends AppCompatActivity {
                 //This returns a JSON object with a {"x": x,"y": y} pattern.
                 String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php?matchId=" + matchId
                                                                                               + "&player=" + oppositePlayer , 2000);
+
+                System.out.println(currentFrame + ": " + data);
 
                 // Parse the JSON information into a Point object.
                 Point p = new Gson().fromJson(data, Point.class);
