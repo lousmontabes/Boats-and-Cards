@@ -27,7 +27,6 @@ public class Player extends Collider{
 
     //private CardZone cardZone; //Its own card zone, each player must to have one
 
-
     public Player(Context context, AttributeSet attrs) {
         super(context, 50);
         this.velocity = 10;

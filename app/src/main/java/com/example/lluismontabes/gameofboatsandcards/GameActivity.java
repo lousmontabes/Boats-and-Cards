@@ -117,7 +117,7 @@ public class GameActivity extends AppCompatActivity {
 
     /** LAYOUT **/
     // Layout
-    static RelativeLayout layout;
+    RelativeLayout layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +125,8 @@ public class GameActivity extends AppCompatActivity {
 
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setContentView(R.layout.activity_game);
 
         Intent intent = getIntent();
         this.matchId = intent.getIntExtra("matchId", -1);
@@ -135,8 +137,6 @@ public class GameActivity extends AppCompatActivity {
 
         System.out.println("Match ID: " + matchId);
         System.out.println("Assigned player: " + assignedPlayer);
-
-        setContentView(R.layout.activity_game);
 
         layout = (RelativeLayout) findViewById(R.id.gameLayout);
 
@@ -167,6 +167,8 @@ public class GameActivity extends AppCompatActivity {
                 GameActivity.this.activeColliders.add(projectile);
 
                 layout.addView(projectile);
+
+                //moveObjectTo(localPlayer, event.getX(), event.getY());
                 return false;
 
             }
@@ -195,8 +197,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void spawnPlayers(){
-        localPlayer = new Player(this, null);
-        remotePlayer = new Player(this, null);
+        localPlayer = new Player(GameActivity.this, null);
+        remotePlayer = new Player(GameActivity.this, null);
 
         localPlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
         remotePlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
@@ -214,6 +216,8 @@ public class GameActivity extends AppCompatActivity {
 
         layout.addView(localPlayer);
         layout.addView(remotePlayer);
+
+        System.out.println(activePlayers);
     }
 
     // Displays a message on the game log
@@ -359,7 +363,7 @@ public class GameActivity extends AppCompatActivity {
                 currentFrame++;
 
                 // Point-and-click controls
-                if (remotePlayer.getX() == destX && remotePlayer.getY() == destY) moving = false;
+                if ((remotePlayer.getX() - destX) < 10 && (remotePlayer.getY() - destY) < 10) moving = false;
                 if (moving) remotePlayer.moveTo(destX, destY);
 
                 // Control buttons (currently unused)
@@ -369,7 +373,8 @@ public class GameActivity extends AppCompatActivity {
                 if(downPressed) localPlayer.moveDown();
 
                 // Joystick controls
-                localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
+                if(currentFrame > 1) localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
 
                 // Player 2 controls
                 //retrieveRemoteAction();
