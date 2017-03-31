@@ -113,7 +113,10 @@ public class Player extends Collider{
 
         this.setX(x + velocityX);
         this.setY(y + velocityY);
-        this.setRotation((float) Math.toDegrees(angle) + 90);
+
+        float convertedAngle = (float) Math.toDegrees(angle) + 90;
+
+        if (Math.abs(pathX) > 10 || Math.abs(pathY) > 10) this.setRotation(convertedAngle);
 
     }
 

@@ -176,7 +176,7 @@ public class GameActivity extends AppCompatActivity {
 
         // Create asynchronous online data gatherer task
         remoteTask = new RemoteDataTask();
-        remoteTask.execute();
+        //remoteTask.execute();
 
         // Start game loop
         startRefreshTimer();
@@ -363,7 +363,7 @@ public class GameActivity extends AppCompatActivity {
                 currentFrame++;
 
                 // Point-and-click controls
-                if ((remotePlayer.getX() - destX) < 10 && (remotePlayer.getY() - destY) < 10) moving = false;
+                if (remotePlayer.getX() == destX && remotePlayer.getY() == destY) moving = false;
                 if (moving) remotePlayer.moveTo(destX, destY);
                 remotePlayer.postInvalidate();
 
@@ -406,10 +406,11 @@ public class GameActivity extends AppCompatActivity {
 
                 // Apply remote data to remotePlayer
                 //moveObjectTo(remotePlayer, remoteX, remoteY); // This seems to work sometimes
-                remotePlayer.setX(remoteX); // Rough animation, but works always.
-                remotePlayer.setY(remoteY);
+                //remotePlayer.setX(remoteX); // Rough animation, but works always.
+                //remotePlayer.setY(remoteY);
 
-                layout.postInvalidate();
+                remotePlayer.moveTo(500, 500);
+                //moveObjectTo(remotePlayer, currentFrame, currentFrame);
 
             }
         });
