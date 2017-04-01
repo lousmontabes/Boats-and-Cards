@@ -120,6 +120,14 @@ public class GameActivity extends AppCompatActivity {
     /** LAYOUT **/
     // Layout
     RelativeLayout layout;
+    LinearLayout cardLayout;
+
+    //CardZone & cardContainers
+    CardZone cardZone;
+    ImageButton containerCard1;
+    ImageButton containerCard2;
+    ImageButton containerCard3;
+
 
     /** SOUND **/
     MediaPlayer pointSound;
@@ -145,11 +153,17 @@ public class GameActivity extends AppCompatActivity {
         System.out.println("Assigned player: " + assignedPlayer);
 
         layout = (RelativeLayout) findViewById(R.id.gameLayout);
+        cardLayout = (LinearLayout) findViewById(R.id.cardLayout);
 
         log = (TextView) findViewById(R.id.log);
         frameLog = (TextView) findViewById(R.id.frameLog);
 
         joystick = (Joystick) findViewById(R.id.joystick);
+
+        containerCard1 = (ImageButton) findViewById(R.id.card1);
+        containerCard2 = (ImageButton) findViewById(R.id.card2);
+        containerCard3 = (ImageButton) findViewById(R.id.card3);
+        cardZone = new CardZone(cardLayout,containerCard1,containerCard2,containerCard3);
 
         timer = (TextView) findViewById(R.id.timer);
         textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
@@ -208,6 +222,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void spawnPlayers(){
         localPlayer = new Player(GameActivity.this, null);
+        localPlayer.setCardZone(cardZone);
         remotePlayer = new Player(GameActivity.this, null);
 
         localPlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
@@ -448,6 +463,10 @@ public class GameActivity extends AppCompatActivity {
 
                 // Apply remote data to remotePlayer
                 remotePlayer.moveTo(remoteX, remoteY);
+
+                //test CardZone
+                localPlayer.improveVisibilityCardZone(500,80,153);
+
 
             }
         });
