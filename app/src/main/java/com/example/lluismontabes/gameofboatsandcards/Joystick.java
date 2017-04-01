@@ -16,10 +16,11 @@ public class Joystick extends RelativeLayout {
     private RelativeLayout area;
 
     /** LOGIC VALUES **/
-    private float currentAngle;
-    private float currentDistance;
+    private float currentAngle = 0;
+    private float currentDistance = 0;
 
     public Joystick(Context context, AttributeSet attrs) {
+
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.joystick, this);
 

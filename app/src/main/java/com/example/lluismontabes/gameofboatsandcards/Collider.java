@@ -63,6 +63,7 @@ public abstract class Collider extends ImageView {
     }
 
     public float getCenterX(){
+        // TODO: Fix this method
         return this.getX() + this.getRadiusPixels();
     }
 

@@ -2,6 +2,7 @@ package com.example.lluismontabes.gameofboatsandcards;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.Chronometer;
@@ -19,18 +20,23 @@ import android.widget.TextView;
 public class Player extends Collider{
 
     private float velocity, idleVelocity;
+    private float rotationSpeed;
+
     private int health;
+
     private float x;
     private float y;
-
     private float angle;
 
     //private CardZone cardZone; //Its own card zone, each player must to have one
 
     public Player(Context context, AttributeSet attrs) {
         super(context, 50);
-        this.velocity = 10;
-        this.health = 100;
+
+        this.velocity = 10;      // 10 pixels per frame
+        this.rotationSpeed = 10; // 10 degrees per frame
+        this.health = 100;       // 100 units of health
+
     }
 
     // SETTERS
@@ -78,6 +84,11 @@ public class Player extends Collider{
         this.setX(x + velocity);
     }
 
+    /**
+     * Moves Player in the specified angle.
+     * @param angle Angle in which to move the Player.
+     * @param intensity Multiplier (from 0.0 to 1.0) of the velocity.
+     */
     public void move(float angle, float intensity){
 
         x = this.getX();
@@ -95,6 +106,11 @@ public class Player extends Collider{
 
     }
 
+    /**
+     * Moves Player towards the specified coordinates.
+     * @param destX X coordinate of the destination.
+     * @param destY Y coordinate of the destination.
+     */
     public void moveTo(float destX, float destY){
 
         x = this.getX();
@@ -117,6 +133,19 @@ public class Player extends Collider{
         float convertedAngle = (float) Math.toDegrees(angle) + 90;
 
         if (Math.abs(pathX) > 10 || Math.abs(pathY) > 10) this.setRotation(convertedAngle);
+
+    }
+
+    public void rotateTo(float a){
+
+        angle = this.getRotation();
+
+        if (angle != a){
+
+            if (Math.abs(angle - a) < rotationSpeed) this.setRotation(angle);
+            else this.setRotation(angle + rotationSpeed);
+        }
+
 
     }
 

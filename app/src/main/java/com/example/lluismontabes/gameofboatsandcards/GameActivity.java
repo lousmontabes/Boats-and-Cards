@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -114,10 +115,15 @@ public class GameActivity extends AppCompatActivity {
     ArrayList<Projectile> activeProjectiles = new ArrayList<>();
     ArrayList<Collider> activeColliders = new ArrayList<>();
     ArrayList<Player> activePlayers = new ArrayList<>();
+    ArrayList<TextView> activePopups = new ArrayList<>();
 
     /** LAYOUT **/
     // Layout
     RelativeLayout layout;
+
+    /** SOUND **/
+    MediaPlayer pointSound;
+    MediaPlayer backgroundMusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +155,9 @@ public class GameActivity extends AppCompatActivity {
         textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
         textViewCounter2 = (TextView) findViewById(R.id.textViewCounter2);
 
+        pointSound = MediaPlayer.create(getApplicationContext(), R.raw.point);
+        backgroundMusic = MediaPlayer.create(getApplicationContext(), R.raw.background_music);
+
         spawnPlayers();
         spawnIslandDomain(100);
 
@@ -174,15 +183,16 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-        // Create asynchronous online data gatherer task
+        /* ASYNCHRONOUS TASKS */
+
+        // Online data gatherer task
         remoteTask = new RemoteDataTask();
         //remoteTask.execute();
 
         // Start game loop
         startRefreshTimer();
 
-        // Link controls to buttons
-        // setControlsTouchListeners();
+        backgroundMusic.start();
 
     }
 
@@ -250,6 +260,24 @@ public class GameActivity extends AppCompatActivity {
         localPlayer.bringToFront();
     }
 
+    private void showPlayerPopup(Player p, String msg){
+
+        TextView popup = new TextView(this);
+        popup.setText(msg);
+
+        float oX = p.getX() + p.getWidth() / 2 - popup.getWidth() / 2;
+        float oY = p.getY() - 35;
+
+        popup.setX(oX);
+        popup.setY(oY);
+
+        activePopups.add(popup);
+
+        layout.addView(popup);
+        popup.animate().setStartDelay(500).alpha(0).y(oY - 100).setDuration(1000);
+
+    }
+
     private void checkProjectileCollisions(){
         Iterator<Projectile> projectileIterator = activeProjectiles.iterator();
 
@@ -298,6 +326,13 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    private void destroyExcessiveViews(){
+
+        // Popups: max 4
+        if (activePopups.size() > 4) activePopups.remove(0);
+
+    }
+
     private void finishGame(){
         if (score1 > score2) log("You win!");
         else if (score1 < score2) log("You lose");
@@ -330,9 +365,13 @@ public class GameActivity extends AppCompatActivity {
             if (--framesUntilTick1 == 0) {
 
                 if (score1 < 100){
+
                     score1++;
                     framesUntilTick1 = fps / 2;
                     textViewCounter1.setText(Integer.toString(score1) + "%");
+
+                    showPlayerPopup(localPlayer, "+1");
+                    pointSound.start();
 
                 }else{
                     // Player 1 reached 100% score.
@@ -362,6 +401,9 @@ public class GameActivity extends AppCompatActivity {
                 // Advance current frame
                 currentFrame++;
 
+                // Garbage collector
+                destroyExcessiveViews();
+
                 // Point-and-click controls
                 if (remotePlayer.getX() == destX && remotePlayer.getY() == destY) moving = false;
                 if (moving) remotePlayer.moveTo(destX, destY);
@@ -375,7 +417,7 @@ public class GameActivity extends AppCompatActivity {
 
                 // Joystick controls
                 // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
-                if(currentFrame > 1) localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                if(currentFrame > 10) localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
 
                 // Player 2 controls
                 //retrieveRemoteAction();
@@ -405,12 +447,7 @@ public class GameActivity extends AppCompatActivity {
                 localY = localPlayer.getY();
 
                 // Apply remote data to remotePlayer
-                //moveObjectTo(remotePlayer, remoteX, remoteY); // This seems to work sometimes
-                //remotePlayer.setX(remoteX); // Rough animation, but works always.
-                //remotePlayer.setY(remoteY);
-
-                remotePlayer.moveTo(500, 500);
-                //moveObjectTo(remotePlayer, currentFrame, currentFrame);
+                remotePlayer.moveTo(remoteX, remoteY);
 
             }
         });
