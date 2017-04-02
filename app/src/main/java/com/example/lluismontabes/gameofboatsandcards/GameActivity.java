@@ -68,6 +68,7 @@ public class GameActivity extends AppCompatActivity {
     // Gameplay
     boolean player1Inside = false;
     boolean player2Inside = false;
+    boolean running = false;
 
     // Control button boolean variables
     private boolean upPressed = false;
@@ -142,6 +143,8 @@ public class GameActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_game);
 
+        running = true;
+
         Intent intent = getIntent();
         this.matchId = intent.getIntExtra("matchId", -1);
         this.assignedPlayer = intent.getIntExtra("assignedPlayer", -1);
@@ -208,6 +211,20 @@ public class GameActivity extends AppCompatActivity {
 
         backgroundMusic.start();
 
+    }
+
+    @Override
+    protected void onPause() {
+        running = false;
+        backgroundMusic.pause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        running = true;
+        super.onResume();
+        backgroundMusic.start();
     }
 
     private void startRefreshTimer(){
@@ -386,8 +403,9 @@ public class GameActivity extends AppCompatActivity {
                     textViewCounter1.setText(Integer.toString(score1) + "%");
 
                     showPlayerPopup(localPlayer, "+1");
-                    pointSound.start();
-
+                    if (running) {
+                        pointSound.start();
+                    }
                 }else{
                     // Player 1 reached 100% score.
                     finishGame();
