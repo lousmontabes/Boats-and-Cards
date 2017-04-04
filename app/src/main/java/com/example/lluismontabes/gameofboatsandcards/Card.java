@@ -1,9 +1,5 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.widget.ImageView;
-
 /**
  * Created by olekboad13.alumnes on 31/03/17.
  */
@@ -35,11 +31,11 @@ public class Card {
     public int getResourceID() {
         switch(id) {
             case 1:
-                return R.drawable.Placeholder1;
+                return R.drawable.placeholder1;
             case 2:
-                return R.drawable.Placeholder2;
+                return R.drawable.placeholder2;
             case 3:
-                return R.drawable.Placeholder3;
+                return R.drawable.placeholder3;
             default:
                 return R.drawable.void_card_resized;
         }

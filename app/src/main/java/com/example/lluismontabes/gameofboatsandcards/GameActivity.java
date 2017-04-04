@@ -187,6 +187,30 @@ public class GameActivity extends AppCompatActivity {
 
         joystick = (Joystick) findViewById(R.id.joystick);
 
+        containerCard1 = (ImageView) findViewById(R.id.card1);
+        containerCard2 = (ImageView) findViewById(R.id.card2);
+        containerCard3 = (ImageView) findViewById(R.id.card3);
+        containerCard1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                cardUsed = 1;
+                return false;
+            }
+        });
+        containerCard2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                cardUsed = 2;
+                return false;
+            }
+        });
+        containerCard3.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                cardUsed = 3;
+                return false;
+            }
+        });
         cardZone = new CardZone(cardLayout, containerCard1, containerCard2, containerCard3);
 
         timer = (TextView) findViewById(R.id.timer);
@@ -531,13 +555,13 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void drawCard(Player player) {
-        /*Card card = new Card();
-        cardZone.addCard();
-*/
-        cardUsed = 0;
+        Card card = new Card();
+        cardZone.addCard(card);
+
     }
 
     private void useCard(Player player, int n) {
+        cardUsed = 0;
 
     }
 

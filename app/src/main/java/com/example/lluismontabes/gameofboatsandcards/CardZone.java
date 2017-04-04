@@ -26,7 +26,8 @@ public class CardZone {
         this.containerCard1 = containerCard1;
         this.containerCard2 = containerCard2;
         this.containerCard3 = containerCard3;
-        cardList = new ArrayList<Card>(3);
+        cardList = new ArrayList<Card>();
+        updateContainers();
     }
 
     //SETTERS
@@ -61,10 +62,6 @@ public class CardZone {
 
     public ImageView getContainerCard3() {
         return this.containerCard3;
-    }
-
-    public int getCardNum() {
-        return this.cardList.size();
     }
 
     //FUNCTIONS
@@ -159,11 +156,16 @@ public class CardZone {
                 containerCard1.setVisibility(VISIBLE);
                 containerCard2.setVisibility(VISIBLE);
                 containerCard3.setVisibility(GONE);
+                containerCard1.setImageResource(((Card) cardList.get(0)).getResourceID());
+                containerCard1.setImageResource(((Card) cardList.get(1)).getResourceID());
                 break;
             case 3:
                 containerCard1.setVisibility(VISIBLE);
                 containerCard2.setVisibility(VISIBLE);
                 containerCard3.setVisibility(VISIBLE);
+                containerCard1.setImageResource(((Card) cardList.get(0)).getResourceID());
+                containerCard2.setImageResource(((Card) cardList.get(1)).getResourceID());
+                containerCard3.setImageResource(((Card) cardList.get(2)).getResourceID());
                 break;
 
         }
