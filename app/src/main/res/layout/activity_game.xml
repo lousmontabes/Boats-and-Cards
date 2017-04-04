@@ -99,25 +99,26 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true">
 
-        <ImageButton
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@mipmap/void_card_resized"
+            app:srcCompat="@drawable/void_card_resized"
             android:id="@+id/card1"
             android:layout_gravity="bottom"
             android:background="#00000000"/>
 
-        <ImageButton
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@mipmap/void_card_resized"
+            app:srcCompat="@drawable/void_card_resized"
             android:id="@+id/card2"
             android:layout_gravity="bottom"
             android:background="#00000000"/>
-        <ImageButton
+
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@mipmap/void_card_resized"
+            app:srcCompat="@drawable/void_card_resized"
             android:id="@+id/card3"
             app:layout_anchorGravity="bottom|center_horizontal"
             android:layout_gravity="bottom"

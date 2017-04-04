@@ -11,7 +11,7 @@ import android.widget.TextView;
 /**
  * Created by JorgeTB on 24/03/2017.
  */
-
+@Deprecated
 public class ChronometerPausable extends Chronometer {
 
     private long timeWhenStopped;

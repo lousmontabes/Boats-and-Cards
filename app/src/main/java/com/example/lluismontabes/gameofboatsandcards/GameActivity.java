@@ -36,15 +36,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class GameActivity extends AppCompatActivity {
 
-    /** GAME LOOP **/
+    /**
+     * GAME LOOP
+     **/
     Timer refreshTimer;
     final static private int fps = 30; // Frames per second
     final static private long refreshPeriod = 1000 / fps; // Period in milliseconds of each update
 
-    /** ONLINE **/
+    /**
+     * ONLINE
+     **/
     RemoteDataTask remoteTask;
     boolean connectionActive = true;
     float remoteX = 0;
@@ -55,20 +61,27 @@ public class GameActivity extends AppCompatActivity {
     int assignedPlayer;
     int oppositePlayer;
 
-    /** DEBUGGING **/
+    /**
+     * DEBUGGING
+     **/
     // Log index and TextView
     int logIndex = 0;
     TextView log;
     TextView frameLog;
 
-    /** GAME DATA **/
+    /**
+     * GAME DATA
+     **/
     Data data = new Data();
 
-    /** LOGIC VARIABLES **/
+    /**
+     * LOGIC VARIABLES
+     **/
     // Gameplay
     boolean player1Inside = false;
     boolean player2Inside = false;
     boolean running = false;
+
 
     // Control button boolean variables
     private boolean upPressed = false;
@@ -80,7 +93,9 @@ public class GameActivity extends AppCompatActivity {
     private boolean moving = false;
     private float destX, destY;
 
-    /** VIEWS **/
+    /**
+     * VIEWS
+     **/
     // Controls
     Joystick joystick;
 
@@ -96,7 +111,9 @@ public class GameActivity extends AppCompatActivity {
     TextView textViewCounter1;
     TextView textViewCounter2;
 
-    /** STATISTICS **/
+    /**
+     * STATISTICS
+     **/
     // Scores
     int score1 = 0;
     int score2 = 0;
@@ -110,7 +127,9 @@ public class GameActivity extends AppCompatActivity {
     byte framesUntilTick1 = fps;
     byte framesUntilTick2 = fps;
 
-    /** COLLECTIONS **/
+    /**
+     * COLLECTIONS
+     **/
     // Props
     ArrayList<Trace> activeTraces = new ArrayList<>();
     ArrayList<Projectile> activeProjectiles = new ArrayList<>();
@@ -118,19 +137,24 @@ public class GameActivity extends AppCompatActivity {
     ArrayList<Player> activePlayers = new ArrayList<>();
     ArrayList<TextView> activePopups = new ArrayList<>();
 
-    /** LAYOUT **/
+    /**
+     * LAYOUT
+     **/
     // Layout
     RelativeLayout layout;
     LinearLayout cardLayout;
 
     //CardZone & cardContainers
     CardZone cardZone;
-    ImageButton containerCard1;
-    ImageButton containerCard2;
-    ImageButton containerCard3;
+    ImageView containerCard1;
+    ImageView containerCard2;
+    ImageView containerCard3;
+    int cardUsed = 0;
 
 
-    /** SOUND **/
+    /**
+     * SOUND
+     **/
     MediaPlayer pointSound;
     MediaPlayer backgroundMusic;
 
@@ -163,10 +187,7 @@ public class GameActivity extends AppCompatActivity {
 
         joystick = (Joystick) findViewById(R.id.joystick);
 
-        containerCard1 = (ImageButton) findViewById(R.id.card1);
-        containerCard2 = (ImageButton) findViewById(R.id.card2);
-        containerCard3 = (ImageButton) findViewById(R.id.card3);
-        cardZone = new CardZone(cardLayout,containerCard1,containerCard2,containerCard3);
+        cardZone = new CardZone(cardLayout, containerCard1, containerCard2, containerCard3);
 
         timer = (TextView) findViewById(R.id.timer);
         textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
@@ -181,19 +202,20 @@ public class GameActivity extends AppCompatActivity {
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                if (localPlayer.canShoot()) {
+                    float pW = localPlayer.getWidth();
+                    float pH = localPlayer.getHeight();
+                    float oX = localPlayer.getX() + pW / 2;
+                    float oY = localPlayer.getY() + pH / 2;
 
-                float pW = localPlayer.getWidth();
-                float pH = localPlayer.getHeight();
-                float oX = localPlayer.getX() + pW / 2;
-                float oY = localPlayer.getY() + pH / 2;
+                    System.out.println(oX + ", " + oY);
+                    Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY);
+                    GameActivity.this.activeProjectiles.add(projectile);
+                    GameActivity.this.activeColliders.add(projectile);
 
-                System.out.println(oX + ", " + oY);
-                Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY);
-                GameActivity.this.activeProjectiles.add(projectile);
-                GameActivity.this.activeColliders.add(projectile);
-
-                layout.addView(projectile);
-
+                    layout.addView(projectile);
+                    localPlayer.setDelay(20);
+                }
                 //moveObjectTo(localPlayer, event.getX(), event.getY());
                 return false;
 
@@ -227,17 +249,22 @@ public class GameActivity extends AppCompatActivity {
         backgroundMusic.start();
     }
 
-    private void startRefreshTimer(){
+    @Override
+    public void onBackPressed() {
+        //do nothing
+    }
+
+    private void startRefreshTimer() {
         this.refreshTimer = new Timer();
         refreshTimer.schedule(new RefreshTask(), 0, refreshPeriod);
     }
 
-    private void spawnIslandDomain(float radius){
-        islandDomain = new IslandDomain(this,radius);
+    private void spawnIslandDomain(float radius) {
+        islandDomain = new IslandDomain(this, radius);
         layout.addView(islandDomain);
     }
 
-    private void spawnPlayers(){
+    private void spawnPlayers() {
         localPlayer = new Player(GameActivity.this, null);
         localPlayer.setCardZone(cardZone);
         remotePlayer = new Player(GameActivity.this, null);
@@ -248,7 +275,7 @@ public class GameActivity extends AppCompatActivity {
         final float scale = this.getResources().getDisplayMetrics().density;
 
         ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) (50 * scale + 0.5f),
-                                                                         (int) (80 * scale + 0.5f));
+                (int) (80 * scale + 0.5f));
 
         localPlayer.setLayoutParams(playerParams);
         remotePlayer.setLayoutParams(playerParams);
@@ -263,18 +290,18 @@ public class GameActivity extends AppCompatActivity {
     }
 
     // Displays a message on the game log
-    private void log(String message){
+    private void log(String message) {
         this.log.setText(Float.toString(this.logIndex) + ": " + message);
         this.logIndex++;
     }
 
-    private void moveObjectTo(View object, float x, float y){
+    private void moveObjectTo(View object, float x, float y) {
         this.destX = x;
         this.destY = y;
         this.moving = true;
     }
 
-    private void showBoatTrace(){
+    private void showBoatTrace() {
         float oX = localPlayer.getX() + 30; // Compensem per l'espai buit de l'imatge
         float oY = localPlayer.getY() + 76; // Compensem per l'espai buit de l'imatge
 
@@ -284,7 +311,7 @@ public class GameActivity extends AppCompatActivity {
         activeTraces.add(trace);
         layout.addView(trace);
 
-        if(activeTraces.size() > 20){
+        if (activeTraces.size() > 20) {
             layout.removeView(activeTraces.get(0));
             activeTraces.remove(0);
         }
@@ -292,7 +319,7 @@ public class GameActivity extends AppCompatActivity {
         localPlayer.bringToFront();
     }
 
-    private void showPlayerPopup(Player p, String msg){
+    private void showPlayerPopup(Player p, String msg) {
 
         TextView popup = new TextView(this);
         popup.setText(msg);
@@ -310,14 +337,14 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void checkProjectileCollisions(){
+    private void checkProjectileCollisions() {
         Iterator<Projectile> projectileIterator = activeProjectiles.iterator();
 
         while (projectileIterator.hasNext()) {
 
             Projectile p = projectileIterator.next();
 
-            if (p.isColliding(remotePlayer)){
+            if (p.isColliding(remotePlayer)) {
 
                 remotePlayer.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
                 remotePlayer.damage(20);
@@ -325,29 +352,27 @@ public class GameActivity extends AppCompatActivity {
                 layout.removeView(p);
                 projectileIterator.remove();
 
-            }
-
-            else remotePlayer.setColorFilter(null);
+            } else remotePlayer.setColorFilter(null);
 
         }
     }
 
-    private void checkIslandDomainCollisions(){
+    private void checkIslandDomainCollisions() {
 
         if (localPlayer.isColliding(islandDomain)) {
             // Player 1 is colliding with islandDomain.
 
-            if (!player1Inside){
+            if (!player1Inside) {
                 // Player 1 was not inside before this collision.
 
                 islandDomain.toggleInvadedStatus();
                 player1Inside = !player1Inside;
             }
 
-        }else{
+        } else {
             // Player 1 is not colliding with islandDomain.
 
-            if (player1Inside){
+            if (player1Inside) {
                 // Player 1 was inside before this collision.
 
                 islandDomain.toggleInvadedStatus();
@@ -358,14 +383,14 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void destroyExcessiveViews(){
+    private void destroyExcessiveViews() {
 
         // Popups: max 4
         if (activePopups.size() > 4) activePopups.remove(0);
 
     }
 
-    private void finishGame(){
+    private void finishGame() {
         if (score1 > score2) log("You win!");
         else if (score1 < score2) log("You lose");
         else if (score1 == score2) log("Draw!");
@@ -375,10 +400,10 @@ public class GameActivity extends AppCompatActivity {
 
         frameLog.setText(Integer.toString(currentFrame));
 
-        if (currentFrame % fps == 0){
+        if (currentFrame % fps == 0) {
             seconds++;
 
-            if(secondsLeft > 0){
+            if (secondsLeft > 0) {
                 secondsLeft--;
 
                 int m = secondsLeft / 60;
@@ -386,7 +411,7 @@ public class GameActivity extends AppCompatActivity {
 
                 timer.setText(Integer.toString(m) + ":" + String.format("%02d", s));
 
-            }else{
+            } else {
                 // Time ran out.
                 finishGame();
             }
@@ -396,7 +421,7 @@ public class GameActivity extends AppCompatActivity {
 
             if (--framesUntilTick1 == 0) {
 
-                if (score1 < 100){
+                if (score1 < 100) {
 
                     score1++;
                     framesUntilTick1 = fps / 2;
@@ -406,7 +431,7 @@ public class GameActivity extends AppCompatActivity {
                     if (running) {
                         pointSound.start();
                     }
-                }else{
+                } else {
                     // Player 1 reached 100% score.
                     finishGame();
                 }
@@ -421,15 +446,14 @@ public class GameActivity extends AppCompatActivity {
     }
 
     // Retrieve online player's last action.
-    private void retrieveRemoteAction(){
+    private void retrieveRemoteAction() {
 
     }
 
     // Method that gets called every frame.
-    private void refresh(){
+    private void refresh() {
         runOnUiThread(new Runnable() {
-            public void run()
-            {
+            public void run() {
 
                 // Advance current frame
                 currentFrame++;
@@ -443,20 +467,21 @@ public class GameActivity extends AppCompatActivity {
                 remotePlayer.postInvalidate();
 
                 // Control buttons (currently unused)
-                if(upPressed) localPlayer.moveUp();
-                if(leftPressed) localPlayer.moveLeft();
-                if(rightPressed) localPlayer.moveRight();
-                if(downPressed) localPlayer.moveDown();
+                if (upPressed) localPlayer.moveUp();
+                if (leftPressed) localPlayer.moveLeft();
+                if (rightPressed) localPlayer.moveRight();
+                if (downPressed) localPlayer.moveDown();
 
                 // Joystick controls
                 // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
-                if(currentFrame > 10) localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                if (currentFrame > 10)
+                    localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
 
                 // Player 2 controls
                 //retrieveRemoteAction();
 
                 // Projectile movement
-                for (Projectile p:activeProjectiles) p.move();
+                for (Projectile p : activeProjectiles) p.move();
 
                 // Boat trace
                 showBoatTrace();
@@ -465,12 +490,27 @@ public class GameActivity extends AppCompatActivity {
                 checkProjectileCollisions();
 
                 // Health
-                for (Player pl:activePlayers){
+                for (Player pl : activePlayers) {
                     if (pl.getHealth() <= 0) pl.die();
+                }
+
+                // Decrease delay to shoot again
+                if (!localPlayer.canShoot()) {
+                    localPlayer.setDelay(localPlayer.getDelay() - 1);
                 }
 
                 // islandDomain collisions
                 checkIslandDomainCollisions();
+
+                // Card collecting
+                if (secondsLeft % 10 == 5 && currentFrame % fps == 0) {//canviar per condició de col·lisió
+                    drawCard(localPlayer);
+                }
+
+                // Card usage
+                if (cardUsed != 0) {
+                    useCard(localPlayer, cardUsed);
+                }
 
                 // Scoreboard and timer counter
                 advanceCounter();
@@ -483,14 +523,27 @@ public class GameActivity extends AppCompatActivity {
                 remotePlayer.moveTo(remoteX, remoteY);
 
                 //test CardZone
-                localPlayer.improveVisibilityCardZone(500,80,153);
+                localPlayer.improveVisibilityCardZone(500, 80, 153);
 
 
             }
         });
     }
 
-    /** BACKGROUND TASKS **/
+    private void drawCard(Player player) {
+        /*Card card = new Card();
+        cardZone.addCard();
+*/
+        cardUsed = 0;
+    }
+
+    private void useCard(Player player, int n) {
+
+    }
+
+    /**
+     * BACKGROUND TASKS
+     **/
     // Timer
     public class RefreshTask extends TimerTask {
         @Override
@@ -509,18 +562,18 @@ public class GameActivity extends AppCompatActivity {
 
         protected Void doInBackground(String... params) {
 
-            while(connectionActive){
+            while (connectionActive) {
 
                 /* SEND DATA */
                 getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?matchId=" + matchId
-                                                                           + "&player=" + assignedPlayer
-                                                                           + "&x=" + localX
-                                                                           + "&y=" + localY, 2000);
+                        + "&player=" + assignedPlayer
+                        + "&x=" + localX
+                        + "&y=" + localY, 2000);
 
                 /* RETRIEVE DATA */
                 //This returns a JSON object with a {"x": x,"y": y} pattern.
                 String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php?matchId=" + matchId
-                                                                                              + "&player=" + oppositePlayer , 2000);
+                        + "&player=" + oppositePlayer, 2000);
 
                 System.out.println(currentFrame + ": " + data);
 
@@ -543,7 +596,8 @@ public class GameActivity extends AppCompatActivity {
 
     /**
      * Get JSON response as String from URL.
-     * @param url URL to retrieve JSON from.
+     *
+     * @param url     URL to retrieve JSON from.
      * @param timeout Time available to establish connection.
      * @return JSON response as String.
      */
@@ -568,7 +622,7 @@ public class GameActivity extends AppCompatActivity {
                     StringBuilder sb = new StringBuilder();
                     String line;
                     while ((line = br.readLine()) != null) {
-                        sb.append(line+"\n");
+                        sb.append(line + "\n");
                     }
                     br.close();
                     return sb.toString();

@@ -2,13 +2,6 @@ package com.example.lluismontabes.gameofboatsandcards;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
-import android.widget.Chronometer;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 /**
  * Created by lluismontabes on 6/3/17.
@@ -28,6 +21,8 @@ public class Player extends Collider{
     private float y;
     private float angle;
 
+    private int delay;
+
     private CardZone cardZone; //Its own card zone, each player must to have one
 
     public Player(Context context, AttributeSet attrs) {
@@ -36,7 +31,7 @@ public class Player extends Collider{
         this.velocity = 10;      // 10 pixels per frame
         this.rotationSpeed = 10; // 10 degrees per frame
         this.health = 100;       // 100 units of health
-
+        delay = 0;
     }
 
     // SETTERS
@@ -82,6 +77,14 @@ public class Player extends Collider{
     public void moveRight(){
         x = this.getX();
         this.setX(x + velocity);
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
+    }
+
+    public int getDelay() {
+        return delay;
     }
 
     /**
@@ -152,6 +155,10 @@ public class Player extends Collider{
     // USER INTERACTION
     public void damage(int d){
         this.health -= d;
+    }
+
+    public boolean canShoot() {
+        return delay == 0;
     }
 
     public void die(){
