@@ -87,6 +87,8 @@ public class Player extends Collider{
         return delay;
     }
 
+    public void decreaseDelay() { delay--; };
+
     /**
      * Moves Player in the specified angle.
      * @param angle Angle in which to move the Player.
