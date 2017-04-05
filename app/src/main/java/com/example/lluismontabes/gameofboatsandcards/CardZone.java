@@ -47,6 +47,12 @@ public class CardZone {
         this.containerCard3 = containerCard3;
     }
 
+    public void setCardList(ArrayList<Card> cardList) {
+        this.cardList = cardList;
+    }
+
+
+
     //GETTERS
     public LinearLayout getLayout_cards() {
         return this.layout_cards;
@@ -62,6 +68,10 @@ public class CardZone {
 
     public ImageView getContainerCard3() {
         return this.containerCard3;
+    }
+
+    public ArrayList<Card> getCardList() {
+        return cardList;
     }
 
     //FUNCTIONS
@@ -134,7 +144,7 @@ public class CardZone {
     }
 
     public Card popCard(int idx) {
-        Card c = cardList.remove(idx);
+        Card c = cardList.remove(idx - 1);
         updateContainers();
         return c;
     }
@@ -147,25 +157,25 @@ public class CardZone {
                 containerCard3.setVisibility(GONE);
                 break;
             case 1:
+                containerCard1.setImageResource(cardList.get(0).getResourceID());
                 containerCard1.setVisibility(VISIBLE);
                 containerCard2.setVisibility(GONE);
                 containerCard3.setVisibility(GONE);
-                containerCard1.setImageResource(((Card) cardList.get(0)).getResourceID());
                 break;
             case 2:
+                containerCard1.setImageResource(cardList.get(0).getResourceID());
+                containerCard2.setImageResource(cardList.get(1).getResourceID());
                 containerCard1.setVisibility(VISIBLE);
                 containerCard2.setVisibility(VISIBLE);
                 containerCard3.setVisibility(GONE);
-                containerCard1.setImageResource(((Card) cardList.get(0)).getResourceID());
-                containerCard1.setImageResource(((Card) cardList.get(1)).getResourceID());
                 break;
             case 3:
+                containerCard1.setImageResource(cardList.get(0).getResourceID());
+                containerCard2.setImageResource(cardList.get(1).getResourceID());
+                containerCard3.setImageResource(cardList.get(2).getResourceID());
                 containerCard1.setVisibility(VISIBLE);
                 containerCard2.setVisibility(VISIBLE);
                 containerCard3.setVisibility(VISIBLE);
-                containerCard1.setImageResource(((Card) cardList.get(0)).getResourceID());
-                containerCard2.setImageResource(((Card) cardList.get(1)).getResourceID());
-                containerCard3.setImageResource(((Card) cardList.get(2)).getResourceID());
                 break;
 
         }

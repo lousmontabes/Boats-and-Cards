@@ -555,12 +555,15 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void drawCard(Player player) {
-        Card card = new Card();
-        cardZone.addCard(card);
-
+        if (player.handSize() > 3) {
+            Card card = new Card();
+            cardZone.addCard(card);
+            log(Integer.toString(card.getId()));
+        }
     }
 
     private void useCard(Player player, int n) {
+        cardZone.popCard(n);
         cardUsed = 0;
 
     }

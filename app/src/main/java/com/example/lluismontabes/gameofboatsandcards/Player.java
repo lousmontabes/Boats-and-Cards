@@ -166,6 +166,10 @@ public class Player extends Collider{
         this.setAlpha(0);
     }
 
+    public int handSize() {
+        return cardZone.getCardList().size();
+    }
+
     public void improveVisibilityCardZone(float maxDistance,float minDistance,int minAlpha){
         this.cardZone.improveVisibility(this,maxDistance,minDistance,minAlpha);
     }
