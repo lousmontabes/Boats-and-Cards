@@ -541,7 +541,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void drawCard(Player player) {
-        if (player.handSize() > 3) {
+        if (player.handSize() < 3) {
             Card card = new Card();
             cardZone.addCard(card);
             log(Integer.toString(card.getId()));
