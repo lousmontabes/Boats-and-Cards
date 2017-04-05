@@ -1,12 +1,9 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,7 +22,8 @@ public class Trace extends View {
         this.setX(originX);
         this.setY(originY);
         this.angle = angle;
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(100,150);
+
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(100, 120);
         this.setLayoutParams(params);
 
         styleDefine();
@@ -44,7 +42,7 @@ public class Trace extends View {
 
         canvas.rotate(this.angle);
 
-        canvas.drawRect(0, 0, 90, 90, tracePaint);  // Estela principal
+        canvas.drawRect((float) (Math.cos(angle)), (float) (Math.cos(angle)), (float) (90 * Math.cos(angle)), (float) (90 * Math.cos(angle)), tracePaint);  // Estela principal
         canvas.drawRect(0, 0, 20, 90, tracePaint);  // Estela esquerra
         canvas.drawRect(70, 0, 90, 90, tracePaint); // Estela dreta
 
