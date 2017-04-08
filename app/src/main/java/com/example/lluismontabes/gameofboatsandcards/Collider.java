@@ -5,12 +5,13 @@ import android.content.Context;
 import android.graphics.Point;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 /**
  * Created by lluismontabes on 17/3/17.
  */
 
-public abstract class Collider extends ImageView {
+public abstract class Collider extends RelativeLayout {
 
     private boolean isRound;
     private float radius;

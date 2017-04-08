@@ -289,13 +289,13 @@ public class GameActivity extends AppCompatActivity {
         localPlayer.setCardZone(cardZone);
         remotePlayer = new Player(GameActivity.this, null);
 
-        localPlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
-        remotePlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
+        //localPlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
+        //remotePlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
 
         final float scale = this.getResources().getDisplayMetrics().density;
 
-        ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) (50 * scale + 0.5f),
-                                                                         (int) (80 * scale + 0.5f));
+        ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) (60 * scale + 0.5f),
+                                                                         (int) (90 * scale + 0.5f));
 
         localPlayer.setLayoutParams(playerParams);
         remotePlayer.setLayoutParams(playerParams);
@@ -366,13 +366,13 @@ public class GameActivity extends AppCompatActivity {
 
             if (p.isColliding(remotePlayer)) {
 
-                remotePlayer.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
+                //remotePlayer.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
                 remotePlayer.damage(20);
 
                 layout.removeView(p);
                 projectileIterator.remove();
 
-            } else remotePlayer.setColorFilter(null);
+            } //else remotePlayer.setColorFilter(null);
 
         }
     }

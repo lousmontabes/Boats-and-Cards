@@ -2,6 +2,8 @@ package com.example.lluismontabes.gameofboatsandcards;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.widget.ImageView;
 
 /**
  * Created by lluismontabes on 6/3/17.
@@ -25,13 +27,22 @@ public class Player extends Collider{
 
     private CardZone cardZone; //Its own card zone, each player must to have one
 
+    private ImageView boatImageView;
+    private ImageView shadowImageView;
+
     public Player(Context context, AttributeSet attrs) {
         super(context, 50);
+
+        LayoutInflater.from(context).inflate(R.layout.player, this);
+
+        this.boatImageView = (ImageView) findViewById(R.id.boatImageView);
+        this.shadowImageView = (ImageView) findViewById(R.id.shadowImageView);
+        shadowImageView.setColorFilter(getResources().getColor(R.color.shadow), android.graphics.PorterDuff.Mode.MULTIPLY);
 
         this.velocity = 10;      // 10 pixels per frame
         this.rotationSpeed = 10; // 10 degrees per frame
         this.health = 100;       // 100 units of health
-        delay = 0;
+        delay = 0;               // 0 frames of fire delay
     }
 
     // SETTERS
@@ -108,6 +119,12 @@ public class Player extends Collider{
         this.setX(x + velocityX);
         this.setY(y + velocityY);
         this.setRotation((float) Math.toDegrees(angle) + 90);
+
+        // Move shadow with player
+        System.out.println(100 * (float) Math.sin(angle));
+        System.out.println(100 * (float) Math.cos(angle));
+        shadowImageView.setY(-45 * (float) Math.sin(angle));
+        shadowImageView.setX(45 * (float) Math.cos(angle));
 
     }
 
