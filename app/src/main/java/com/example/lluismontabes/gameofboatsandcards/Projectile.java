@@ -22,6 +22,8 @@ public class Projectile extends Collider {
     public Projectile(Context context, float angle, float originX, float originY) {
         super(context, 20);
 
+        setWillNotDraw(false);
+
         this.velocity = 30;
         this.angle = angle;
         this.setX(originX);
