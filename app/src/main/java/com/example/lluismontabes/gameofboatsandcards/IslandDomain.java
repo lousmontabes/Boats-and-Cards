@@ -26,6 +26,8 @@ public class IslandDomain extends Collider {
         this.isInvaded = false; // It is not being invaded
         setVisibility(VISIBLE);
 
+        setWillNotDraw(false);
+
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         int width = metrics.widthPixels;
         int height = metrics.heightPixels;
@@ -53,6 +55,7 @@ public class IslandDomain extends Collider {
     @Override
     protected void onDraw(Canvas canvas){
         canvas.drawCircle(this.getRadiusPixels(), this.getRadiusPixels(), this.getRadiusPixels(), islandPaint);
+        System.out.println("ISLA DIBUJADA");
     }
 
     public void toggleInvadedStatus(){

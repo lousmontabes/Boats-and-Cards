@@ -27,6 +27,9 @@ public class MainMenuActivity extends AppCompatActivity {
                 // Start MatchmakingActivity
                 Intent i = new Intent(MainMenuActivity.this, MatchmakingActivity.class);
                 startActivity(i);
+                //test without connect server
+                //Intent e = new Intent(MainMenuActivity.this, GameActivity.class);
+                //startActivity(e);
 
             }
         });
