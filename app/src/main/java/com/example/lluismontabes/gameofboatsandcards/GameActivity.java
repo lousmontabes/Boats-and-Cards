@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -243,9 +242,14 @@ public class GameActivity extends AppCompatActivity {
             float pH = localPlayer.getHeight();
             float oX = localPlayer.getX() + pW / 2;
             float oY = localPlayer.getY() + pH / 2;
+            int baseDamage = 20;
+
+            if (localPlayer.isEffectActive(Card.Effect.ATTACK_UP)) {
+                baseDamage *= 2;
+            }
 
             System.out.println(oX + ", " + oY);
-            Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY);
+            Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY, baseDamage);
             GameActivity.this.activeProjectiles.add(projectile);
             GameActivity.this.activeColliders.add(projectile);
 
@@ -367,7 +371,7 @@ public class GameActivity extends AppCompatActivity {
             if (p.isColliding(remotePlayer)) {
 
                 //remotePlayer.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
-                remotePlayer.damage(20);
+                remotePlayer.damage(p.getDamage());
 
                 layout.removeView(p);
                 projectileIterator.remove();
@@ -517,10 +521,14 @@ public class GameActivity extends AppCompatActivity {
 
                 // Card collecting
                 // TODO: canviar per condició de col·lisió
-                if (secondsLeft % 10 == 5 && currentFrame % fps == 0) drawCard(localPlayer);
+                if (secondsLeft % 8 == 5 && currentFrame % fps == 0) drawCard(localPlayer);
 
                 // Card usage
                 if (cardUsed != 0) useCard(localPlayer, cardUsed);
+
+                // Effect management
+                localPlayer.handleEffects();
+                localPlayer.decreaseEffectsDuration();
 
                 // Scoreboard and timer counter
                 advanceCounter();
@@ -533,7 +541,7 @@ public class GameActivity extends AppCompatActivity {
                 remotePlayer.moveTo(remoteX, remoteY);
 
                 //test CardZone
-                localPlayer.improveVisibilityCardZone(500, 80, 153);
+                localPlayer.improveVisibilityCardZone(180, 140, 90);
 
 
             }
@@ -549,7 +557,28 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void useCard(Player player, int n) {
-        cardZone.popCard(n);
+        Card usedCard = cardZone.popCard(n);
+        int effect = usedCard.getEffect();
+        int duration = usedCard.getDuration();
+        switch (usedCard.getTarget()) {
+            case Card.Target.RANDOM:
+                if (Math.random() < .5) {
+                    remotePlayer.addEffect(effect, duration);
+                    break;
+                }
+            case Card.Target.SELF:
+                localPlayer.addEffect(effect, duration);
+                break;
+            case Card.Target.ALL:
+                localPlayer.addEffect(effect, duration);
+            case Card.Target.OPPONENT:
+                remotePlayer.addEffect(effect, duration);
+                break;
+            case Card.Target.TRAP:
+                //TODO: implemantar trampes
+                break;
+        }
+        showPlayerPopup(localPlayer, usedCard.getName());
         cardUsed = 0;
     }
 

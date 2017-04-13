@@ -26,6 +26,7 @@ public class Player extends Collider{
     private int delay;
 
     private CardZone cardZone; //Its own card zone, each player must to have one
+    private int[] cardEffects;
 
     private ImageView boatImageView;
     private ImageView shadowImageView;
@@ -43,6 +44,7 @@ public class Player extends Collider{
         this.rotationSpeed = 10; // 10 degrees per frame
         this.health = 100;       // 100 units of health
         delay = 0;               // 0 frames of fire delay
+        cardEffects = new int[Card.TOTAL_CARD_NUMBER];
     }
 
     // SETTERS
@@ -107,25 +109,32 @@ public class Player extends Collider{
      */
     public void move(float angle, float intensity){
 
-        x = this.getX();
-        y = this.getY();
+        if (!isEffectActive(Card.Effect.STUNNED)) {
 
-        float scaleX = (float) Math.cos(angle);
-        float scaleY = (float) Math.sin(angle);
+            x = this.getX();
+            y = this.getY();
 
-        float velocityX = scaleX * this.velocity * intensity;
-        float velocityY = scaleY * this.velocity * intensity;
+            float scaleX = (float) Math.cos(angle);
+            float scaleY = (float) Math.sin(angle);
 
-        this.setX(x + velocityX);
-        this.setY(y + velocityY);
-        this.setRotation((float) Math.toDegrees(angle) + 90);
+            float modifier = 1;
+            if (isEffectActive(Card.Effect.SPEED_UP)) {
+                modifier *= 2;
+            }
 
-        // Move shadow with player
-        System.out.println(100 * (float) Math.sin(angle));
-        System.out.println(100 * (float) Math.cos(angle));
-        shadowImageView.setY(-45 * (float) Math.sin(angle));
-        shadowImageView.setX(45 * (float) Math.cos(angle));
+            float velocityX = scaleX * this.velocity * intensity * modifier;
+            float velocityY = scaleY * this.velocity * intensity * modifier;
 
+            this.setX(x + velocityX);
+            this.setY(y + velocityY);
+            this.setRotation((float) Math.toDegrees(angle) + 90);
+
+            // Move shadow with player
+            System.out.println(100 * (float) Math.sin(angle));
+            System.out.println(100 * (float) Math.cos(angle));
+            shadowImageView.setY(-45 * (float) Math.sin(angle));
+            shadowImageView.setX(45 * (float) Math.cos(angle));
+        }
     }
 
     /**
@@ -173,6 +182,9 @@ public class Player extends Collider{
 
     // USER INTERACTION
     public void damage(int d){
+        if (isEffectActive(Card.Effect.DEFENSE_UP)) {
+            d /= 2;
+        }
         this.health -= d;
     }
 
@@ -183,10 +195,41 @@ public class Player extends Collider{
     public void die(){
         System.out.println("Player died");
         this.setAlpha(0);
+        removeAllEffects();
     }
 
     public int handSize() {
         return cardZone.getCardList().size();
+    }
+
+
+
+    public void addEffect(int effect, int duration) {
+        cardEffects[effect] = duration;
+    }
+
+    public void removeEffect(int effect) {
+        cardEffects[effect] = 0;
+    }
+
+    public void removeAllEffects() {
+        for (int pos = 0; pos < cardEffects.length; pos++) {
+            cardEffects[pos] = 0;
+        }
+    }
+
+    public boolean isEffectActive(int effect) {
+        return cardEffects[effect] != 0;
+    }
+
+    public void handleEffects() {
+        cardZone.reverseCards(isEffectActive(Card.Effect.REVERSED_HAND));
+    }
+
+    public void decreaseEffectsDuration() {
+        for (int pos = 0; pos < cardEffects.length; pos++) {
+            if (cardEffects[pos] > 0) cardEffects[pos]--;
+        }
     }
 
     public void improveVisibilityCardZone(float maxDistance,float minDistance,int minAlpha){

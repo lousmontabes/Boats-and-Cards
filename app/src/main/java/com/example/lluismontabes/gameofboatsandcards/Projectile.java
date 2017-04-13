@@ -16,13 +16,14 @@ import android.widget.ImageView;
 public class Projectile extends Collider {
 
     Paint projectilePaint;
-    private float damage, velocity;
-    private float angle, originX, originY;
+    private int damage;
+    private float velocity, angle, originX, originY;
 
-    public Projectile(Context context, float angle, float originX, float originY) {
+    public Projectile(Context context, float angle, float originX, float originY, int damage) {
         super(context, 20);
 
         this.velocity = 30;
+        this.damage = damage;
         this.angle = angle;
         this.setX(originX);
         this.setY(originY);
@@ -72,6 +73,10 @@ public class Projectile extends Collider {
         this.setScaleX(2);
         this.setScaleY(2);
 
+    }
+
+    public int getDamage() {
+        return damage;
     }
 
 }

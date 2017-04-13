@@ -1,6 +1,5 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -20,6 +19,7 @@ public class CardZone {
     private ImageView containerCard2;
     private ImageView containerCard3;
     private ArrayList<Card> cardList;
+    private boolean reversed;
 
     public CardZone(LinearLayout layout_cards, ImageView containerCard1, ImageView containerCard2, ImageView containerCard3) {
         this.layout_cards = layout_cards;
@@ -27,6 +27,7 @@ public class CardZone {
         this.containerCard2 = containerCard2;
         this.containerCard3 = containerCard3;
         cardList = new ArrayList<Card>();
+        reversed = false;
         updateContainers();
     }
 
@@ -50,7 +51,6 @@ public class CardZone {
     public void setCardList(ArrayList<Card> cardList) {
         this.cardList = cardList;
     }
-
 
 
     //GETTERS
@@ -100,16 +100,16 @@ public class CardZone {
 
         float distCard1X = positionPlayerX - card1X;
         float distCard1Y = positionPlayerY - card1Y;
-        double distToCard1 = Math.sqrt(Math.pow((double) distCard1X, 2) + Math.pow((double) distCard1Y, 2));
+        double distToCard1 = Math.hypot(distCard1X, distCard1Y);
 
 
         float distCard2X = positionPlayerX - card2X;
         float distCard2Y = positionPlayerY - card2Y;
-        double distToCard2 = Math.sqrt(Math.pow((double) distCard2X, 2) + Math.pow((double) distCard2Y, 2));
+        double distToCard2 = Math.hypot(distCard2X, distCard2Y);
 
         float distCard3X = positionPlayerX - card3X;
         float distCard3Y = positionPlayerY - card3Y;
-        double distToCard3 = Math.sqrt(Math.pow((double) distCard3X, 2) + Math.pow((double) distCard3Y, 2));
+        double distToCard3 = Math.hypot(distCard3X, distCard3Y);
 
         int maxTransparent = minAlpha;
         float ratio = (255 - maxTransparent) / (maxDistance - minDistance);
@@ -139,6 +139,7 @@ public class CardZone {
     }
 
     public void addCard(Card card) {
+        card.setReversed(reversed);
         cardList.add(card);
         updateContainers();
     }
@@ -149,8 +150,18 @@ public class CardZone {
         return c;
     }
 
+    public void reverseCards(boolean reverse) {
+        if (reversed != reverse) {
+            reversed = reverse;
+            for (Card c : cardList) {
+                c.setReversed(reversed);
+            }
+            updateContainers();
+        }
+    }
+
     public void updateContainers() {
-        switch(cardList.size()) {
+        switch (cardList.size()) {
             case 0:
                 containerCard1.setVisibility(GONE);
                 containerCard2.setVisibility(GONE);
