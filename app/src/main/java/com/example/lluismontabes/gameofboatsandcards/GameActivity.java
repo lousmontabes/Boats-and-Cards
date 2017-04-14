@@ -343,7 +343,13 @@ public class GameActivity extends AppCompatActivity {
         localPlayer.bringToFront();
     }
 
-    private void showPlayerPopup(Player p, String msg) {
+    /**
+     * Shows text pop-up above player position
+     * @param p     Player to show the pop-up above.
+     * @param msg   Message to display.
+     * @param t     Time in milliseconds to display the message for.
+     */
+    private void showPlayerPopup(Player p, String msg, int t) {
 
         TextView popup = new TextView(this);
         popup.setText(msg);
@@ -357,7 +363,7 @@ public class GameActivity extends AppCompatActivity {
         activePopups.add(popup);
 
         layout.addView(popup);
-        popup.animate().setStartDelay(500).alpha(0).y(oY - 100).setDuration(1000);
+        popup.animate().setStartDelay(t).alpha(0).y(oY - 100).setDuration(1000);
 
     }
 
@@ -447,7 +453,7 @@ public class GameActivity extends AppCompatActivity {
                     framesUntilTick1 = fps / 2;
                     textViewCounter1.setText(Integer.toString(score1) + "%");
 
-                    showPlayerPopup(localPlayer, "+1");
+                    showPlayerPopup(localPlayer, "+1", 500);
                     if (running) {
                         pointSound.start();
                     }
@@ -578,8 +584,10 @@ public class GameActivity extends AppCompatActivity {
                 //TODO: implemantar trampes
                 break;
         }
-        showPlayerPopup(localPlayer, usedCard.getName());
+
+        showPlayerPopup(localPlayer, usedCard.getName(), 1000);
         cardUsed = 0;
+
     }
 
     /**

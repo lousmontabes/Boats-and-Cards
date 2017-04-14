@@ -25,7 +25,7 @@ public class Player extends Collider{
 
     private int delay;
 
-    private CardZone cardZone; //Its own card zone, each player must to have one
+    private CardZone cardZone;
     private int[] cardEffects;
 
     private ImageView boatImageView;
@@ -201,8 +201,6 @@ public class Player extends Collider{
     public int handSize() {
         return cardZone.getCardList().size();
     }
-
-
 
     public void addEffect(int effect, int duration) {
         cardEffects[effect] = duration;

@@ -5,7 +5,7 @@ package com.example.lluismontabes.gameofboatsandcards;
  * Created by olekboad13.alumnes on 31/03/17.
  */
 
-public class Card {
+public class  Card {
 
     public static final int TOTAL_CARD_NUMBER = 6;
 
