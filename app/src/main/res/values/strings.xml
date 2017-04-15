@@ -22,6 +22,7 @@
     <string name="next">New Game</string>
     <string name="returnToMenu">Main Menu</string>
 
+
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
@@ -100,4 +101,9 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <!-- Animations test -->
+    <string name="description_image_1">Image 1</string>
+    <string name="description_touch_zoom_close">Touch zoom close</string>
+
 </resources>

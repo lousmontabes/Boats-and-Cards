@@ -22,7 +22,7 @@ public class Joystick extends RelativeLayout {
     public Joystick(Context context, AttributeSet attrs) {
 
         super(context, attrs);
-        LayoutInflater.from(context).inflate(R.layout.joystick, this);
+        LayoutInflater.from(context).inflate(R.layout.joystick,this);
 
         this.image = (ImageView) findViewById(R.id.imgJoystick);
         this.area = (RelativeLayout) findViewById(R.id.layoutJoystick);

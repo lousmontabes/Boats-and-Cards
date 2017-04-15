@@ -562,6 +562,8 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+
+
     private void useCard(Player player, int n) {
         Card usedCard = cardZone.popCard(n);
         int effect = usedCard.getEffect();

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+
+    android:background="#a6c"
+    android:padding="16dp"
+    android:gravity="bottom"
+    android:id="@+id/back">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@android:id/text1"
+        style="?android:textAppearanceLarge"
+        android:textStyle="bold"
+        android:textColor="#fff"
+        android:text="Card Back"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@android:id/text2"
+        style="?android:textAppearanceSmall"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:textColor="#80ffffff"
+        android:lineSpacingMultiplier="1.2"
+        android:text="The Back of the Card"/>
+
+
+</LinearLayout>
