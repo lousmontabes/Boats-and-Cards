@@ -1,6 +1,9 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -147,11 +150,16 @@ public class GameActivity extends AppCompatActivity {
     MediaPlayer pointSound;
     MediaPlayer backgroundMusic;
 
+    /**
+     * VISUAL EFFECTS
+     **/
+    Canvas fxCanvas;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        establishFullscreen();
+        setFullscreen();
         setContentView(R.layout.activity_game);
 
         running = true;
@@ -167,9 +175,24 @@ public class GameActivity extends AppCompatActivity {
         initializeIslandDomain(100);
         initializeListeners();
 
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+        /*int w = layout.getWidth();
+        int h = layout.getHeight();
+
+        System.out.println(w);
+        System.out.println(h);
+
+        Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        fxCanvas = new Canvas(b);*/
+
         /**
          * ASYNCHRONOUS TASKS
-         */
+         **/
         // Online data gatherer task
         startRemoteTask();
 
@@ -220,7 +243,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void establishFullscreen() {
+    private void setFullscreen() {
 
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -397,9 +420,9 @@ public class GameActivity extends AppCompatActivity {
      * Shows text pop-up above player position
      * @param p     Player to show the pop-up above.
      * @param msg   Message to display.
-     * @param t     Time in milliseconds to display the message for.
+     * @param time  Time in milliseconds to display the message for.
      */
-    private void showPlayerPopup(Player p, String msg, int t) {
+    private void showPlayerPopup(Player p, String msg, int time) {
 
         TextView popup = new TextView(this);
         popup.setText(msg);
@@ -413,7 +436,7 @@ public class GameActivity extends AppCompatActivity {
         activePopups.add(popup);
 
         layout.addView(popup);
-        popup.animate().setStartDelay(t).alpha(0).y(oY - 100).setDuration(1000);
+        popup.animate().setStartDelay(time).alpha(0).y(oY - 100).setDuration(1000);
 
     }
 
@@ -599,9 +622,24 @@ public class GameActivity extends AppCompatActivity {
                 //test CardZone
                 localPlayer.improveVisibilityCardZone(180, 140, 90);
 
+                // Environmental effects
+                //showDripplets();
 
             }
         });
+    }
+
+    private void showDripplets() {
+
+        Paint drippletPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        drippletPaint.setColor(getResources().getColor(R.color.uninvadedIsland));
+        drippletPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+
+        float drippletX = layout.getWidth() * ((float) Math.random());
+        float drippletY = layout.getHeight() * ((float) Math.random());
+
+        fxCanvas.drawCircle(drippletX, drippletY, 10, drippletPaint);
+
     }
 
     private void drawCard(Player player) {
@@ -611,8 +649,6 @@ public class GameActivity extends AppCompatActivity {
             log(Integer.toString(card.getId()));
         }
     }
-
-
 
     private void useCard(Player player, int n) {
         Card usedCard = cardZone.popCard(n);
