@@ -29,19 +29,14 @@
          from the bounds of the thumbnail button above, to its final laid-out
          bounds.
          -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/container_expandedImage">
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/container2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/expanded_image"
-        android:visibility="invisible"
-        android:contentDescription="@string/description_touch_zoom_close"/>
+        <include android:id="@+id/notelist" layout="@layout/first_view" />
+        <include android:id="@+id/notelist" layout="@layout/second_view" />
 
-
-    </LinearLayout>
+    </FrameLayout>
 
 </FrameLayout>

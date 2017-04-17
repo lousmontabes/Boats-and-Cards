@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
@@ -18,6 +19,8 @@ import android.widget.ImageView;
  */
 
 public class AnimationsActivity extends Activity {
+
+
     // Hold a reference to the current animator,
     // so that it can be canceled mid-way.
     private Animator mCurrentAnimator;
@@ -34,6 +37,8 @@ public class AnimationsActivity extends Activity {
     private final Rect startBounds = new Rect();
 
     private ImageView expandedImageView;
+    private ImageView image2;
+    private boolean isFirstImage = true;
 
     /**
      * Whether or not we're showing the back of the card (otherwise showing the front).
@@ -44,6 +49,9 @@ public class AnimationsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zoom);
+
+        image2 = (ImageView) findViewById(R.id.image_View2);
+        image2.setVisibility(View.GONE);
 
         //Descomentar para visualizar card-flip animation
         //getFragmentManager().beginTransaction().add(R.id.container,new CardFrontFragment()).commit();
@@ -71,8 +79,7 @@ public class AnimationsActivity extends Activity {
         }
 
         // Load the high-resolution "zoomed-in" image.
-        expandedImageView = (ImageView) findViewById(
-                R.id.expanded_image);
+        expandedImageView = (ImageView) findViewById(R.id.expanded_image);
         expandedImageView.setImageResource(imageResId);
 
         // Calculate the starting and ending bounds for the zoomed-in image.
@@ -161,6 +168,9 @@ public class AnimationsActivity extends Activity {
             @Override
             public void onClick(View view) {
 
+                expandedImageView.clearAnimation();
+                image2.clearAnimation();
+
                 clicks++;
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -169,6 +179,16 @@ public class AnimationsActivity extends Activity {
                         if (clicks == 1) {
                             //Descomentar para test card-flip
                             //flipCard();
+
+                            //Implementation of flip animation between double ImageView instead of Fragments
+
+                            if (isFirstImage) {
+                                applyRotation(0, 90);
+                                isFirstImage = !isFirstImage;
+                            } else {
+                                applyRotation(0, -90);
+                                isFirstImage = !isFirstImage;
+                            }
 
                         } else if (clicks == 2) {
                             if (mCurrentAnimator != null) {
@@ -216,6 +236,35 @@ public class AnimationsActivity extends Activity {
         });
     }
 
+
+    // Animation Flip-Card with double ImageView
+    private void applyRotation(float start, float end) {
+
+// Find the center of image
+
+        final float centerX = expandedImageView.getWidth() / 2.0f;
+        final float centerY = expandedImageView.getHeight() / 2.0f;
+
+
+// Create a new 3D rotation with the supplied parameter
+
+// The animation listener is used to trigger the next animation
+
+        final Flip3DAnimation rotation = new Flip3DAnimation(start, end, centerX, centerY);
+        rotation.setDuration(500);
+        rotation.setFillAfter(true);
+        rotation.setInterpolator(new AccelerateInterpolator());
+        rotation.setAnimationListener(new DisplayNextView(isFirstImage, expandedImageView, image2));
+
+        if (isFirstImage) {expandedImageView.startAnimation(rotation);}
+        else {image2.startAnimation(rotation);}
+
+
+
+    }
+
+
+    // Animation Flip-Card with double Fragment
     private void flipCard(){
         if (mShowingBack){
             getFragmentManager().popBackStack();
