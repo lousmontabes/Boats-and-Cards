@@ -151,12 +151,83 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        establishFullscreen();
         setContentView(R.layout.activity_game);
 
         running = true;
+
+        /**
+         * INITIALIZATION
+         */
+        initializeOnlineParameters();
+        initializeLayoutViews();
+        initializeCards();
+        initializeAudio();
+        initializePlayers();
+        initializeIslandDomain(100);
+        initializeListeners();
+
+        /**
+         * ASYNCHRONOUS TASKS
+         */
+        // Online data gatherer task
+        startRemoteTask();
+
+        // Start game loop
+        startRefreshTimer();
+
+    }
+
+    private void startRemoteTask() {
+
+        remoteTask = new RemoteDataTask();
+        //remoteTask.execute();
+
+    }
+
+    private void initializeListeners() {
+
+        layout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                localPlayerShoot();
+                // UNIMPLEMENTED: Point-and-click movement
+                //moveObjectTo(localPlayer, event.getX(), event.getY());
+                return false;
+
+            }
+        });
+
+    }
+
+    private void initializeLayoutViews() {
+
+        // Layout
+        layout = (RelativeLayout) findViewById(R.id.gameLayout);
+        cardLayout = (LinearLayout) findViewById(R.id.cardLayout);
+
+        // Debugging logs
+        log = (TextView) findViewById(R.id.log);
+        frameLog = (TextView) findViewById(R.id.frameLog);
+
+        // Joystick
+        joystick = (Joystick) findViewById(R.id.joystick);
+
+        // Timer and scoreboard
+        timer = (TextView) findViewById(R.id.timer);
+        textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
+        textViewCounter2 = (TextView) findViewById(R.id.textViewCounter2);
+
+    }
+
+    private void establishFullscreen() {
+
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+    }
+
+    private void initializeOnlineParameters() {
 
         Intent intent = getIntent();
         this.matchId = intent.getIntExtra("matchId", -1);
@@ -168,13 +239,9 @@ public class GameActivity extends AppCompatActivity {
         System.out.println("Match ID: " + matchId);
         System.out.println("Assigned player: " + assignedPlayer);
 
-        layout = (RelativeLayout) findViewById(R.id.gameLayout);
-        cardLayout = (LinearLayout) findViewById(R.id.cardLayout);
+    }
 
-        log = (TextView) findViewById(R.id.log);
-        frameLog = (TextView) findViewById(R.id.frameLog);
-
-        joystick = (Joystick) findViewById(R.id.joystick);
+    private void initializeCards() {
 
         containerCard1 = (ImageView) findViewById(R.id.card1);
         containerCard2 = (ImageView) findViewById(R.id.card2);
@@ -202,35 +269,48 @@ public class GameActivity extends AppCompatActivity {
         });
         cardZone = new CardZone(cardLayout, containerCard1, containerCard2, containerCard3);
 
-        timer = (TextView) findViewById(R.id.timer);
-        textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
-        textViewCounter2 = (TextView) findViewById(R.id.textViewCounter2);
+    }
 
+    private void initializeIslandDomain(float radius) {
+        islandDomain = new IslandDomain(this, radius);
+        layout.addView(islandDomain);
+    }
+
+    private void initializePlayers() {
+        localPlayer = new Player(GameActivity.this, null);
+        localPlayer.setCardZone(cardZone);
+        remotePlayer = new Player(GameActivity.this, null);
+
+        //localPlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
+        //remotePlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
+
+        final float scale = this.getResources().getDisplayMetrics().density;
+
+        ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) (60 * scale + 0.5f),
+                (int) (90 * scale + 0.5f));
+
+        localPlayer.setLayoutParams(playerParams);
+        remotePlayer.setLayoutParams(playerParams);
+
+        activePlayers.add(localPlayer);
+        activePlayers.add(remotePlayer);
+
+        layout.addView(localPlayer);
+        layout.addView(remotePlayer);
+
+        System.out.println(activePlayers);
+    }
+
+    private void initializeAudio() {
+
+        // Initialize score sound
         pointSound = MediaPlayer.create(getApplicationContext(), R.raw.point);
+
+        // Initialize background music
         backgroundMusic = MediaPlayer.create(getApplicationContext(), R.raw.background_music);
 
-        spawnPlayers();
-        spawnIslandDomain(100);
-
-        layout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                localPlayerShoot();
-                // UNIMPLEMENTED: Point-and-click movement
-                //moveObjectTo(localPlayer, event.getX(), event.getY());
-                return false;
-
-            }
-        });
-
-        /** ASYNCHRONOUS TASKS **/
-        // Online data gatherer task
-        remoteTask = new RemoteDataTask();
-        //remoteTask.execute();
-
-        // Start game loop
-        startRefreshTimer();
-
+        // Start background music
+        // TODO: Add condition in case the user has turned off sound in the settings.
         backgroundMusic.start();
 
     }
@@ -281,36 +361,6 @@ public class GameActivity extends AppCompatActivity {
     private void startRefreshTimer() {
         this.refreshTimer = new Timer();
         refreshTimer.schedule(new RefreshTask(), 0, refreshPeriod);
-    }
-
-    private void spawnIslandDomain(float radius) {
-        islandDomain = new IslandDomain(this, radius);
-        layout.addView(islandDomain);
-    }
-
-    private void spawnPlayers() {
-        localPlayer = new Player(GameActivity.this, null);
-        localPlayer.setCardZone(cardZone);
-        remotePlayer = new Player(GameActivity.this, null);
-
-        //localPlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
-        //remotePlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
-
-        final float scale = this.getResources().getDisplayMetrics().density;
-
-        ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) (60 * scale + 0.5f),
-                                                                         (int) (90 * scale + 0.5f));
-
-        localPlayer.setLayoutParams(playerParams);
-        remotePlayer.setLayoutParams(playerParams);
-
-        activePlayers.add(localPlayer);
-        activePlayers.add(remotePlayer);
-
-        layout.addView(localPlayer);
-        layout.addView(remotePlayer);
-
-        System.out.println(activePlayers);
     }
 
     // Displays a message on the game log
