@@ -26,6 +26,7 @@ public class  Card {
         public static final int STUNNED = 3;
         public static final int REVERSED_HAND = 4;
         public static final int DISCARD_ALL = 5;
+        public static final int REVERSED_CONTROLS = 6;
     }
 
     private int target;
@@ -60,6 +61,10 @@ public class  Card {
                 return "Speed up!";
             case 4:
                 return "Cards reversed!";
+            case 5:
+                return "All cards discarded!";
+            case 6:
+                return "Backwards!";
             default:
                 return "Carta ?";
         }
@@ -124,8 +129,9 @@ public class  Card {
             case 4:
                 return Effect.REVERSED_HAND;
             case 5:
+                return Effect.DISCARD_ALL;
             case 6:
-                return 0;
+                return Effect.REVERSED_CONTROLS;
             default:
                 throw new UnknownError();
         }

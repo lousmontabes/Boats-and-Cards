@@ -60,7 +60,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AnimationsActivity" />
+        <!--<activity android:name=".AnimationsActivity" />-->
 
     </application>
 
