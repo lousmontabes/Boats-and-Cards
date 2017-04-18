@@ -25,14 +25,8 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // Start MatchmakingActivity
-                //Intent i = new Intent(MainMenuActivity.this, MatchmakingActivity.class);
-                //startActivity(i);
-                //test without connect server
-                Intent e = new Intent(MainMenuActivity.this, GameActivity.class);
-                startActivity(e);
-                //test card-flip and zoom-in animation
-                //Intent a = new Intent(MainMenuActivity.this, AnimationsActivity.class);
-                //startActivity(a);
+                Intent i = new Intent(MainMenuActivity.this, MatchmakingActivity.class);
+                startActivity(i);
 
             }
         });
