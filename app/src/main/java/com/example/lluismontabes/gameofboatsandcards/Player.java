@@ -32,7 +32,7 @@ public class Player extends Collider{
     private ImageView shadowImageView;
 
     public Player(Context context, AttributeSet attrs) {
-        super(context, 50);
+        super(context, 40);
 
         LayoutInflater.from(context).inflate(R.layout.player, this);
 
@@ -45,6 +45,7 @@ public class Player extends Collider{
         this.health = 100;       // 100 units of health
         delay = 0;               // 0 frames of fire delay
         cardEffects = new int[Card.TOTAL_CARD_NUMBER];
+
     }
 
     // SETTERS

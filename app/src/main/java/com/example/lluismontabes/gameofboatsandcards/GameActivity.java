@@ -117,8 +117,8 @@ public class GameActivity extends AppCompatActivity {
     int secondsLeft = 120;
 
     // Counters
-    byte framesUntilTick1 = fps;
-    byte framesUntilTick2 = fps;
+    byte framesUntilTick1 = fps / 2;
+    byte framesUntilTick2 = fps / 2;
 
     /**
      * COLLECTIONS
@@ -304,6 +304,8 @@ public class GameActivity extends AppCompatActivity {
         localPlayer.setCardZone(cardZone);
         remotePlayer = new Player(GameActivity.this, null);
 
+        localPlayer.showHitbox();
+
         //localPlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
         //remotePlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
 
@@ -422,16 +424,26 @@ public class GameActivity extends AppCompatActivity {
      * @param msg   Message to display.
      * @param time  Time in milliseconds to display the message for.
      */
-    private void showPlayerPopup(Player p, String msg, int time) {
+    private void showPlayerPopup(Player p, String msg, int time, boolean disperse) {
 
         TextView popup = new TextView(this);
         popup.setText(msg);
 
-        float oX = p.getX() + p.getWidth() / 2 - popup.getWidth() / 2;
+        float oX = p.getX() - popup.getWidth() / 2;
         float oY = p.getY() - 35;
 
-        popup.setX(oX);
-        popup.setY(oY);
+        float detourX, detourY;
+
+        if(disperse){
+            detourX = (float) (p.getWidth() / 2 * Math.random());
+            detourY = (float) (20 * Math.random());
+        }else{
+            detourX = p.getWidth() / 2;
+            detourY = 0;
+        }
+
+        popup.setX(oX + detourX);
+        popup.setY(oY + detourY);
 
         activePopups.add(popup);
 
@@ -526,7 +538,7 @@ public class GameActivity extends AppCompatActivity {
                     framesUntilTick1 = fps / 2;
                     textViewCounter1.setText(Integer.toString(score1) + "%");
 
-                    showPlayerPopup(localPlayer, "+1", 500);
+                    showPlayerPopup(localPlayer, "+1", 250, true);
                     if (running) {
                         pointSound.start();
                     }
@@ -673,7 +685,7 @@ public class GameActivity extends AppCompatActivity {
                 break;
         }
 
-        showPlayerPopup(localPlayer, usedCard.getName(), 1000);
+        showPlayerPopup(localPlayer, usedCard.getName(), 1000, false);
         cardUsed = 0;
 
     }

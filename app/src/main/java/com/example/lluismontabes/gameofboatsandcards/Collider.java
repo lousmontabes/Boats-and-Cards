@@ -2,6 +2,10 @@ package com.example.lluismontabes.gameofboatsandcards;
 
 import android.content.Context;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,6 +31,8 @@ public abstract class Collider extends RelativeLayout {
 
         this.isRound = true;
         this.radius = r;
+
+        setWillNotDraw(false);
     }
 
     /**
@@ -85,7 +91,7 @@ public abstract class Collider extends RelativeLayout {
         float distX = c.getCenterX() - this.getCenterX();
         float distY = c.getCenterY() - this.getCenterY();
 
-        float dist = (float) Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+        float dist = (float) Math.hypot(distX, distY);
 
         return dist;
 
@@ -93,7 +99,22 @@ public abstract class Collider extends RelativeLayout {
 
     public boolean isColliding(Collider c){
 
-        return (this.getDistance(c) <= c.getRadiusPixels());
+        return (this.getDistance(c) <= (this.getRadiusPixels() + c.getRadiusPixels()));
+
+    }
+
+    public void showHitbox(){
+
+        int bDim = (int) getRadiusPixels();
+
+        Bitmap bitmap = Bitmap.createBitmap(bDim, bDim, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        Paint hitboxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        hitboxPaint.setColor(Color.MAGENTA);
+        hitboxPaint.setStyle(Paint.Style.STROKE);
+
+        canvas.drawCircle(getCenterX(), getCenterY(), getRadiusPixels(), hitboxPaint);
 
     }
 
