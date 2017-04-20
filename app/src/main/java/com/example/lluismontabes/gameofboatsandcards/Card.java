@@ -9,7 +9,7 @@ public class  Card {
 
     public static final int TOTAL_CARD_NUMBER = 6;
 
-    //Target of the effect of the card
+    // Target of the effect of the card
     public static final class Target {
         public static final int SELF = 0;
         public static final int OPPONENT = 1;
@@ -18,7 +18,7 @@ public class  Card {
         public static final int TRAP = 4;
     }
 
-    //Possible effects of the cards
+    // Possible effects of the cards
     public static final class Effect {
         public static final int SPEED_UP = 0;
         public static final int ATTACK_UP = 1;
@@ -34,6 +34,9 @@ public class  Card {
     private String name;
     private boolean reversed;
 
+    /**
+     * Random card constructor.
+     */
     public Card() {
         id = (int) (Math.random() * TOTAL_CARD_NUMBER) + 1;
         name = getName(id);
@@ -41,6 +44,10 @@ public class  Card {
         reversed = false;
     }
 
+    /**
+     * Specific card constructor.
+     * @param id    Type of the card to create.
+     */
     public Card(int id) {
         this.id = id;
         name = getName(id);

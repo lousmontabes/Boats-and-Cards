@@ -105,6 +105,9 @@ public class GameActivity extends AppCompatActivity {
     TextView textViewCounter1;
     TextView textViewCounter2;
 
+    // Images
+    ImageView treasureImageView;
+
     /**
      * STATISTICS
      **/
@@ -257,6 +260,9 @@ public class GameActivity extends AppCompatActivity {
         textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
         textViewCounter2 = (TextView) findViewById(R.id.textViewCounter2);
 
+        // Images
+        treasureImageView = (ImageView) findViewById(R.id.treasureImageView);
+
     }
 
     private void setFullscreen() {
@@ -311,24 +317,24 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initializeIslandDomain(float radius) {
+
         islandDomain = new IslandDomain(this, radius);
         layout.addView(islandDomain);
+
+        treasureImageView.bringToFront();
+
     }
 
     private void initializePlayers() {
+
         localPlayer = new Player(GameActivity.this, null);
         localPlayer.setCardZone(cardZone);
         remotePlayer = new Player(GameActivity.this, null);
 
-        localPlayer.showHitbox();
+        //localPlayer.showHitbox();
 
-        //localPlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
-        //remotePlayer.setImageDrawable(getResources().getDrawable(R.drawable.basicboat));
-
-        final float scale = this.getResources().getDisplayMetrics().density;
-
-        ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) (60 * scale + 0.5f),
-                (int) (90 * scale + 0.5f));
+        ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) Graphics.toPixels(this, 60),
+                                                                         (int) Graphics.toPixels(this, 90));
 
         localPlayer.setLayoutParams(playerParams);
         remotePlayer.setLayoutParams(playerParams);

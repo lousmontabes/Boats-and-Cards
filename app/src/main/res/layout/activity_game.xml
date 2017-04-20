@@ -80,12 +80,12 @@
             android:id="@+id/frameLog" />
 
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            app:srcCompat="@drawable/island"
+            app:srcCompat="@drawable/treasure"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/imageView2" />
+            android:id="@+id/treasureImageView"
+            android:layout_width="70dp"
+            android:layout_height="70dp" />
 
     </RelativeLayout>
 

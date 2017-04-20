@@ -12,7 +12,7 @@ import android.widget.ImageView;
  *
  */
 
-public class Player extends Collider{
+public class Player extends RectangularCollider {
 
     private float velocity, idleVelocity;
     private float rotationSpeed;
@@ -32,7 +32,7 @@ public class Player extends Collider{
     private ImageView shadowImageView;
 
     public Player(Context context, AttributeSet attrs) {
-        super(context, 40);
+        super(context, 50, 120);
 
         LayoutInflater.from(context).inflate(R.layout.player, this);
 

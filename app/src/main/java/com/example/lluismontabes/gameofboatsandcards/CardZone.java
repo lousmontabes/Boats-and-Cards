@@ -80,8 +80,8 @@ public class CardZone {
     //maxDistance define the distance from card zone starts to get transparent
     //minDistance define the distance at the transparency gets its minimum value and doesn't get smaller values
     public void improveVisibility(Player player, float maxDistance, float minDistance, int minAlpha) {
-        float positionPlayerX = player.getCenterX();
-        float positionPlayerY = player.getCenterY();
+        float positionPlayerX = player.getCenter().x;
+        float positionPlayerY = player.getCenter().y;
 
         int[] location1 = new int[2];
         containerCard1.getLocationOnScreen(location1);
@@ -101,7 +101,6 @@ public class CardZone {
         float distCard1X = positionPlayerX - card1X;
         float distCard1Y = positionPlayerY - card1Y;
         double distToCard1 = Math.hypot(distCard1X, distCard1Y);
-
 
         float distCard2X = positionPlayerX - card2X;
         float distCard2Y = positionPlayerY - card2Y;
