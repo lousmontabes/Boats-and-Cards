@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
@@ -154,6 +155,7 @@ public class GameActivity extends AppCompatActivity {
      * VISUAL EFFECTS
      **/
     Canvas fxCanvas;
+    boolean canvasCreated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,15 +183,6 @@ public class GameActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
 
-        /*int w = layout.getWidth();
-        int h = layout.getHeight();
-
-        System.out.println(w);
-        System.out.println(h);
-
-        Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        fxCanvas = new Canvas(b);*/
-
         /**
          * ASYNCHRONOUS TASKS
          **/
@@ -210,6 +203,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void initializeListeners() {
 
+        // Layout onTouchListener
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -217,6 +211,28 @@ public class GameActivity extends AppCompatActivity {
                 // UNIMPLEMENTED: Point-and-click movement
                 //moveObjectTo(localPlayer, event.getX(), event.getY());
                 return false;
+
+            }
+        });
+
+        // Layout dimensions listener
+        layout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+
+                // We can get layout dimensions at this point.
+
+                int w = layout.getWidth();
+                int h = layout.getHeight();
+
+                System.out.println(w);
+                System.out.println(h);
+
+                Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+                fxCanvas = new Canvas(b);
+
+                canvasCreated = true;
 
             }
         });
@@ -635,7 +651,7 @@ public class GameActivity extends AppCompatActivity {
                 localPlayer.improveVisibilityCardZone(180, 140, 90);
 
                 // Environmental effects
-                //showDripplets();
+                showDripplets();
 
             }
         });
@@ -643,14 +659,18 @@ public class GameActivity extends AppCompatActivity {
 
     private void showDripplets() {
 
-        Paint drippletPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        drippletPaint.setColor(getResources().getColor(R.color.uninvadedIsland));
-        drippletPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        if(canvasCreated){
 
-        float drippletX = layout.getWidth() * ((float) Math.random());
-        float drippletY = layout.getHeight() * ((float) Math.random());
+            Paint drippletPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            drippletPaint.setColor(getResources().getColor(R.color.uninvadedIsland));
+            drippletPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
-        fxCanvas.drawCircle(drippletX, drippletY, 10, drippletPaint);
+            float drippletX = layout.getWidth() * ((float) Math.random());
+            float drippletY = layout.getHeight() * ((float) Math.random());
+
+            fxCanvas.drawCircle(drippletX, drippletY, 10, drippletPaint);
+
+        }
 
     }
 
