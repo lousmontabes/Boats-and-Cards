@@ -379,8 +379,21 @@ public class GameActivity extends AppCompatActivity {
             Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY, baseDamage);
             GameActivity.this.activeProjectiles.add(projectile);
             GameActivity.this.activeColliders.add(projectile);
-
             layout.addView(projectile);
+
+            if (localPlayer.isEffectActive(Card.Effect.TRIPLE_SHOT)) {
+
+                Projectile projectileL = new Projectile(GameActivity.this, joystick.getCurrentAngle() - .3f, oX, oY, baseDamage);
+                GameActivity.this.activeProjectiles.add(projectileL);
+                GameActivity.this.activeColliders.add(projectileL);
+                layout.addView(projectileL);
+
+                Projectile projectileR = new Projectile(GameActivity.this, joystick.getCurrentAngle() + .3f, oX, oY, baseDamage);
+                GameActivity.this.activeProjectiles.add(projectileR);
+                GameActivity.this.activeColliders.add(projectileR);
+                layout.addView(projectileR);
+            }
+
             localPlayer.setDelay(20);
         }
 
@@ -621,13 +634,8 @@ public class GameActivity extends AppCompatActivity {
                 // Collisions
                 checkProjectileCollisions();
 
-                // Health
-                for (Player pl : activePlayers) {
-                    if (pl.getHealth() <= 0) pl.die();
-                }
-
                 // Decrease delay to shoot again
-                if (!localPlayer.canShoot()) localPlayer.decreaseDelay();
+                localPlayer.decreaseDelay();
 
                 // islandDomain collisions
                 checkIslandDomainCollisions();
