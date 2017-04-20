@@ -61,16 +61,10 @@ public abstract class Collider extends RelativeLayout {
     }
 
     public float getRadiusPixels() {
-
-        final float scale = getContext().getResources().getDisplayMetrics().density;
-        int rp = (int) (this.radius * scale + 0.5f);
-
-        return rp;
-
+        return (int) Graphics.toPixels(getContext(), this.radius);
     }
 
     public float getCenterX(){
-        // TODO: Fix this method
         return this.getX() + this.getRadiusPixels();
     }
 

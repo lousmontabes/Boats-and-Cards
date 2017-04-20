@@ -30,8 +30,7 @@ public class Projectile extends Collider {
         this.setX(originX);
         this.setY(originY);
 
-        final float scale = getContext().getResources().getDisplayMetrics().density;
-        int pixels = (int) (20 * scale + 0.5f);
+        int pixels = (int) Graphics.toPixels(getContext(), 20);
 
         this.setLayoutParams(new ViewGroup.LayoutParams(pixels, pixels));
 
