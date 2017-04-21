@@ -149,6 +149,11 @@ public class CardZone {
         return c;
     }
 
+    public void discardAll() {
+        cardList.clear();
+        updateContainers();
+    }
+
     public void reverseCards(boolean reverse) {
         if (reversed != reverse) {
             reversed = reverse;
@@ -190,7 +195,6 @@ public class CardZone {
 
         }
     }
-
 }
 
 

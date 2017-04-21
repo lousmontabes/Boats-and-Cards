@@ -5,6 +5,8 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 
+import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.*;
+
 /**
  * Created by lluismontabes on 6/3/17.
  *
@@ -44,7 +46,7 @@ public class Player extends RectangularCollider {
         this.rotationSpeed = 10; // 10 degrees per frame
         this.health = 100;       // 100 units of health
         delay = 0;               // 0 frames of fire delay
-        cardEffects = new int[Card.TOTAL_CARD_NUMBER];
+        cardEffects = new int[Card.TOTAL_CARD_NUMBER*2];
 
     }
 
@@ -101,7 +103,11 @@ public class Player extends RectangularCollider {
         return delay;
     }
 
-    public void decreaseDelay() { delay--; };
+    public void decreaseDelay() {
+        if (delay > 0) {
+            delay--;
+        }
+    }
 
     /**
      * Moves Player in the specified angle.
@@ -110,7 +116,7 @@ public class Player extends RectangularCollider {
      */
     public void move(float angle, float intensity){
 
-        if (!isEffectActive(Card.Effect.STUNNED)) {
+        if (!isEffectActive(STUNNED)) {
 
             x = this.getX();
             y = this.getY();
@@ -119,8 +125,11 @@ public class Player extends RectangularCollider {
             float scaleY = (float) Math.sin(angle);
 
             float modifier = 1;
-            if (isEffectActive(Card.Effect.SPEED_UP)) {
+            if (isEffectActive(SPEED_UP)) {
                 modifier *= 2;
+            }
+            if (isEffectActive(REVERSED_CONTROLS)) {
+                modifier = -modifier;
             }
 
             float velocityX = scaleX * this.velocity * intensity * modifier;
@@ -183,14 +192,17 @@ public class Player extends RectangularCollider {
 
     // USER INTERACTION
     public void damage(int d){
-        if (isEffectActive(Card.Effect.DEFENSE_UP)) {
+        if (isEffectActive(DEFENSE_UP)) {
             d /= 2;
         }
         this.health -= d;
+        if (this.health <= 0) {
+            die();
+        }
     }
 
     public boolean canShoot() {
-        return delay == 0;
+        return delay == 0 && !isEffectActive(STUNNED);
     }
 
     public void die(){
@@ -222,7 +234,16 @@ public class Player extends RectangularCollider {
     }
 
     public void handleEffects() {
-        cardZone.reverseCards(isEffectActive(Card.Effect.REVERSED_HAND));
+        cardZone.reverseCards(isEffectActive(REVERSED_HAND));
+        if (isEffectActive(DISCARD_ALL)) {
+            cardZone.discardAll();
+        }
+        if (isEffectActive(KO)) {
+            die();
+        }
+        if (isEffectActive(DISPEL)) {
+            removeAllEffects();
+        }
     }
 
     public void decreaseEffectsDuration() {
