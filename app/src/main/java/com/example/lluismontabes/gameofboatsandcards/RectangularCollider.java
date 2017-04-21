@@ -16,7 +16,8 @@ public abstract class RectangularCollider extends RelativeLayout implements Coll
 
     private Point center;
     private float w, h;
-    private float halfWidth, halfHeight;
+    private float halfWidth, halfHeight, halfHypothenuse;
+    private float criticalAngle;
 
     /**
      * Rectangular collider constructor
@@ -32,7 +33,12 @@ public abstract class RectangularCollider extends RelativeLayout implements Coll
 
         this.halfWidth = w / 2;
         this.halfHeight = h / 2;
+        this.halfHypothenuse = (float) Math.hypot((double) halfWidth,(double) halfHeight);
+
+        this.criticalAngle = (float) Math.asin(halfHeight / halfHypothenuse);
+
         this.center = new Point();
+
     }
 
     public float getHalfWidth(){
@@ -67,8 +73,29 @@ public abstract class RectangularCollider extends RelativeLayout implements Coll
         float distY = c.getCenter().y - this.getCenter().y;
 
         float dist = (float) Math.hypot(distX, distY);
-
         return dist;
+
+    }
+
+    public float getIncidenceAngle(Collider c){
+
+        return (float) Math.asin(c.getCenter().x - this.getCenter().x / this.getDistance(c));
+
+    }
+
+    public float getHypotAtAngle(float angle){
+
+        float hypot = -1;
+
+        if (angle < criticalAngle){
+            hypot = (float) (halfWidth / Math.cos(angle));
+        } else if (angle > criticalAngle){
+            hypot = (float) (halfHeight / Math.sin(angle));
+        } else if (angle == criticalAngle){
+            hypot = halfHypothenuse;
+        }
+
+        return hypot;
 
     }
 
@@ -82,7 +109,8 @@ public abstract class RectangularCollider extends RelativeLayout implements Coll
             // Rectangular - Round collision.
 
             RoundCollider roundCollider = (RoundCollider) c;
-            colliding = (this.getDistance(c) <= (this.getHalfWidthPixels() + roundCollider.getRadiusPixels()));
+            float angle = getIncidenceAngle(c);
+            colliding = (this.getDistance(c) <= (this.getHypotAtAngle(angle) + roundCollider.getRadiusPixels()));
 
         }else if(c instanceof RectangularCollider){
 
