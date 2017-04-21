@@ -1,26 +1,72 @@
 package com.example.lluismontabes.gameofboatsandcards;
 
+import android.content.Context;
 import android.graphics.Point;
+import android.widget.RelativeLayout;
 
 /**
  * Created by lluismontabes on 20/4/17.
  */
 
-public interface Collider {
+public abstract class Collider extends RelativeLayout {
 
-    // Returns center coordinates.
-    Point getCenter();
+    public Collider(Context context) {
+        super(context);
+    }
 
-    // Returns top-left (real) coordinates.
-    Point getPosition();
+    /**
+     * Return center coordinates.
+     * @return  Center position of the Collider.
+     */
+    abstract Point getCenter();
 
-    // Returns the distance from this collider to the specified collider.
-    float getDistance(Collider c);
+    /**
+     * Returns top-left (real) coordinates.
+     * @return  Top-left position of the Collider.
+     */
+    public Point getPosition() {
+        Point p = new Point((int)this.getX(), (int)this.getY());
+        return p;
+    }
 
-    // Returns true if this collider is currently colliding with the specified collider.
-    boolean isColliding(Collider c);
+    /**
+     * Returns distance from this Collider to the specified Collider.
+     * @param c     Collider to get distance to.
+     * @return      Distance.
+     */
+    public float getDistance(Collider c){
+        float distX = c.getCenter().x - this.getCenter().x;
+        float distY = c.getCenter().y - this.getCenter().y;
 
-    // Unimplemented. Shows a visual representation of the hitbox.
-    void showHitbox();
+        return (float) Math.hypot(distX, distY);
+    }
+
+    /**
+     * Returns distance from the center of this Collider to the contact point
+     * with the specified Collider.
+     * @param c     Collider to get distance to contact with.
+     * @return
+     */
+    abstract float getDistanceToContact(Collider c);
+
+    /**
+     * Returns whether or not the current Collider is in contact with the specified Collider.
+     * @param c     Collider to check collision with.
+     * @return      Whether or not there is a collision.
+     */
+    public boolean isColliding(Collider c){
+
+        // Generic comparison for all types of collisions.
+        // getDistanceToContact(c) returns the radius in a RoundCollider
+        // and the distance from the center to an edge at a given angle
+        // in a RectangularCollider.
+        return (this.getDistance(c) <= (c.getDistanceToContact(c) + c.getDistanceToContact(this)));
+
+    }
+
+    /**
+     * UNIMPLEMENTED - Shows a visual representation of the current Collider's hitbox.
+     */
+    abstract void showHitbox();
 
 }

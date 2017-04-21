@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
  * Created by lluismontabes on 20/4/17.
  */
 
-public abstract class RectangularCollider extends RelativeLayout implements Collider {
+public abstract class RectangularCollider extends Collider {
 
     private Point center;
     private float w, h;
@@ -62,19 +62,8 @@ public abstract class RectangularCollider extends RelativeLayout implements Coll
         return this.center;
     }
 
-    public Point getPosition() {
-        Point p = new Point((int)this.getX(), (int)this.getY());
-        return p;
-    }
-
-    public float getDistance(Collider c){
-
-        float distX = c.getCenter().x - this.getCenter().x;
-        float distY = c.getCenter().y - this.getCenter().y;
-
-        float dist = (float) Math.hypot(distX, distY);
-        return dist;
-
+    public float getDistanceToContact(Collider c){
+        return getHypotAtAngle(getIncidenceAngle(c));
     }
 
     public float getIncidenceAngle(Collider c){
@@ -99,30 +88,18 @@ public abstract class RectangularCollider extends RelativeLayout implements Coll
 
     }
 
+    /**
+     * Returns whether or not the current Collider is in contact with the specified Collider.
+     * @param c     Collider to check collision with.
+     * @return      Whether or not there is a collision.
+     */
     public boolean isColliding(Collider c){
 
-        boolean colliding = false;
-
-        if (c instanceof RoundCollider){
-
-            // Specified collider is a RoundCollider.
-            // Rectangular - Round collision.
-
-            RoundCollider roundCollider = (RoundCollider) c;
-            float angle = getIncidenceAngle(c);
-            colliding = (this.getDistance(c) <= (this.getHypotAtAngle(angle) + roundCollider.getRadiusPixels()));
-
-        }else if(c instanceof RectangularCollider){
-
-            // Specified collider is a RectangularCollider.
-            // Rectangular - Rectangular collision.
-
-            RectangularCollider rectangularCollider = (RectangularCollider) c;
-            colliding = (this.getDistance(c) <= (this.getHalfWidthPixels() + rectangularCollider.getHalfWidthPixels()));
-
-        }
-
-        return colliding;
+        // Generic comparison for all types of collisions.
+        // getDistanceToContact(c) returns the radius in a RoundCollider
+        // and the distance from the center to an edge at a given angle
+        // in a RectangularCollider.
+        return (this.getDistance(c) <= (c.getDistanceToContact(c) + c.getDistanceToContact(this)));
 
     }
 

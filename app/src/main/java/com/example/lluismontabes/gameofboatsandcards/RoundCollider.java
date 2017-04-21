@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
  * Created by lluismontabes on 17/3/17.
  */
 
-public abstract class RoundCollider extends RelativeLayout implements Collider {
+public abstract class RoundCollider extends Collider {
 
     private float radius, radiusPixels;
     private Point center;
@@ -41,49 +41,13 @@ public abstract class RoundCollider extends RelativeLayout implements Collider {
         return radiusPixels;
     }
 
+    public float getDistanceToContact(Collider c){
+        return getRadiusPixels();
+    }
+
     public Point getCenter(){
         center.set((int) (this.getX() + this.getRadiusPixels()), (int) (this.getY() + this.getRadiusPixels()));
         return this.center;
-    }
-
-    public Point getPosition() {
-        Point p = new Point((int)this.getX(), (int)this.getY());
-        return p;
-    }
-
-    public float getDistance(Collider c){
-        float distX = c.getCenter().x - this.getCenter().x;
-        float distY = c.getCenter().y - this.getCenter().y;
-
-        float dist = (float) Math.hypot(distX, distY);
-
-        return dist;
-    }
-
-    public boolean isColliding(Collider c){
-
-        boolean colliding = false;
-
-        if (c instanceof RoundCollider){
-
-            // Specified collider is a RoundCollider.
-            // Round - Round collision.
-
-            RoundCollider roundCollider = (RoundCollider) c;
-            colliding = (this.getDistance(c) <= (this.getRadiusPixels() + roundCollider.getRadiusPixels()));
-
-        }else if (c instanceof RectangularCollider){
-
-            // Specified collider is a RectangularCollider.
-            // Round - Rectangular collision.
-
-            RectangularCollider rectangularCollider = (RectangularCollider) c;
-            colliding = (this.getDistance(c) <= (this.getRadiusPixels() + rectangularCollider.getHalfWidthPixels()));
-
-        }
-
-        return colliding;
-
     }
 
     public void showHitbox(){
