@@ -229,9 +229,6 @@ public class GameActivity extends AppCompatActivity {
                 int w = layout.getWidth();
                 int h = layout.getHeight();
 
-                System.out.println(w);
-                System.out.println(h);
-
                 Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
                 fxCanvas = new Canvas(b);
 

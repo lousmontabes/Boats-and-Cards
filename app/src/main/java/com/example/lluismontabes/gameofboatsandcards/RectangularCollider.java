@@ -31,14 +31,15 @@ public abstract class RectangularCollider extends Collider {
         this.w = w;
         this.h = h;
 
-        this.halfWidth = w / 2;
-        this.halfHeight = h / 2;
+        this.halfWidth = Graphics.toPixels(getContext(), w / 2);
+        this.halfHeight = Graphics.toPixels(getContext(), h / 2);
         this.halfHypothenuse = (float) Math.hypot((double) halfWidth,(double) halfHeight);
 
         this.criticalAngle = (float) Math.asin(halfHeight / halfHypothenuse);
 
         this.center = new Point();
 
+        setWillNotDraw(false);
     }
 
     public float getHalfWidth(){
@@ -58,8 +59,9 @@ public abstract class RectangularCollider extends Collider {
     }
 
     public Point getCenter(){
-        this.center.set((int) (this.getX() + halfWidth), (int) (this.getY() + halfHeight));
-        return this.center;
+        center.set((int) (this.getX() + halfWidth), (int) (this.getY() + halfHeight));
+        //System.out.println("Center of RectangularCollider at: " + center);
+        return center;
     }
 
     public float getDistanceToContact(Collider c){
@@ -67,9 +69,8 @@ public abstract class RectangularCollider extends Collider {
     }
 
     public float getIncidenceAngle(Collider c){
-
+        System.out.println("ANGLE OF INCIDENCE: " + Math.toDegrees(Math.asin(c.getCenter().x - this.getCenter().x / this.getDistance(c))));
         return (float) Math.asin(c.getCenter().x - this.getCenter().x / this.getDistance(c));
-
     }
 
     public float getHypotAtAngle(float angle){
@@ -88,21 +89,6 @@ public abstract class RectangularCollider extends Collider {
 
     }
 
-    /**
-     * Returns whether or not the current Collider is in contact with the specified Collider.
-     * @param c     Collider to check collision with.
-     * @return      Whether or not there is a collision.
-     */
-    public boolean isColliding(Collider c){
-
-        // Generic comparison for all types of collisions.
-        // getDistanceToContact(c) returns the radius in a RoundCollider
-        // and the distance from the center to an edge at a given angle
-        // in a RectangularCollider.
-        return (this.getDistance(c) <= (c.getDistanceToContact(c) + c.getDistanceToContact(this)));
-
-    }
-
     public void showHitbox(){
 
         Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
@@ -114,6 +100,17 @@ public abstract class RectangularCollider extends Collider {
 
         canvas.drawRect(getPosition().x, getPosition().y, getPosition().x + getWidth(), getPosition().y + getHeight(), hitboxPaint);
 
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas){
+
+        Paint hitboxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        hitboxPaint.setColor(Color.MAGENTA);
+        hitboxPaint.setStyle(Paint.Style.STROKE);
+
+        canvas.drawRect(getPosition().x, getPosition().y, getPosition().x + getWidth(), getPosition().y + getHeight(), hitboxPaint);
+        canvas.drawCircle(getCenter().x, getCenter().y, 10, hitboxPaint);
     }
 
 }

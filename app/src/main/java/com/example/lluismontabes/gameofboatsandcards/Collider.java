@@ -35,8 +35,8 @@ public abstract class Collider extends RelativeLayout {
      * @return      Distance.
      */
     public float getDistance(Collider c){
-        float distX = c.getCenter().x - this.getCenter().x;
-        float distY = c.getCenter().y - this.getCenter().y;
+        float distX = Math.abs(c.getCenter().x - this.getCenter().x);
+        float distY = Math.abs(c.getCenter().y - this.getCenter().y);
 
         return (float) Math.hypot(distX, distY);
     }
@@ -60,7 +60,7 @@ public abstract class Collider extends RelativeLayout {
         // getDistanceToContact(c) returns the radius in a RoundCollider
         // and the distance from the center to an edge at a given angle
         // in a RectangularCollider.
-        return (this.getDistance(c) <= (c.getDistanceToContact(c) + c.getDistanceToContact(this)));
+        return (this.getDistance(c) <= (this.getDistanceToContact(c) + c.getDistanceToContact(this)));
 
     }
 

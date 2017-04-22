@@ -42,12 +42,14 @@ public abstract class RoundCollider extends Collider {
     }
 
     public float getDistanceToContact(Collider c){
-        return getRadiusPixels();
+        return getRadius();
     }
 
     public Point getCenter(){
-        center.set((int) (this.getX() + this.getRadiusPixels()), (int) (this.getY() + this.getRadiusPixels()));
-        return this.center;
+        // Position of colliders can change, so center must be set dynamically.
+        center.set((int) (this.getX() + this.getRadius()), (int) (this.getY() + this.getRadius()));
+        //System.out.println("Center of RoundCollider at: " + center);
+        return center;
     }
 
     public void showHitbox(){
@@ -63,6 +65,16 @@ public abstract class RoundCollider extends Collider {
 
         canvas.drawCircle(getCenter().x, getCenter().y, getRadiusPixels(), hitboxPaint);
 
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas){
+
+        Paint hitboxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        hitboxPaint.setColor(Color.MAGENTA);
+        hitboxPaint.setStyle(Paint.Style.STROKE);
+
+        canvas.drawRect(getPosition().x, getPosition().y, getPosition().x + getWidth(), getPosition().y + getHeight(), hitboxPaint);
     }
 
 }

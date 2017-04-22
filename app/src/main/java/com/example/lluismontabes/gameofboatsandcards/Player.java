@@ -34,7 +34,7 @@ public class Player extends RectangularCollider {
     private ImageView shadowImageView;
 
     public Player(Context context, AttributeSet attrs) {
-        super(context, 50, 120);
+        super(context, 50, 100);
 
         LayoutInflater.from(context).inflate(R.layout.player, this);
 
@@ -140,8 +140,6 @@ public class Player extends RectangularCollider {
             this.setRotation((float) Math.toDegrees(angle) + 90);
 
             // Move shadow with player
-            System.out.println(100 * (float) Math.sin(angle));
-            System.out.println(100 * (float) Math.cos(angle));
             shadowImageView.setY(-45 * (float) Math.sin(angle));
             shadowImageView.setX(45 * (float) Math.cos(angle));
         }
