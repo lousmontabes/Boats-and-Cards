@@ -30,15 +30,25 @@ public abstract class Collider extends RelativeLayout {
     }
 
     /**
-     * Returns distance from this Collider to the specified Collider.
+     * Returns distance from the center of this Collider to the center of the
+     * specified Collider.
      * @param c     Collider to get distance to.
      * @return      Distance.
      */
     public float getDistance(Collider c){
-        float distX = Math.abs(c.getCenter().x - this.getCenter().x);
-        float distY = Math.abs(c.getCenter().y - this.getCenter().y);
+        return (float) Math.hypot(getDistanceVector(c).x, getDistanceVector(c).y);
+    }
 
-        return (float) Math.hypot(distX, distY);
+    /**
+     * Returns the coordinates of the vector from the center of this Collider to
+     * the center of the specified Collider.
+     * @param c     Collider to get vector to.
+     * @return      Vector coordinates.
+     */
+    public Point getDistanceVector(Collider c){
+        float distX = c.getCenter().x - this.getCenter().x;
+        float distY = c.getCenter().y - this.getCenter().y;
+        return new Point((int) distX, (int) distY);
     }
 
     /**

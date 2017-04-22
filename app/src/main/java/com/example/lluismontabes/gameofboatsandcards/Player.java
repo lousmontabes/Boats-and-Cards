@@ -34,7 +34,7 @@ public class Player extends RectangularCollider {
     private ImageView shadowImageView;
 
     public Player(Context context, AttributeSet attrs) {
-        super(context, 50, 100);
+        super(context, 70, 90);
 
         LayoutInflater.from(context).inflate(R.layout.player, this);
 

@@ -16,14 +16,14 @@ public abstract class RectangularCollider extends Collider {
 
     private Point center;
     private float w, h;
-    private float halfWidth, halfHeight, halfHypothenuse;
+    private float halfWidth, halfHeight, halfHypotenuse;
     private float criticalAngle;
 
     /**
      * Rectangular collider constructor
-     * @param context View context
-     * @param w Width
-     * @param h Height
+     * @param context   View context
+     * @param w         Width
+     * @param h         Height
      */
     public RectangularCollider(Context context, float w, float h){
         super(context);
@@ -31,11 +31,11 @@ public abstract class RectangularCollider extends Collider {
         this.w = w;
         this.h = h;
 
-        this.halfWidth = Graphics.toPixels(getContext(), w / 2);
-        this.halfHeight = Graphics.toPixels(getContext(), h / 2);
-        this.halfHypothenuse = (float) Math.hypot((double) halfWidth,(double) halfHeight);
+        this.halfWidth = w / 2;
+        this.halfHeight = h / 2;
+        this.halfHypotenuse = (float) Math.hypot((double) halfWidth,(double) halfHeight);
 
-        this.criticalAngle = (float) Math.asin(halfHeight / halfHypothenuse);
+        this.criticalAngle = (float) Math.asin(halfHeight / halfHypotenuse);
 
         this.center = new Point();
 
@@ -59,30 +59,32 @@ public abstract class RectangularCollider extends Collider {
     }
 
     public Point getCenter(){
-        center.set((int) (this.getX() + halfWidth), (int) (this.getY() + halfHeight));
+        center.set((int) (getX() + getHalfWidthPixels()), (int) (getY() + getHalfHeightPixels()));
         //System.out.println("Center of RectangularCollider at: " + center);
         return center;
     }
 
     public float getDistanceToContact(Collider c){
-        return getHypotAtAngle(getIncidenceAngle(c));
+        return Graphics.toPixels(getContext(), getHypotAtAngle(getIncidenceAngle(c)));
     }
 
     public float getIncidenceAngle(Collider c){
-        System.out.println("ANGLE OF INCIDENCE: " + Math.toDegrees(Math.asin(c.getCenter().x - this.getCenter().x / this.getDistance(c))));
-        return (float) Math.asin(c.getCenter().x - this.getCenter().x / this.getDistance(c));
+        float distX = Math.abs(getDistanceVector(c).x);
+        float distY = Math.abs(getDistanceVector(c).y);
+        float angle = (float) Math.atan2(distY, distX);
+        return angle;
     }
 
     public float getHypotAtAngle(float angle){
 
         float hypot = -1;
 
-        if (angle < criticalAngle){
+        if (Math.abs(angle) < criticalAngle){
             hypot = (float) (halfWidth / Math.cos(angle));
-        } else if (angle > criticalAngle){
+        } else if (Math.abs(angle) > criticalAngle){
             hypot = (float) (halfHeight / Math.sin(angle));
-        } else if (angle == criticalAngle){
-            hypot = halfHypothenuse;
+        } else if (Math.abs(angle) == criticalAngle){
+            hypot = halfHypotenuse;
         }
 
         return hypot;
@@ -107,10 +109,11 @@ public abstract class RectangularCollider extends Collider {
 
         Paint hitboxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         hitboxPaint.setColor(Color.MAGENTA);
-        hitboxPaint.setStyle(Paint.Style.STROKE);
+        hitboxPaint.setStyle(Paint.Style.FILL);
 
-        canvas.drawRect(getPosition().x, getPosition().y, getPosition().x + getWidth(), getPosition().y + getHeight(), hitboxPaint);
+        canvas.drawRect(getPosition().x, getPosition().y, getPosition().x + Graphics.toPixels(getContext(), w), getPosition().y + Graphics.toPixels(getContext(), h), hitboxPaint);
         canvas.drawCircle(getCenter().x, getCenter().y, 10, hitboxPaint);
+
     }
 
 }
