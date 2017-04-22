@@ -200,7 +200,7 @@ public class GameActivity extends AppCompatActivity {
     private void startRemoteTask() {
 
         remoteTask = new RemoteDataTask();
-        //remoteTask.execute();
+        remoteTask.execute();
 
     }
 
@@ -491,13 +491,13 @@ public class GameActivity extends AppCompatActivity {
 
             if (p.isColliding(remotePlayer)) {
 
-                //remotePlayer.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
+                remotePlayer.boatImageView.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
                 remotePlayer.damage(p.getDamage());
 
                 layout.removeView(p);
                 projectileIterator.remove();
 
-            } //else remotePlayer.setColorFilter(null);
+            } else remotePlayer.boatImageView.setColorFilter(null);
 
         }
     }

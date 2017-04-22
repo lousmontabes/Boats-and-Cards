@@ -47,7 +47,7 @@ public abstract class RoundCollider extends Collider {
 
     public Point getCenter(){
         // Position of colliders can change, so center must be set dynamically.
-        center.set((int) (this.getX() + this.getRadiusPixels()), (int) (this.getY() + this.getRadiusPixels()));
+        center.set((int) (this.getX() + this.getRadiusPixels() + marginLeft), (int) (this.getY() + this.getRadiusPixels() + marginTop));
         //System.out.println("Center of RoundCollider at: " + center);
         return center;
     }

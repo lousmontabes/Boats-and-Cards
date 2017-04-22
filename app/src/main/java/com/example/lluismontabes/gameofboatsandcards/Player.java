@@ -30,11 +30,11 @@ public class Player extends RectangularCollider {
     private CardZone cardZone;
     private int[] cardEffects;
 
-    private ImageView boatImageView;
+    public ImageView boatImageView;
     private ImageView shadowImageView;
 
     public Player(Context context, AttributeSet attrs) {
-        super(context, 70, 90);
+        super(context, 34, 59, 40, 45);
 
         LayoutInflater.from(context).inflate(R.layout.player, this);
 

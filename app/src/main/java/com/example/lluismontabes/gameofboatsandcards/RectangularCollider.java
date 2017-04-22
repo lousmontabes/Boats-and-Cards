@@ -20,13 +20,36 @@ public abstract class RectangularCollider extends Collider {
     private float criticalAngle;
 
     /**
-     * Rectangular collider constructor
+     * Rectangular collider with no margins constructor.
      * @param context   View context
      * @param w         Width
      * @param h         Height
      */
     public RectangularCollider(Context context, float w, float h){
         super(context);
+
+        this.w = w;
+        this.h = h;
+
+        this.halfWidth = w / 2;
+        this.halfHeight = h / 2;
+        this.halfHypotenuse = (float) Math.hypot((double) halfWidth,(double) halfHeight);
+
+        this.criticalAngle = (float) Math.asin(halfHeight / halfHypotenuse);
+
+        this.center = new Point();
+
+        setWillNotDraw(false);
+    }
+
+    /**
+     * Rectangular collider with specified margins constructor.
+     * @param context   View context
+     * @param w         Width
+     * @param h         Height
+     */
+    public RectangularCollider(Context context, float w, float h, int marginLeft, int marginTop){
+        super(context, marginLeft, marginTop);
 
         this.w = w;
         this.h = h;
@@ -59,7 +82,7 @@ public abstract class RectangularCollider extends Collider {
     }
 
     public Point getCenter(){
-        center.set((int) (getX() + getHalfWidthPixels()), (int) (getY() + getHalfHeightPixels()));
+        center.set((int) (getX() + getHalfWidthPixels() + marginLeft), (int) (getY() + getHalfHeightPixels() + marginTop));
         //System.out.println("Center of RectangularCollider at: " + center);
         return center;
     }
@@ -106,14 +129,14 @@ public abstract class RectangularCollider extends Collider {
 
     @Override
     protected void onDraw(Canvas canvas){
-
+        /*
         Paint hitboxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         hitboxPaint.setColor(Color.MAGENTA);
         hitboxPaint.setStyle(Paint.Style.FILL);
 
         canvas.drawRect(getPosition().x, getPosition().y, getPosition().x + Graphics.toPixels(getContext(), w), getPosition().y + Graphics.toPixels(getContext(), h), hitboxPaint);
         canvas.drawCircle(getCenter().x, getCenter().y, 10, hitboxPaint);
-
+        */
     }
 
 }

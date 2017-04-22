@@ -10,8 +10,18 @@ import android.widget.RelativeLayout;
 
 public abstract class Collider extends RelativeLayout {
 
+    protected int marginLeft, marginTop;
+
     public Collider(Context context) {
         super(context);
+        marginLeft = 0;
+        marginTop = 0;
+    }
+
+    public Collider(Context context, int marginLeft, int marginTop) {
+        super(context);
+        this.marginLeft = marginLeft;
+        this.marginTop = marginTop;
     }
 
     /**
@@ -25,7 +35,7 @@ public abstract class Collider extends RelativeLayout {
      * @return  Top-left position of the Collider.
      */
     public Point getPosition() {
-        Point p = new Point((int)this.getX(), (int)this.getY());
+        Point p = new Point((int)this.getX() + marginLeft, (int)this.getY() + marginTop);
         return p;
     }
 
