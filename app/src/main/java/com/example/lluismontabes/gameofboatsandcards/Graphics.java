@@ -15,6 +15,24 @@ public final class Graphics {
     private Graphics(){}
 
     /**
+     * Returns application screen width.
+     * @param c     Application context.
+     * @return      Screen width.
+     */
+    public static int getScreenWidth(Context c){
+        return c.getResources().getDisplayMetrics().widthPixels;
+    }
+
+    /**
+     * Returns application screen height.
+     * @param c     Application context.
+     * @return      Screen height.
+     */
+    public static int getScreenHeight(Context c){
+        return c.getResources().getDisplayMetrics().widthPixels;
+    }
+
+    /**
      * Converts from density-independent units (dp) to real pixels.
      * @param c     Window context.
      * @param dp    Density-independent units.
