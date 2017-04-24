@@ -37,7 +37,7 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // Start SettingsActivity
-                Intent i = new Intent(MainMenuActivity.this,SettingsActivity.class);
+                Intent i = new Intent(MainMenuActivity.this, SettingsActivity.class);
                 startActivity(i);
 
             }
@@ -47,11 +47,9 @@ public class MainMenuActivity extends AppCompatActivity {
         {
             public void onClick(View v) {
 
-                // Start SettingsActivity
+                // Start GameActivity
                 Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
                 startActivity(i);
-                //Intent i = new Intent(MainMenuActivity.this, AnimationsActivity.class);
-                //startActivity(i);
 
             }
         });

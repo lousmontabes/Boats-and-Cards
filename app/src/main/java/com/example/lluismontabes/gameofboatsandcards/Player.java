@@ -16,39 +16,58 @@ import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.*;
 
 public class Player extends RectangularCollider {
 
+    /**
+     * VIEWS
+     */
+    public ImageView boatImageView;
+    private ImageView shadowImageView;
+
+    /**
+     * MOVEMENT & POSITIONING
+     */
+    // Velocity
     private float velocity, idleVelocity;
     private float rotationSpeed;
 
-    private int health;
-
+    // Position
     private float x;
     private float y;
     private float angle;
 
-    private int delay;
+    /**
+     * HEALTH & GAMEPLAY PARAMETERS
+     */
+    // Health
+    private final int maxHealth;
+    private int health;
+
+    // Cooldowns
+    private final int maxFireCooldown;
+    private int fireCooldown;
+
+    // Effects
     private boolean alive;
-
-    private CardZone cardZone;
-    private int[] cardEffects;
-
-    public ImageView boatImageView;
-    private ImageView shadowImageView;
+    private boolean stunned;
 
     public Player(Context context, AttributeSet attrs) {
         super(context, 34, 59, 40, 45);
 
         LayoutInflater.from(context).inflate(R.layout.player, this);
 
-        this.boatImageView = (ImageView) findViewById(R.id.boatImageView);
-        this.shadowImageView = (ImageView) findViewById(R.id.shadowImageView);
+        boatImageView = (ImageView) findViewById(R.id.boatImageView);
+        shadowImageView = (ImageView) findViewById(R.id.shadowImageView);
         shadowImageView.setColorFilter(getResources().getColor(R.color.shadow), android.graphics.PorterDuff.Mode.MULTIPLY);
 
-        this.velocity = 10;      // 10 pixels per frame
-        this.rotationSpeed = 10; // 10 degrees per frame
-        this.health = 100;       // 100 units of health
-        delay = 0;               // 0 frames of fire delay
+        velocity = 10;              // 10 pixels per frame
+        rotationSpeed = 10;         // 10 degrees per frame
+        
+        maxHealth = 100;            // 100 units of max health
+        health = 100;               // 100 units of current health
+        
+        maxFireCooldown = 10;       // 10 frames of max fire cooldown
+        fireCooldown = 0;    // 0 frames of current fire cooldown
+        
         alive = true;
-        cardEffects = new int[Card.TOTAL_CARD_NUMBER*2];
 
     }
 
@@ -65,8 +84,6 @@ public class Player extends RectangularCollider {
     public void setAlive(boolean alive) {
         this.alive = alive;
     }
-    //cardZone test
-    public void setCardZone(CardZone cardZone) { this.cardZone = cardZone; }
 
     // GETTERS
     public float getAngle() {
@@ -81,12 +98,6 @@ public class Player extends RectangularCollider {
     public boolean isAlive() {
         return this.alive;
     }
-
-
-
-
-    //cardZone test
-    public CardZone getCardZone() { return this.cardZone; }
 
     // MOVEMENT METHODS
     public void moveUp(){
@@ -109,20 +120,6 @@ public class Player extends RectangularCollider {
         this.setX(x + velocity);
     }
 
-    public void setDelay(int delay) {
-        this.delay = delay;
-    }
-
-    public int getDelay() {
-        return delay;
-    }
-
-    public void decreaseDelay() {
-        if (delay > 0) {
-            delay--;
-        }
-    }
-
     /**
      * Moves Player in the specified angle.
      * @param angle Angle in which to move the Player.
@@ -130,7 +127,7 @@ public class Player extends RectangularCollider {
      */
     public void move(float angle, float intensity){
 
-        if (!isEffectActive(STUNNED) && alive) {
+        if (!stunned && alive) {
 
             x = this.getX();
             y = this.getY();
@@ -139,12 +136,13 @@ public class Player extends RectangularCollider {
             float scaleY = (float) Math.sin(angle);
 
             float modifier = 1;
+            /*
             if (isEffectActive(SPEED_UP)) {
                 modifier *= 2;
             }
             if (isEffectActive(REVERSED_CONTROLS)) {
                 modifier = -modifier;
-            }
+            }*/
 
             float velocityX = scaleX * this.velocity * intensity * modifier;
             float velocityY = scaleY * this.velocity * intensity * modifier;
@@ -194,98 +192,74 @@ public class Player extends RectangularCollider {
         angle = this.getRotation();
 
         if (angle != a){
-
             if (Math.abs(angle - a) < rotationSpeed) this.setRotation(angle);
             else this.setRotation(angle + rotationSpeed);
         }
 
-
     }
 
     public void respawn() {
-        if (delay <= 0) {
+        if (fireCooldown <= 0) {
             setAlpha(1);
             alive = true;
             setAngle(0);
         }
     }
 
-    // USER INTERACTION
+    // HEALTH
+
+    public void restoreHealth(){
+        health = maxHealth;
+    }
+
     public void damage(int d){
+        /*
         if (isEffectActive(DEFENSE_UP)) {
             d /= 2;
         }
+        */
         this.health -= d;
         if (this.health <= 0) {
             die();
         }
     }
 
-    public boolean canShoot() {
-        return delay == 0 && !isEffectActive(STUNNED);
-    }
-
     public void die(){
+
         System.out.println("Player died");
+
         alive = false;
         this.setAlpha(0);
-        if (isEffectActive(QUICK_REVIVE)) {
+
+        /*if (isEffectActive(QUICK_REVIVE)) {
             delay = 30;
         } else {
             delay = 150;
-        }
-        removeAllEffects();
+        }*/
+
+        //removeAllEffects();
+
     }
 
-    public int handSize() {
-        return cardZone.getCardList().size();
+    // COOLDOWNS
+
+    public void restoreFireCooldown(){
+        fireCooldown = maxFireCooldown;
     }
 
-    public void addEffect(int effect, int duration) {
-        cardEffects[effect] = duration;
-    }
-
-    public void removeEffect(int effect) {
-        cardEffects[effect] = 0;
-    }
-
-    public void removeAllEffects() {
-        for (int pos = 0; pos < cardEffects.length; pos++) {
-            cardEffects[pos] = 0;
+    public void decreaseFireCooldown() {
+        if (fireCooldown > 0) {
+            fireCooldown--;
         }
     }
 
-    public boolean isEffectActive(int effect) {
-        return cardEffects[effect] != 0;
-    }
-
-    public void handleEffects() {
-        cardZone.reverseCards(isEffectActive(REVERSED_HAND));
-        if (isEffectActive(DISCARD_ALL)) {
-            cardZone.discardAll();
-        }
-        if (isEffectActive(KO)) {
-            die();
-        }
-        if (isEffectActive(DISPEL)) {
-            removeAllEffects();
-        }
-    }
-
-    public void decreaseEffectsDuration() {
-        for (int pos = 0; pos < cardEffects.length; pos++) {
-            if (cardEffects[pos] > 0) cardEffects[pos]--;
-        }
-    }
-
-    public void improveVisibilityCardZone(float maxDistance,float minDistance,int minAlpha){
-        this.cardZone.improveVisibility(this,maxDistance,minDistance,minAlpha);
+    public boolean canShoot() {
+        return fireCooldown == 0 && !stunned;
     }
 
     @Override
     public boolean isColliding(Collider c) {
-        if (alive) return super.isColliding(c);
-        return false;
+        return (alive && super.isColliding(c));
     }
 
 }

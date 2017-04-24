@@ -33,7 +33,7 @@ public class CardZone {
     }
 
     //SETTERS
-    public void setLayout_cards(LinearLayout layout_cards) {
+    public void setLayoutCards(LinearLayout layout_cards) {
         this.layout_cards = layout_cards;
     }
 
@@ -144,7 +144,7 @@ public class CardZone {
         updateContainers();
     }
 
-    public Card popCard(int idx) {
+    public Card removeCard(int idx) {
         Card c = cardList.remove(idx - 1);
         updateContainers();
         return c;
@@ -155,17 +155,15 @@ public class CardZone {
         updateContainers();
     }
 
-    public void reverseCards(boolean reverse) {
-        if (reversed != reverse) {
-            reversed = reverse;
+    public void reverseCards() {
+
+            reversed = !reversed;
+
             for (Card c : cardList) {
                 c.setReversed(reversed);
             }
-            if (reversed) {
-                Collections.shuffle(cardList);
-            }
+
             updateContainers();
-        }
     }
 
     public void updateContainers() {

@@ -39,10 +39,8 @@ public final class Graphics {
      * @return      (Float) Converted unit.
      */
     public static float toPixels(Context c, float dp){
-
         final float scale = c.getResources().getDisplayMetrics().density;
         return (dp * scale) + 0.5f;
-
     }
 
     /**
@@ -52,10 +50,8 @@ public final class Graphics {
      * @return      (Float) Converted unit.
      */
     public static float toDp(Context c, float px){
-
         final float scale = c.getResources().getDisplayMetrics().density;
         return (px / scale) + 0.5f;
-
     }
 
 }

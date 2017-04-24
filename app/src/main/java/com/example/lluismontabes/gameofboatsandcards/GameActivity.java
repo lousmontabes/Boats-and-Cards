@@ -33,6 +33,11 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.DISCARD_ALL;
+import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.DISPEL;
+import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.KO;
+import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.REVERSED_HAND;
+
 public class GameActivity extends AppCompatActivity {
 
     /**
@@ -160,6 +165,11 @@ public class GameActivity extends AppCompatActivity {
     Canvas fxCanvas;
     boolean canvasCreated = false;
 
+    /**
+     * CARDS & CARD EFFECTS
+     **/
+    private int[] cardEffects;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,6 +189,7 @@ public class GameActivity extends AppCompatActivity {
         initializePlayers();
         initializeIslandDomain(100);
         initializeListeners();
+        initializeCardEffects();
 
     }
 
@@ -202,6 +213,10 @@ public class GameActivity extends AppCompatActivity {
         remoteTask = new RemoteDataTask();
         remoteTask.execute();
 
+    }
+
+    private void initializeCardEffects(){
+        cardEffects = new int[Card.TOTAL_CARD_NUMBER*2];
     }
 
     private void initializeListeners() {
@@ -323,7 +338,6 @@ public class GameActivity extends AppCompatActivity {
     private void initializePlayers() {
 
         localPlayer = new Player(GameActivity.this, null);
-        localPlayer.setCardZone(cardZone);
         remotePlayer = new Player(GameActivity.this, null);
 
         //localPlayer.showHitbox();
@@ -366,30 +380,30 @@ public class GameActivity extends AppCompatActivity {
             float oY = localPlayer.getY() + pH / 2;
             int baseDamage = 20;
 
-            if (localPlayer.isEffectActive(Card.Effect.ATTACK_UP)) {
+            if (isEffectActive(Card.Effect.ATTACK_UP)) {
                 baseDamage *= 2;
             }
 
-            System.out.println(oX + ", " + oY);
             Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY, baseDamage);
             GameActivity.this.activeProjectiles.add(projectile);
             GameActivity.this.activeColliders.add(projectile);
             layout.addView(projectile);
 
-            if (localPlayer.isEffectActive(Card.Effect.TRIPLE_SHOT)) {
+            if (isEffectActive(Card.Effect.TRIPLE_SHOT)) {
 
                 Projectile projectileL = new Projectile(GameActivity.this, joystick.getCurrentAngle() - .3f, oX, oY, baseDamage);
                 GameActivity.this.activeProjectiles.add(projectileL);
                 GameActivity.this.activeColliders.add(projectileL);
-                layout.addView(projectileL);
 
                 Projectile projectileR = new Projectile(GameActivity.this, joystick.getCurrentAngle() + .3f, oX, oY, baseDamage);
                 GameActivity.this.activeProjectiles.add(projectileR);
                 GameActivity.this.activeColliders.add(projectileR);
+
+                layout.addView(projectileL);
                 layout.addView(projectileR);
             }
 
-            localPlayer.setDelay(20);
+            localPlayer.restoreFireCooldown();
         }
 
     }
@@ -638,11 +652,8 @@ public class GameActivity extends AppCompatActivity {
                 // Collisions
                 checkProjectileCollisions();
 
-                // Hitbox viewing
-                localPlayer.showHitbox();
-
-                // Decrease delay to shoot again
-                localPlayer.decreaseDelay();
+                // Decrease cooldown to shoot again
+                localPlayer.decreaseFireCooldown();
 
                 // islandDomain collisions
                 checkIslandDomainCollisions();
@@ -655,8 +666,8 @@ public class GameActivity extends AppCompatActivity {
                 if (cardUsed != 0) useCard(localPlayer, cardUsed);
 
                 // Effect management
-                localPlayer.handleEffects();
-                localPlayer.decreaseEffectsDuration();
+                handleEffects();
+                decreaseEffectsDuration();
 
                 // Scoreboard and timer counter
                 advanceCounter();
@@ -669,7 +680,7 @@ public class GameActivity extends AppCompatActivity {
                 remotePlayer.moveTo(remoteX, remoteY);
 
                 //test CardZone
-                localPlayer.improveVisibilityCardZone(180, 140, 90);
+                improveVisibilityCardZone(180, 140, 90);
 
                 // Environmental effects
                 showDripplets();
@@ -700,11 +711,10 @@ public class GameActivity extends AppCompatActivity {
             fxCanvas.drawCircle(drippletX, drippletY, 10, drippletPaint);
 
         }
-
     }
 
     private void drawCard(Player player) {
-        if (player.handSize() < 3) {
+        if (cardZone.getCardList().size() < 3) {
             Card card = new Card();
             cardZone.addCard(card);
             log(Integer.toString(card.getId()));
@@ -712,31 +722,60 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void useCard(Player player, int n) {
-        Card usedCard = cardZone.popCard(n);
+
+        Card usedCard = cardZone.removeCard(n);
+
         int effect = usedCard.getEffect();
         int duration = usedCard.getDuration();
+
         switch (usedCard.getTarget()) {
-            case Card.Target.RANDOM:
-                if (Math.random() < .5) {
-                    remotePlayer.addEffect(effect, duration);
-                    break;
-                }
+
             case Card.Target.SELF:
-                localPlayer.addEffect(effect, duration);
+                addEffect(effect, duration);
                 break;
-            case Card.Target.ALL:
-                localPlayer.addEffect(effect, duration);
+
             case Card.Target.OPPONENT:
-                remotePlayer.addEffect(effect, duration);
+                addEffect(effect, duration);
                 break;
+
+            case Card.Target.ALL:
+                addEffect(effect, duration);
+                break;
+
             case Card.Target.TRAP:
                 //TODO: implemantar trampes
                 break;
+
         }
 
         showPlayerPopup(localPlayer, usedCard.getName(), 1000, false);
         cardUsed = 0;
 
+    }
+
+    private void handleEffects() {
+        if (isEffectActive(REVERSED_HAND)) cardZone.reverseCards();
+        if (isEffectActive(DISCARD_ALL)) cardZone.discardAll();
+        if (isEffectActive(KO)) localPlayer.die();
+        //if (isEffectActive(DISPEL)) localPlayer.removeAllEffects();
+    }
+
+    private void decreaseEffectsDuration() {
+        for (int pos = 0; pos < cardEffects.length; pos++) {
+            if (cardEffects[pos] > 0) cardEffects[pos]--;
+        }
+    }
+
+    private void addEffect(int effect, int duration) {
+        cardEffects[effect] = duration;
+    }
+
+    private boolean isEffectActive(int e) {
+        return cardEffects[e] != 0;
+    }
+
+    private void improveVisibilityCardZone(float maxDistance, float minDistance, int minAlpha){
+        cardZone.improveVisibility(localPlayer, maxDistance, minDistance, minAlpha);
     }
 
     /**
