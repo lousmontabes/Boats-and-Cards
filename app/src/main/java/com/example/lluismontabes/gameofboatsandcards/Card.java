@@ -31,6 +31,8 @@ public class  Card {
         public static final int DISPEL = 8;
         public static final int KO = 9;
         public static final int QUICK_REVIVE = 10;
+        public static final int RANDOM_WARP = 11;
+        public static final int FULL_RESTORATION = 12;
     }
 
     private int target;

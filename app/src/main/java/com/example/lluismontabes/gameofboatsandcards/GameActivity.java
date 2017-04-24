@@ -493,7 +493,7 @@ public class GameActivity extends AppCompatActivity {
 
                 remotePlayer.boatImageView.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
                 remotePlayer.damage(p.getDamage());
-                showPlayerPopup(remotePlayer, "♡ -" + p.getDamage(), 500, false);
+                showPlayerPopup(remotePlayer, "-" + p.getDamage() + " ♡", 500, false);
 
                 layout.removeView(p);
                 projectileIterator.remove();
@@ -625,9 +625,6 @@ public class GameActivity extends AppCompatActivity {
                     localPlayer.respawn();
                     joystick.resetCurrentAngle();
                 }
-
-
-
 
                 // Player 2 controls
                 //retrieveRemoteAction();
