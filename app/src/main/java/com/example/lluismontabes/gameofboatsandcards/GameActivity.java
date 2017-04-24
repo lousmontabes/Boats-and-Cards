@@ -190,7 +190,7 @@ public class GameActivity extends AppCompatActivity {
          * ASYNCHRONOUS TASKS
          **/
         // Online data gatherer task
-        startRemoteTask();
+        //startRemoteTask();
 
         // Start game loop
         startRefreshTimer();
