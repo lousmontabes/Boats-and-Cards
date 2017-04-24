@@ -50,8 +50,8 @@ public class AnimationsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zoom);
 
-        //image2 = (ImageView) findViewById(R.id.image_View2);
-        //image2.setVisibility(View.GONE);
+        image2 = (ImageView) findViewById(R.id.image2);
+        image2.setVisibility(View.GONE);
 
         //Descomentar para visualizar card-flip animation
         //getFragmentManager().beginTransaction().add(R.id.container,new CardFrontFragment()).commit();

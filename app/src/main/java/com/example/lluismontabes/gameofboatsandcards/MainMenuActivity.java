@@ -50,6 +50,8 @@ public class MainMenuActivity extends AppCompatActivity {
                 // Start SettingsActivity
                 Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
                 startActivity(i);
+                //Intent i = new Intent(MainMenuActivity.this, AnimationsActivity.class);
+                //startActivity(i);
 
             }
         });
