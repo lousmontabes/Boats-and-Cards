@@ -206,6 +206,7 @@ public class Player extends RectangularCollider {
         if (delay <= 0) {
             setAlpha(1);
             alive = true;
+            setAngle(0);
         }
     }
 

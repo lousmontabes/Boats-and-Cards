@@ -157,10 +157,10 @@ public class CardZone {
 
     public void reverseCards(boolean reverse) {
         if (reversed != reverse) {
-            /*reversed = reverse;
+            reversed = reverse;
             for (Card c : cardList) {
                 c.setReversed(reversed);
-            }*/
+            }
             if (reversed) {
                 Collections.shuffle(cardList);
             }

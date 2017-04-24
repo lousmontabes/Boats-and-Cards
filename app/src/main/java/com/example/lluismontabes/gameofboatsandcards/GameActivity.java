@@ -623,6 +623,7 @@ public class GameActivity extends AppCompatActivity {
                     localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
                     localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
                     localPlayer.respawn();
+                    joystick.resetCurrentAngle();
                 }
 
 

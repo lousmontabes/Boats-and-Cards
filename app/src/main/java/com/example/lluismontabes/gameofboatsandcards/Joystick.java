@@ -101,6 +101,9 @@ public class Joystick extends RelativeLayout {
     public float getCurrentAngle(){
         return this.currentAngle;
     }
+    public void resetCurrentAngle() {
+        currentAngle = 0;
+    }
 
     /**
      * Returns the current distance from the center the user is pulling the joystick to.
