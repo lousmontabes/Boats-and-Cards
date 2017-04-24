@@ -56,6 +56,14 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
 
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageView"
+            android:layout_centerHorizontal="true"
+            android:text="This is a button that bypasses the online functionality that won't be here on the final version of this app" />
+
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

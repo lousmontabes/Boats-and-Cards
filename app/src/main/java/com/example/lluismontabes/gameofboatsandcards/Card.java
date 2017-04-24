@@ -7,7 +7,7 @@ package com.example.lluismontabes.gameofboatsandcards;
 
 public class  Card {
 
-    public static final int TOTAL_CARD_NUMBER = 9;
+    public static final int TOTAL_CARD_NUMBER = 10;
 
     // Target of the effect of the card
     public static final class Target {
@@ -30,6 +30,7 @@ public class  Card {
         public static final int TRIPLE_SHOT = 7;
         public static final int DISPEL = 8;
         public static final int KO = 9;
+        public static final int QUICK_REVIVE = 10;
     }
 
     private int target;
@@ -81,6 +82,8 @@ public class  Card {
                 return "All effects removed!";
             case 9:
                 return "YOU DIED";
+            case 10:
+                return "Quick revive!";
             default:
                 return "Carta ?";
         }
@@ -154,6 +157,8 @@ public class  Card {
                 return Effect.DISPEL;
             case 9:
                 return Effect.KO;
+            case 10:
+                return Effect.QUICK_REVIVE;
             default:
                 throw new UnknownError();
         }
@@ -162,12 +167,15 @@ public class  Card {
     public int getDuration() {
         switch (id) {
             //TODO: specify the duration of all effects
+            // Duration in frames
             case 5:
             case 8:
             case 9:
-                return 1;// Duration in frames
+                return 1;//Instant
+            case 10:
+                return Integer.MAX_VALUE;//Infinite
             default:
-                return 150;// Duration in frames
+                return 150;
         }
     }
 

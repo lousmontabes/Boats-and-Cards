@@ -20,10 +20,11 @@ public abstract class RoundCollider extends Collider {
 
     /**
      * Round collider constructor
+     *
      * @param context View context
-     * @param r Radius of the collider
+     * @param r       Radius of the collider
      */
-    public RoundCollider(Context context, float r){
+    public RoundCollider(Context context, float r) {
         super(context);
 
         this.radius = r;
@@ -33,7 +34,7 @@ public abstract class RoundCollider extends Collider {
         setWillNotDraw(false);
     }
 
-    public float getRadius(){
+    public float getRadius() {
         return this.radius;
     }
 
@@ -41,18 +42,18 @@ public abstract class RoundCollider extends Collider {
         return radiusPixels;
     }
 
-    public float getDistanceToContact(Collider c){
+    public float getDistanceToContact(Collider c) {
         return getRadiusPixels();
     }
 
-    public Point getCenter(){
+    public Point getCenter() {
         // Position of colliders can change, so center must be set dynamically.
         center.set((int) (this.getX() + this.getRadiusPixels() + marginLeft), (int) (this.getY() + this.getRadiusPixels() + marginTop));
         //System.out.println("Center of RoundCollider at: " + center);
         return center;
     }
 
-    public void showHitbox(){
+    public void showHitbox() {
 
         int bDim = (int) getRadiusPixels();
 
@@ -61,14 +62,14 @@ public abstract class RoundCollider extends Collider {
 
         Paint hitboxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         hitboxPaint.setColor(Color.MAGENTA);
-        hitboxPaint.setStyle(Paint.Style.STROKE);
+        hitboxPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
         canvas.drawCircle(getCenter().x, getCenter().y, getRadiusPixels(), hitboxPaint);
 
     }
 
     @Override
-    protected void onDraw(Canvas canvas){
+    protected void onDraw(Canvas canvas) {
 
         Paint hitboxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         hitboxPaint.setColor(Color.MAGENTA);

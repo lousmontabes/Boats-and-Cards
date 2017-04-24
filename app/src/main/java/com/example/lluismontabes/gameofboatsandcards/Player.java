@@ -26,6 +26,7 @@ public class Player extends RectangularCollider {
     private float angle;
 
     private int delay;
+    private boolean alive;
 
     private CardZone cardZone;
     private int[] cardEffects;
@@ -46,6 +47,7 @@ public class Player extends RectangularCollider {
         this.rotationSpeed = 10; // 10 degrees per frame
         this.health = 100;       // 100 units of health
         delay = 0;               // 0 frames of fire delay
+        alive = true;
         cardEffects = new int[Card.TOTAL_CARD_NUMBER*2];
 
     }
@@ -57,8 +59,12 @@ public class Player extends RectangularCollider {
     public void setVelocity(float v){
         this.velocity = v;
     }
-    public void setHealth(int h) { this.health = h; };
-
+    public void setHealth(int h){
+        this.health = h;
+    }
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
     //cardZone test
     public void setCardZone(CardZone cardZone) { this.cardZone = cardZone; }
 
@@ -69,7 +75,15 @@ public class Player extends RectangularCollider {
     public float getVelocity(){
         return this.velocity;
     }
-    public int getHealth() { return this.health; };
+    public int getHealth() {
+        return this.health;
+    }
+    public boolean isAlive() {
+        return this.alive;
+    }
+
+
+
 
     //cardZone test
     public CardZone getCardZone() { return this.cardZone; }
@@ -116,7 +130,7 @@ public class Player extends RectangularCollider {
      */
     public void move(float angle, float intensity){
 
-        if (!isEffectActive(STUNNED)) {
+        if (!isEffectActive(STUNNED) && alive) {
 
             x = this.getX();
             y = this.getY();
@@ -188,6 +202,13 @@ public class Player extends RectangularCollider {
 
     }
 
+    public void respawn() {
+        if (delay <= 0) {
+            setAlpha(1);
+            alive = true;
+        }
+    }
+
     // USER INTERACTION
     public void damage(int d){
         if (isEffectActive(DEFENSE_UP)) {
@@ -205,7 +226,13 @@ public class Player extends RectangularCollider {
 
     public void die(){
         System.out.println("Player died");
+        alive = false;
         this.setAlpha(0);
+        if (isEffectActive(QUICK_REVIVE)) {
+            delay = 30;
+        } else {
+            delay = 150;
+        }
         removeAllEffects();
     }
 
@@ -252,6 +279,12 @@ public class Player extends RectangularCollider {
 
     public void improveVisibilityCardZone(float maxDistance,float minDistance,int minAlpha){
         this.cardZone.improveVisibility(this,maxDistance,minDistance,minAlpha);
+    }
+
+    @Override
+    public boolean isColliding(Collider c) {
+        if (alive) return super.isColliding(c);
+        return false;
     }
 
 }

@@ -459,8 +459,8 @@ public class GameActivity extends AppCompatActivity {
         TextView popup = new TextView(this);
         popup.setText(msg);
 
-        float oX = p.getX() - popup.getWidth() / 2;
-        float oY = p.getY() - 35;
+        float oX = Math.max(p.getX() - popup.getWidth() / 2, 0);
+        float oY = Math.max(p.getY() - 35, 0);
 
         float detourX, detourY;
 
@@ -493,6 +493,7 @@ public class GameActivity extends AppCompatActivity {
 
                 remotePlayer.boatImageView.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
                 remotePlayer.damage(p.getDamage());
+                showPlayerPopup(remotePlayer, "♡ -" + p.getDamage(), 500, false);
 
                 layout.removeView(p);
                 projectileIterator.remove();
@@ -613,9 +614,19 @@ public class GameActivity extends AppCompatActivity {
                 if (rightPressed) localPlayer.moveRight();
                 if (downPressed) localPlayer.moveDown();
 
+                // Starting position (doesn't work on player init for some reason)
+                if (currentFrame <= 10) setStartingPositions();
                 // Joystick controls
                 // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
-                if (currentFrame > 10) localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                else if (localPlayer.isAlive()) localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                else {
+                    localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
+                    localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
+                    localPlayer.respawn();
+                }
+
+
+
 
                 // Player 2 controls
                 //retrieveRemoteAction();
@@ -629,6 +640,9 @@ public class GameActivity extends AppCompatActivity {
                 // Collisions
                 checkProjectileCollisions();
 
+                // Hitbox viewing
+                localPlayer.showHitbox();
+
                 // Decrease delay to shoot again
                 localPlayer.decreaseDelay();
 
@@ -637,7 +651,7 @@ public class GameActivity extends AppCompatActivity {
 
                 // Card collecting
                 // TODO: canviar per condició de col·lisió
-                if (secondsLeft % 8 == 5 && currentFrame % fps == 0) drawCard(localPlayer);
+                if (secondsLeft % 6 == 5 && currentFrame % fps == 0) drawCard(localPlayer);
 
                 // Card usage
                 if (cardUsed != 0) useCard(localPlayer, cardUsed);
@@ -664,6 +678,14 @@ public class GameActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void setStartingPositions() {
+        int centerX = (layout.getWidth() - localPlayer.getWidth()) / 2;
+        localPlayer.setX(centerX);
+        localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
+        remotePlayer.setX(centerX);
+        remotePlayer.setY(0);
     }
 
     private void showDripplets() {

@@ -4,6 +4,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -156,9 +157,12 @@ public class CardZone {
 
     public void reverseCards(boolean reverse) {
         if (reversed != reverse) {
-            reversed = reverse;
+            /*reversed = reverse;
             for (Card c : cardList) {
                 c.setReversed(reversed);
+            }*/
+            if (reversed) {
+                Collections.shuffle(cardList);
             }
             updateContainers();
         }

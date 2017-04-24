@@ -19,6 +19,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         Button playButton = (Button) findViewById(R.id.playButton);
         TextView settingsTextView = (TextView) findViewById(R.id.settingsTextView);
+        Button debugButton = (Button) findViewById(R.id.button3);
 
         playButton.setOnClickListener(new View.OnClickListener()
         {
@@ -31,13 +32,23 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         });
 
-        settingsTextView = (TextView) findViewById(R.id.settingsTextView);
         settingsTextView.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v) {
 
                 // Start SettingsActivity
                 Intent i = new Intent(MainMenuActivity.this,SettingsActivity.class);
+                startActivity(i);
+
+            }
+        });
+
+        debugButton.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v) {
+
+                // Start SettingsActivity
+                Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
                 startActivity(i);
 
             }
