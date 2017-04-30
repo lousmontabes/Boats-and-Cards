@@ -1,4 +1,4 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Interface;
 
 
 import android.annotation.TargetApi;
@@ -19,6 +19,8 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
+
+import com.example.lluismontabes.gameofboatsandcards.R;
 
 import java.util.List;
 

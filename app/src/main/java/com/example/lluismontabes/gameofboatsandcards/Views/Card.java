@@ -1,5 +1,7 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Views;
 
+
+import com.example.lluismontabes.gameofboatsandcards.R;
 
 /**
  * Created by olekboad13.alumnes on 31/03/17.

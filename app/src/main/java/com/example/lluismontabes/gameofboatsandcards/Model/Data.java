@@ -1,4 +1,4 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Model;
 
 /**
  * Created by lluismontabes on 6/3/17.

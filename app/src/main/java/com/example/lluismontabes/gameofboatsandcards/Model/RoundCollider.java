@@ -1,4 +1,4 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.widget.RelativeLayout;
 
 /**
  * Created by lluismontabes on 17/3/17.

@@ -1,4 +1,4 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Interface;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.example.lluismontabes.gameofboatsandcards.R;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;

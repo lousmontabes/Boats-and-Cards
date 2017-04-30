@@ -1,4 +1,4 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Interface;
 
 import android.graphics.Camera;
 import android.graphics.Matrix;
@@ -17,8 +17,6 @@ public class Flip3DAnimation extends Animation {
     private final float mCenterY;
     private Camera mCamera;
 
-
-
     public Flip3DAnimation(float fromDegrees, float toDegrees, float centerX, float centerY) {
         mFromDegrees = fromDegrees;
         mToDegrees = toDegrees;
@@ -26,19 +24,13 @@ public class Flip3DAnimation extends Animation {
         mCenterY = centerY;
     }
 
-
-
     @Override
-
     public void initialize(int width, int height, int parentWidth, int parentHeight) {
         super.initialize(width, height, parentWidth, parentHeight);
         mCamera = new Camera();
     }
 
-
-
     @Override
-
     protected void applyTransformation(float interpolatedTime, Transformation t) {
         final float fromDegrees = mFromDegrees;
         float degrees = fromDegrees + ((mToDegrees - fromDegrees) * interpolatedTime);

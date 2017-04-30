@@ -1,10 +1,13 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Views;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup;
+
+import com.example.lluismontabes.gameofboatsandcards.Model.RoundCollider;
+import com.example.lluismontabes.gameofboatsandcards.R;
 
 /**
  * Created by jtomebla14.alumnes on 13/03/17.

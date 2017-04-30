@@ -1,4 +1,4 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Interface;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+
+import com.example.lluismontabes.gameofboatsandcards.Model.DisplayNextView;
+import com.example.lluismontabes.gameofboatsandcards.R;
 
 /**
  * Created by JorgeTB on 15/04/2017.

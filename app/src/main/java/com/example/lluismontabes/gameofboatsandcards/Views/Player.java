@@ -1,11 +1,13 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Views;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 
-import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.*;
+import com.example.lluismontabes.gameofboatsandcards.Model.Collider;
+import com.example.lluismontabes.gameofboatsandcards.Model.RectangularCollider;
+import com.example.lluismontabes.gameofboatsandcards.R;
 
 /**
  * Created by lluismontabes on 6/3/17.

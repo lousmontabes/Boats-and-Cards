@@ -1,9 +1,11 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Interface;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.animation.Animation;
 import android.widget.TextView;
+
+import com.example.lluismontabes.gameofboatsandcards.R;
 
 import java.util.Timer;
 import java.util.TimerTask;

@@ -1,4 +1,4 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Model;
 
 import android.view.animation.Animation;
 import android.widget.ImageView;

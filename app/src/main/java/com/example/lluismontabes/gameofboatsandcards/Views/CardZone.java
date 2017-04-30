@@ -1,10 +1,9 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Views;
 
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;

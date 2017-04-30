@@ -1,8 +1,10 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Model;
 
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+
+import com.example.lluismontabes.gameofboatsandcards.Interface.Flip3DAnimation;
 
 /**
  * Created by JorgeTB on 17/04/2017.
@@ -19,7 +21,6 @@ public class SwapViews implements Runnable{
         this.image1 = image1;
         this.image2 = image2;
     }
-
 
     @Override
     public void run() {

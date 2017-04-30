@@ -1,4 +1,4 @@
-package com.example.lluismontabes.gameofboatsandcards;
+package com.example.lluismontabes.gameofboatsandcards.Interface;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,6 +18,17 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 
+import com.example.lluismontabes.gameofboatsandcards.Views.Card;
+import com.example.lluismontabes.gameofboatsandcards.Views.CardZone;
+import com.example.lluismontabes.gameofboatsandcards.Model.Collider;
+import com.example.lluismontabes.gameofboatsandcards.Model.Data;
+import com.example.lluismontabes.gameofboatsandcards.Model.Graphics;
+import com.example.lluismontabes.gameofboatsandcards.Views.IslandDomain;
+import com.example.lluismontabes.gameofboatsandcards.Views.Joystick;
+import com.example.lluismontabes.gameofboatsandcards.Views.Player;
+import com.example.lluismontabes.gameofboatsandcards.Views.Projectile;
+import com.example.lluismontabes.gameofboatsandcards.R;
+import com.example.lluismontabes.gameofboatsandcards.Views.Trace;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -33,10 +44,9 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.DISCARD_ALL;
-import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.DISPEL;
-import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.KO;
-import static com.example.lluismontabes.gameofboatsandcards.Card.Effect.REVERSED_HAND;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.DISCARD_ALL;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.KO;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.REVERSED_HAND;
 
 public class GameActivity extends AppCompatActivity {
 
