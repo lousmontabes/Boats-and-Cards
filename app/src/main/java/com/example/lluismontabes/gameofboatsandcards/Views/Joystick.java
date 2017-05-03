@@ -29,7 +29,7 @@ public class Joystick extends RelativeLayout {
         this.image = (ImageView) findViewById(R.id.imgJoystick);
         this.area = (RelativeLayout) findViewById(R.id.layoutJoystick);
 
-        this.image.setOnTouchListener(new OnTouchListener() {
+        this.area.setOnTouchListener(new OnTouchListener() {
 
             RelativeLayout.LayoutParams parms;
             LinearLayout.LayoutParams par;
@@ -41,25 +41,25 @@ public class Joystick extends RelativeLayout {
 
                 switch(event.getAction()) {
 
-                    case MotionEvent.ACTION_DOWN:
+                    /*case MotionEvent.ACTION_DOWN:
                         dx = Joystick.this.image.getX() - event.getRawX();
                         dy = Joystick.this.image.getY() - event.getRawY();
-                        break;
+                        break;*/
 
                     case MotionEvent.ACTION_MOVE:
 
                         centerX = area.getWidth()/2 - image.getWidth()/2;
                         centerY = area.getHeight()/2 - image.getHeight()/2;
 
-                        x = event.getRawX() + dx;
-                        y = event.getRawY() + dy;
+                        x = event.getX();// + dx;
+                        y = event.getY();// + dy;
 
                         // Calculate the current angle using the arctangent:
                         Joystick.this.currentAngle = (float) Math.atan2((y - centerY), (x - centerX));
 
                         // Calculate the current distance using Pythagoras' theorem:
                         // (Distance is limited to 90)
-                        Joystick.this.currentDistance = 10 + (float) Math.hypot(y - centerY, x - centerX);
+                        Joystick.this.currentDistance = 10 + (float) Math.min(Math.hypot(y - centerY, x - centerX), centerX);
 
                         // Animate the joystick view:
                         Joystick.this.image.animate()

@@ -44,9 +44,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.DISCARD_ALL;
-import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.KO;
-import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.REVERSED_HAND;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.*;
 
 public class GameActivity extends AppCompatActivity {
 

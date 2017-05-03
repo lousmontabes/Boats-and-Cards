@@ -11,9 +11,8 @@ import com.example.lluismontabes.gameofboatsandcards.R;
 
 /**
  * Created by lluismontabes on 6/3/17.
- *
+ * <p>
  * Classe general per a definir un jugador.
- *
  */
 
 public class Player extends RectangularCollider {
@@ -40,11 +39,12 @@ public class Player extends RectangularCollider {
      * HEALTH & GAMEPLAY PARAMETERS
      */
     // Health
-    private final int maxHealth;
+    private final int MAX_HEALTH = 100;
     private int health;
 
     // Cooldowns
-    private final int maxFireCooldown;
+    private final int MAX_FIRE_COOLDOWN = 10;       // 10 frames of max fire cooldown
+
     private int fireCooldown;
 
     // Effects
@@ -62,13 +62,11 @@ public class Player extends RectangularCollider {
 
         velocity = 10;              // 10 pixels per frame
         rotationSpeed = 10;         // 10 degrees per frame
-        
-        maxHealth = 100;            // 100 units of max health
-        health = 100;               // 100 units of current health
-        
-        maxFireCooldown = 10;       // 10 frames of max fire cooldown
+
+        health = MAX_HEALTH;               // 100 units of current health
+
         fireCooldown = 0;    // 0 frames of current fire cooldown
-        
+
         alive = true;
 
     }
@@ -77,12 +75,15 @@ public class Player extends RectangularCollider {
     public void setAngle(float a) {
         this.angle = a;
     }
-    public void setVelocity(float v){
+
+    public void setVelocity(float v) {
         this.velocity = v;
     }
-    public void setHealth(int h){
+
+    public void setHealth(int h) {
         this.health = h;
     }
+
     public void setAlive(boolean alive) {
         this.alive = alive;
     }
@@ -91,43 +92,47 @@ public class Player extends RectangularCollider {
     public float getAngle() {
         return angle;
     }
-    public float getVelocity(){
+
+    public float getVelocity() {
         return this.velocity;
     }
+
     public int getHealth() {
         return this.health;
     }
+
     public boolean isAlive() {
         return this.alive;
     }
 
     // MOVEMENT METHODS
-    public void moveUp(){
+    public void moveUp() {
         y = this.getY();
         this.setY(y - velocity);
     }
 
-    public void moveDown(){
+    public void moveDown() {
         y = this.getY();
         this.setY(y + velocity);
     }
 
-    public void moveLeft(){
+    public void moveLeft() {
         x = this.getX();
         this.setX(x - velocity);
     }
 
-    public void moveRight(){
+    public void moveRight() {
         x = this.getX();
         this.setX(x + velocity);
     }
 
     /**
      * Moves Player in the specified angle.
-     * @param angle Angle in which to move the Player.
+     *
+     * @param angle     Angle in which to move the Player.
      * @param intensity Multiplier (from 0.0 to 1.0) of the velocity.
      */
-    public void move(float angle, float intensity){
+    public void move(float angle, float intensity) {
 
         if (!stunned && alive) {
 
@@ -161,10 +166,11 @@ public class Player extends RectangularCollider {
 
     /**
      * Moves Player towards the specified coordinates.
+     *
      * @param destX X coordinate of the destination.
      * @param destY Y coordinate of the destination.
      */
-    public void moveTo(float destX, float destY){
+    public void moveTo(float destX, float destY) {
 
         x = this.getX();
         y = this.getY();
@@ -189,11 +195,11 @@ public class Player extends RectangularCollider {
 
     }
 
-    public void rotateTo(float a){
+    public void rotateTo(float a) {
 
         angle = this.getRotation();
 
-        if (angle != a){
+        if (angle != a) {
             if (Math.abs(angle - a) < rotationSpeed) this.setRotation(angle);
             else this.setRotation(angle + rotationSpeed);
         }
@@ -210,11 +216,11 @@ public class Player extends RectangularCollider {
 
     // HEALTH
 
-    public void restoreHealth(){
-        health = maxHealth;
+    public void restoreHealth() {
+        health = MAX_HEALTH;
     }
 
-    public void damage(int d){
+    public void damage(int d) {
         /*
         if (isEffectActive(DEFENSE_UP)) {
             d /= 2;
@@ -226,7 +232,7 @@ public class Player extends RectangularCollider {
         }
     }
 
-    public void die(){
+    public void die() {
 
         System.out.println("Player died");
 
@@ -245,8 +251,8 @@ public class Player extends RectangularCollider {
 
     // COOLDOWNS
 
-    public void restoreFireCooldown(){
-        fireCooldown = maxFireCooldown;
+    public void restoreFireCooldown() {
+        fireCooldown = MAX_FIRE_COOLDOWN;
     }
 
     public void decreaseFireCooldown() {
