@@ -9,7 +9,7 @@ import com.example.lluismontabes.gameofboatsandcards.R;
 
 public class  Card {
 
-    public static final int TOTAL_CARD_NUMBER = 10;
+    public static final int TOTAL_CARD_NUMBER = 11;
 
     // Target of the effect of the card
     public static final class Target {
@@ -39,7 +39,7 @@ public class  Card {
 
     private int target;
     private int id;
-    private String name;
+    private String effectName;
     private boolean reversed;
 
     /**
@@ -47,7 +47,7 @@ public class  Card {
      */
     public Card() {
         id = (int) (Math.random() * TOTAL_CARD_NUMBER) + 1;
-        name = getName(id);
+        effectName = getEffectName(id);
         target = getTarget(id);
         reversed = false;
     }
@@ -58,7 +58,7 @@ public class  Card {
      */
     public Card(int id) {
         this.id = id;
-        name = getName(id);
+        effectName = getEffectName(id);
         target = getTarget(id);
     }
 
@@ -66,7 +66,7 @@ public class  Card {
         return id;
     }
 
-    public static String getName(int id) {
+    public static String getEffectName(int id) {
         switch(id) {
             case 1:
                 return "Attack up!";
@@ -93,8 +93,8 @@ public class  Card {
         }
     }
 
-    public String getName() {
-        return name;
+    public String getEffectName() {
+        return effectName;
     }
 
     public static int getTarget(int id) {
@@ -163,6 +163,8 @@ public class  Card {
                 return Effect.KO;
             case 10:
                 return Effect.QUICK_REVIVE;
+            case 11:
+                return Effect.FULL_RESTORATION;
             default:
                 throw new UnknownError();
         }
@@ -175,6 +177,7 @@ public class  Card {
             case 5:
             case 8:
             case 9:
+            case 11:
                 return 1;//Instant
             case 10:
                 return Integer.MAX_VALUE;//Infinite

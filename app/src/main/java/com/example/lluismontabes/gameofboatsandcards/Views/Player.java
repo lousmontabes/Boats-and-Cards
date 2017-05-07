@@ -39,13 +39,16 @@ public class Player extends RectangularCollider {
      * HEALTH & GAMEPLAY PARAMETERS
      */
     // Health
-    private final int MAX_HEALTH = 100;
+    public static final int MAX_HEALTH = 100;
     private int health;
 
     // Cooldowns
     private final int MAX_FIRE_COOLDOWN = 10;       // 10 frames of max fire cooldown
-
     private int fireCooldown;
+
+    private final int RESPAWN_TIMER = 150;
+    private final int RESPAWN_TIMER_QUICK = 30;
+    private int respawnTimer;
 
     // Effects
     private boolean alive;
@@ -66,6 +69,7 @@ public class Player extends RectangularCollider {
         health = MAX_HEALTH;               // 100 units of current health
 
         fireCooldown = 0;    // 0 frames of current fire cooldown
+        respawnTimer = 0;
 
         alive = true;
 
@@ -207,7 +211,9 @@ public class Player extends RectangularCollider {
     }
 
     public void respawn() {
-        if (fireCooldown <= 0) {
+        if (respawnTimer > 0) {
+            respawnTimer--;
+        } else {
             setAlpha(1);
             alive = true;
             setAngle(0);
@@ -227,23 +233,21 @@ public class Player extends RectangularCollider {
         }
         */
         this.health -= d;
-        if (this.health <= 0) {
-            die();
-        }
+
     }
 
-    public void die() {
+    public void die(boolean quickRespawn) {
 
         System.out.println("Player died");
 
         alive = false;
         this.setAlpha(0);
 
-        /*if (isEffectActive(QUICK_REVIVE)) {
-            delay = 30;
+        if (quickRespawn) {
+            respawnTimer = 30;
         } else {
-            delay = 150;
-        }*/
+            respawnTimer = 150;
+        }
 
         //removeAllEffects();
 

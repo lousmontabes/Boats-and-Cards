@@ -154,15 +154,17 @@ public class CardZone {
         updateContainers();
     }
 
-    public void reverseCards() {
+    public void reverseCards(boolean reverse) {
+        if (reversed != reverse) {
 
-            reversed = !reversed;
+            reversed ^= true;
 
             for (Card c : cardList) {
                 c.setReversed(reversed);
             }
 
             updateContainers();
+        }
     }
 
     public void updateContainers() {

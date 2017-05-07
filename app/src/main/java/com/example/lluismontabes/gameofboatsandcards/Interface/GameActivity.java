@@ -202,7 +202,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
 
         /**
@@ -223,8 +223,8 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void initializeCardEffects(){
-        cardEffects = new int[Card.TOTAL_CARD_NUMBER*2];
+    private void initializeCardEffects() {
+        cardEffects = new int[Card.TOTAL_CARD_NUMBER * 2];
     }
 
     private void initializeListeners() {
@@ -233,7 +233,7 @@ public class GameActivity extends AppCompatActivity {
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                localPlayerShoot();
+                if (cardUsed == 0) localPlayerShoot();
                 // UNIMPLEMENTED: Point-and-click movement
                 //moveObjectTo(localPlayer, event.getX(), event.getY());
                 return false;
@@ -351,7 +351,7 @@ public class GameActivity extends AppCompatActivity {
         //localPlayer.showHitbox();
 
         ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) Graphics.toPixels(this, 60),
-                                                                         (int) Graphics.toPixels(this, 90));
+                (int) Graphics.toPixels(this, 90));
 
         localPlayer.setLayoutParams(playerParams);
         remotePlayer.setLayoutParams(playerParams);
@@ -361,6 +361,8 @@ public class GameActivity extends AppCompatActivity {
 
         layout.addView(localPlayer);
         layout.addView(remotePlayer);
+
+        drawCard(localPlayer);
 
         System.out.println(activePlayers);
     }
@@ -472,9 +474,10 @@ public class GameActivity extends AppCompatActivity {
 
     /**
      * Shows text pop-up above player position
-     * @param p     Player to show the pop-up above.
-     * @param msg   Message to display.
-     * @param time  Time in milliseconds to display the message for.
+     *
+     * @param p    Player to show the pop-up above.
+     * @param msg  Message to display.
+     * @param time Time in milliseconds to display the message for.
      */
     private void showPlayerPopup(Player p, String msg, int time, boolean disperse) {
 
@@ -486,10 +489,10 @@ public class GameActivity extends AppCompatActivity {
 
         float detourX, detourY;
 
-        if(disperse){
+        if (disperse) {
             detourX = (float) (p.getWidth() / 2 * Math.random());
             detourY = (float) (20 * Math.random());
-        }else{
+        } else {
             detourX = p.getWidth() / 2;
             detourY = 0;
         }
@@ -558,6 +561,7 @@ public class GameActivity extends AppCompatActivity {
         if (score1 > score2) log("You win!");
         else if (score1 < score2) log("You lose");
         else if (score1 == score2) log("Draw!");
+        //TODO: go to the game end activity
     }
 
     private void advanceCounter() {
@@ -638,9 +642,10 @@ public class GameActivity extends AppCompatActivity {
 
                 // Starting position (doesn't work on player init for some reason)
                 if (currentFrame <= 10) setStartingPositions();
-                // Joystick controls
-                // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
-                else if (localPlayer.isAlive()) localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                    // Joystick controls
+                    // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
+                else if (localPlayer.isAlive())
+                    localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
                 else {
                     localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
                     localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
@@ -659,6 +664,10 @@ public class GameActivity extends AppCompatActivity {
 
                 // Collisions
                 checkProjectileCollisions();
+
+                // Death check
+                if (localPlayer.getHealth() <= 0) localPlayer.die(isEffectActive(QUICK_REVIVE));
+
 
                 // Decrease cooldown to shoot again
                 localPlayer.decreaseFireCooldown();
@@ -707,7 +716,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void showDripplets() {
 
-        if(canvasCreated){
+        if (canvasCreated) {
 
             Paint drippletPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             drippletPaint.setColor(getResources().getColor(R.color.uninvadedIsland));
@@ -721,7 +730,12 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    private void spawnCard() {
+        //TODO: spawn the card colliders at random
+    }
+
     private void drawCard(Player player) {
+        //TODO: use Deck class for card drawing
         if (cardZone.getCardList().size() < 3) {
             Card card = new Card();
             cardZone.addCard(card);
@@ -730,41 +744,46 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void useCard(Player player, int n) {
+        if (player.isAlive()) {
+            Card usedCard = cardZone.removeCard(n);
 
-        Card usedCard = cardZone.removeCard(n);
+            int effect = usedCard.getEffect();
+            int duration = usedCard.getDuration();
 
-        int effect = usedCard.getEffect();
-        int duration = usedCard.getDuration();
+            switch (usedCard.getTarget()) {
 
-        switch (usedCard.getTarget()) {
+                case Card.Target.SELF:
+                    addEffect(effect, duration);
+                    break;
 
-            case Card.Target.SELF:
-                addEffect(effect, duration);
-                break;
+                case Card.Target.OPPONENT:
+                    addEffect(effect, duration);
+                    break;
 
-            case Card.Target.OPPONENT:
-                addEffect(effect, duration);
-                break;
+                case Card.Target.ALL:
+                    addEffect(effect, duration);
+                    break;
 
-            case Card.Target.ALL:
-                addEffect(effect, duration);
-                break;
+                case Card.Target.TRAP:
+                    //TODO: implemantar trampes
+                    break;
 
-            case Card.Target.TRAP:
-                //TODO: implemantar trampes
-                break;
+            }
 
+            showPlayerPopup(localPlayer, usedCard.getEffectName(), 1000, false);
         }
-
-        showPlayerPopup(localPlayer, usedCard.getName(), 1000, false);
         cardUsed = 0;
 
     }
 
     private void handleEffects() {
-        if (isEffectActive(REVERSED_HAND)) cardZone.reverseCards();
+        cardZone.reverseCards(isEffectActive(REVERSED_HAND));
         if (isEffectActive(DISCARD_ALL)) cardZone.discardAll();
-        if (isEffectActive(KO)) localPlayer.die();
+        if (isEffectActive(KO)) localPlayer.die(isEffectActive(QUICK_REVIVE));
+        if (isEffectActive(FULL_RESTORATION)) {
+            showPlayerPopup(localPlayer, "+" + (Player.MAX_HEALTH - localPlayer.getHealth()) + " ♡", 500, false);
+            localPlayer.setHealth(Player.MAX_HEALTH);
+        }
         //if (isEffectActive(DISPEL)) localPlayer.removeAllEffects();
     }
 
@@ -782,7 +801,7 @@ public class GameActivity extends AppCompatActivity {
         return cardEffects[e] != 0;
     }
 
-    private void improveVisibilityCardZone(float maxDistance, float minDistance, int minAlpha){
+    private void improveVisibilityCardZone(float maxDistance, float minDistance, int minAlpha) {
         cardZone.improveVisibility(localPlayer, maxDistance, minDistance, minAlpha);
     }
 
@@ -838,7 +857,7 @@ public class GameActivity extends AppCompatActivity {
      *
      * @param url     URL to retrieve JSON from.
      * @param timeout Time available to establish connection.
-     * @return        JSON response as String.
+     * @return JSON response as String.
      */
     @Nullable
     private String getJSON(String url, int timeout) {

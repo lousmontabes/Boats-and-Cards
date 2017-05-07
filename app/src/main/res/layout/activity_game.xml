@@ -90,8 +90,10 @@
     </RelativeLayout>
 
     <com.example.lluismontabes.gameofboatsandcards.Views.Joystick
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
         android:id="@+id/joystick"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true">
@@ -108,25 +110,31 @@
         android:layout_alignParentEnd="true">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="67dp"
+            android:layout_height="116dp"
             app:srcCompat="@drawable/void_card_resized"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
             android:id="@+id/card1"
             android:layout_gravity="bottom"
             android:background="#00000000"/>
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="67dp"
+            android:layout_height="116dp"
             app:srcCompat="@drawable/void_card_resized"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
             android:id="@+id/card2"
             android:layout_gravity="bottom"
             android:background="#00000000"/>
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="67dp"
+            android:layout_height="116dp"
             app:srcCompat="@drawable/void_card_resized"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
             android:id="@+id/card3"
             app:layout_anchorGravity="bottom|center_horizontal"
             android:layout_gravity="bottom"
