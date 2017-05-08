@@ -665,8 +665,6 @@ public class GameActivity extends AppCompatActivity {
                 // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
                 else if (localPlayer.isAlive()) {
 
-                    log(Float.toString(joystick.getCurrentIntensity()));
-
                     if (joystick.getCurrentIntensity() != 0) {
                         localPlayer.accelerate();
                         localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
@@ -929,6 +927,7 @@ public class GameActivity extends AppCompatActivity {
                     // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
                     // variables. These variables will be used to position remotePlayer on the next frame.
                     if (p != null){
+                        log(p.x + ", " + p.y);
                         remotePosition = p;
                     }
 
