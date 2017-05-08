@@ -61,10 +61,8 @@ public class GameActivity extends AppCompatActivity {
      **/
     RemoteDataTask remoteTask;
     boolean connectionActive = true;
-    float remoteX = 0;
-    float remoteY = 0;
-    float localX = 0;
-    float localY = 0;
+    Point remotePosition = new Point(0, 0);
+    Point localPosition = new Point(0, 0);
     int matchId;
     int assignedPlayer;
     int oppositePlayer;
@@ -724,11 +722,11 @@ public class GameActivity extends AppCompatActivity {
                 advanceCounter();
 
                 // Prepare local data to send to server
-                localX = localPlayer.getX();
-                localY = localPlayer.getY();
+                localPosition.x = (int) localPlayer.getX();
+                localPosition.y = (int) localPlayer.getY();
 
                 // Apply remote data to remotePlayer
-                remotePlayer.moveTo(remoteX, remoteY);
+                remotePlayer.moveTo(remotePosition.x, remotePosition.y);
 
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
@@ -915,8 +913,8 @@ public class GameActivity extends AppCompatActivity {
                     /* SEND DATA */
                     getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?matchId=" + matchId
                             + "&player=" + assignedPlayer
-                            + "&x=" + localX
-                            + "&y=" + localY, 2000);
+                            + "&x=" + localPosition.x
+                            + "&y=" + localPosition.y, 2000);
 
                     /* RETRIEVE DATA */
                     //This returns a JSON object with a {"x": x,"y": y} pattern.
@@ -928,10 +926,11 @@ public class GameActivity extends AppCompatActivity {
                     // Parse the JSON information into a Point object.
                     Point p = new Gson().fromJson(data, Point.class);
 
-                    // Set X and Y coordinates retrieved from JSON to the remoteX and remoteY global
+                    // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
                     // variables. These variables will be used to position remotePlayer on the next frame.
-                    remoteX = p.x;
-                    remoteY = p.y;
+                    if (p != null){
+                        remotePosition = p;
+                    }
 
                 }
 

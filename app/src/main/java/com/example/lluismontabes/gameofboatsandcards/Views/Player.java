@@ -221,8 +221,8 @@ public class Player extends RectangularCollider {
         float scaleX = (float) Math.cos(angle);
         float scaleY = (float) Math.sin(angle);
 
-        float velocityX = scaleX * this.velocity;
-        float velocityY = scaleY * this.velocity;
+        float velocityX = scaleX * MAX_VELOCITY;
+        float velocityY = scaleY * MAX_VELOCITY;
 
         this.setX(x + velocityX);
         this.setY(y + velocityY);
