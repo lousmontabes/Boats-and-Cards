@@ -216,7 +216,7 @@ public class GameActivity extends AppCompatActivity {
          * ASYNCHRONOUS TASKS
          **/
         // Online data gatherer task
-        //startRemoteTask();
+        startRemoteTask();
 
         // Start game loop
         startRefreshTimer();
@@ -661,7 +661,7 @@ public class GameActivity extends AppCompatActivity {
                 if (downPressed) localPlayer.moveDown();
 
                 // Starting position
-                if (currentFrame <= 10) setStartingPositions();
+                if (currentFrame <= 10) setStartPositions();
 
                 // Joystick controls
                 // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
@@ -740,12 +740,32 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
-    private void setStartingPositions() {
+    private void setStartPositions() {
+
         int centerX = (layout.getWidth() - localPlayer.getWidth()) / 2;
-        localPlayer.setX(centerX);
-        localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
-        remotePlayer.setX(centerX);
-        remotePlayer.setY(0);
+
+        if (assignedPlayer == 1 || assignedPlayer == -1){
+
+            // Spawn local player at bottom position
+            localPlayer.setX(centerX);
+            localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
+
+            // Spawn remote player at top position
+            remotePlayer.setX(centerX);
+            remotePlayer.setY(0);
+
+        }else if(assignedPlayer == 2) {
+
+            // Spawn local player at bottom position
+            remotePlayer.setX(centerX);
+            remotePlayer.setY(layout.getHeight() - localPlayer.getHeight());
+
+            // Spawn remote player at top position
+            localPlayer.setX(centerX);
+            localPlayer.setY(0);
+
+        }
+
     }
 
     private void showDripplets() {
