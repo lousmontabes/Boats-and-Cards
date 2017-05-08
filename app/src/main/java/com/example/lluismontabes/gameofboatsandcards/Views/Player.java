@@ -27,7 +27,7 @@ public class Player extends RectangularCollider {
      * MOVEMENT & POSITIONING
      */
     // Velocity
-    private final float MAX_VELOCITY = 80;
+    private final float MAX_VELOCITY = 50;
     private float velocity, idleVelocity;
     private float acceleration;
     private float drag;
@@ -70,7 +70,7 @@ public class Player extends RectangularCollider {
         shadowImageView.setColorFilter(getResources().getColor(R.color.shadow), android.graphics.PorterDuff.Mode.MULTIPLY);
 
         velocity = 0;               // 10 pixels per frame
-        acceleration = 1;           // Velocity increments 1 pixel/frame per frame (1px / frame^2)
+        acceleration = 2;           // Velocity increments 2 pixels/frame per frame (2px / frame^2)
         drag = 2;                   // Drag further decelerates the player on deceleration.
         rotationSpeed = 10;         // 10 degrees per frame
 
