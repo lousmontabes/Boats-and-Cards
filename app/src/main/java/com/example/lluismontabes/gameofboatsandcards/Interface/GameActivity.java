@@ -724,6 +724,7 @@ public class GameActivity extends AppCompatActivity {
                 localPosition.y = (int) localPlayer.getY();
 
                 // Apply remote data to remotePlayer
+                log(remotePosition.x + ", " + remotePosition.y);
                 remotePlayer.moveTo(remotePosition.x, remotePosition.y);
 
                 //test CardZone
@@ -927,7 +928,6 @@ public class GameActivity extends AppCompatActivity {
                     // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
                     // variables. These variables will be used to position remotePlayer on the next frame.
                     if (p != null){
-                        log(p.x + ", " + p.y);
                         remotePosition = p;
                     }
 
