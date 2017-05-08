@@ -19,6 +19,7 @@ import android.view.WindowManager;
 import android.widget.*;
 
 import com.example.lluismontabes.gameofboatsandcards.Views.Card;
+import com.example.lluismontabes.gameofboatsandcards.Views.CardSpawn;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardZone;
 import com.example.lluismontabes.gameofboatsandcards.Model.Collider;
 import com.example.lluismontabes.gameofboatsandcards.Model.Data;
@@ -159,7 +160,12 @@ public class GameActivity extends AppCompatActivity {
     ImageView containerCard1;
     ImageView containerCard2;
     ImageView containerCard3;
+    CardSpawn cardSpawn;
     int cardUsed = 0;
+    int cardSpawnCooldown;
+    boolean cardHasSpawned = false;
+    private static final int MAX_CARD_COOLDOWN = 110;
+    private static final int MIN_CARD_COOLDOWN = 100;
 
     /**
      * SOUND
@@ -331,7 +337,11 @@ public class GameActivity extends AppCompatActivity {
             }
         });
         cardZone = new CardZone(cardLayout, containerCard1, containerCard2, containerCard3);
-
+        cardSpawn = new CardSpawn(getApplicationContext());
+        cardSpawn.setLayoutParams(new ViewGroup.LayoutParams((int) Graphics.toPixels(this, 15),
+                (int) Graphics.toPixels(this, 20)));
+        cardSpawnCooldown = (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
+        layout.addView(cardSpawn);
     }
 
     private void initializeIslandDomain(float radius) {
@@ -484,8 +494,8 @@ public class GameActivity extends AppCompatActivity {
         TextView popup = new TextView(this);
         popup.setText(msg);
 
-        float oX = Math.max(p.getX() - popup.getWidth() / 2, 0);
-        float oY = Math.max(p.getY() - 35, 0);
+        float oX = Math.min(Math.max(p.getX() - popup.getWidth() / 2, 0), layout.getWidth() - popup.getWidth());
+        float oY = Math.min(Math.max(p.getY() - 35, 0), layout.getHeight() - popup.getHeight());
 
         float detourX, detourY;
 
@@ -493,7 +503,7 @@ public class GameActivity extends AppCompatActivity {
             detourX = (float) (p.getWidth() / 2 * Math.random());
             detourY = (float) (20 * Math.random());
         } else {
-            detourX = p.getWidth() / 2;
+            detourX = 0;
             detourY = 0;
         }
 
@@ -682,6 +692,9 @@ public class GameActivity extends AppCompatActivity {
                 // Card usage
                 if (cardUsed != 0) useCard(localPlayer, cardUsed);
 
+                //Card spawning
+                spawnCard();
+
                 // Effect management
                 handleEffects();
                 decreaseEffectsDuration();
@@ -731,11 +744,23 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void spawnCard() {
-        //TODO: spawn the card colliders at random
+        if (!cardHasSpawned) {
+            cardSpawn.setVisibility(View.VISIBLE);
+            cardSpawn.setX(layout.getWidth() / 4);
+            cardSpawn.setY(layout.getHeight() / 2);
+            cardHasSpawned = true;
+        }    /*do {
+                card.setX((float)(Math.random() * (layout.getWidth() - card.getWidth())));
+                card.setY((float)(Math.random() * (layout.getHeight() - card.getHeight())));
+            } while (islandDomain.isColliding(card));*
+        } else {
+            cardSpawnCooldown--;
+        }*/
     }
 
     private void drawCard(Player player) {
         //TODO: use Deck class for card drawing
+        // (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
         if (cardZone.getCardList().size() < 3) {
             Card card = new Card();
             cardZone.addCard(card);
@@ -782,14 +807,23 @@ public class GameActivity extends AppCompatActivity {
         if (isEffectActive(KO)) localPlayer.die(isEffectActive(QUICK_REVIVE));
         if (isEffectActive(FULL_RESTORATION)) {
             showPlayerPopup(localPlayer, "+" + (Player.MAX_HEALTH - localPlayer.getHealth()) + " ♡", 500, false);
-            localPlayer.setHealth(Player.MAX_HEALTH);
+            localPlayer.restoreHealth();
         }
-        //if (isEffectActive(DISPEL)) localPlayer.removeAllEffects();
+        localPlayer.setStunned(isEffectActive(STUNNED));
+        localPlayer.setBackwards(isEffectActive(REVERSED_CONTROLS));
+        localPlayer.setSpeedUp(isEffectActive(SPEED_UP));
+        if (isEffectActive(DISPEL)) removeAllEffects();
     }
 
     private void decreaseEffectsDuration() {
         for (int pos = 0; pos < cardEffects.length; pos++) {
             if (cardEffects[pos] > 0) cardEffects[pos]--;
+        }
+    }
+
+    private void removeAllEffects() {
+        for (int pos = 0; pos < cardEffects.length; pos++) {
+            cardEffects[pos] = 0;
         }
     }
 

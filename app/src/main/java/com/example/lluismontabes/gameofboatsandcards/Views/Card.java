@@ -178,9 +178,10 @@ public class  Card {
             case 8:
             case 9:
             case 11:
+            case 12:
                 return 1;//Instant
             case 10:
-                return Integer.MAX_VALUE;//Infinite
+                return -1;//Infinite
             default:
                 return 150;
         }

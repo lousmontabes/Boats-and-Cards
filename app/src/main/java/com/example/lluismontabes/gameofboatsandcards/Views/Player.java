@@ -54,6 +54,9 @@ public class Player extends RectangularCollider {
     private boolean alive;
     private boolean stunned;
 
+    private boolean speedUp;
+    private boolean backwards;
+
     public Player(Context context, AttributeSet attrs) {
         super(context, 34, 59, 40, 45);
 
@@ -70,6 +73,10 @@ public class Player extends RectangularCollider {
 
         fireCooldown = 0;    // 0 frames of current fire cooldown
         respawnTimer = 0;
+
+        stunned = false;
+        speedUp = false;
+        backwards = false;
 
         alive = true;
 
@@ -147,13 +154,13 @@ public class Player extends RectangularCollider {
             float scaleY = (float) Math.sin(angle);
 
             float modifier = 1;
-            /*
-            if (isEffectActive(SPEED_UP)) {
+
+            if (speedUp) {
                 modifier *= 2;
             }
-            if (isEffectActive(REVERSED_CONTROLS)) {
+            if (backwards) {
                 modifier = -modifier;
-            }*/
+            }
 
             float velocityX = scaleX * this.velocity * intensity * modifier;
             float velocityY = scaleY * this.velocity * intensity * modifier;
@@ -220,6 +227,18 @@ public class Player extends RectangularCollider {
         }
     }
 
+    public void setStunned(boolean stunned) {
+        this.stunned = stunned;
+    }
+
+    public void setSpeedUp(boolean speedUp) {
+        this.speedUp = speedUp;
+    }
+
+    public void setBackwards(boolean backwards) {
+        this.backwards = backwards;
+    }
+
     // HEALTH
 
     public void restoreHealth() {
@@ -266,7 +285,7 @@ public class Player extends RectangularCollider {
     }
 
     public boolean canShoot() {
-        return fireCooldown == 0 && !stunned;
+        return fireCooldown == 0 && !stunned && alive;
     }
 
     @Override

@@ -1,7 +1,10 @@
 package com.example.lluismontabes.gameofboatsandcards.Views;
 
 import android.content.Context;
+import android.view.LayoutInflater;
+import android.widget.ImageView;
 
+import com.example.lluismontabes.gameofboatsandcards.Model.Graphics;
 import com.example.lluismontabes.gameofboatsandcards.Model.RectangularCollider;
 import com.example.lluismontabes.gameofboatsandcards.R;
 
@@ -11,11 +14,13 @@ import com.example.lluismontabes.gameofboatsandcards.R;
 
 public class CardSpawn extends RectangularCollider {
 
-    public CardSpawn(Context context, float w, float h) {
-        super(context, w, h);
+    public CardSpawn(Context context) {
+        super(context, 15, 20, 40, 45);
+        LayoutInflater.from(context).inflate(R.layout.card_back, this);
     }
 
-    public CardSpawn(Context context, float w, float h, int marginLeft, int marginTop) {
-        super(context, w, h, marginLeft, marginTop);
+    public CardSpawn(Context context, int marginLeft, int marginTop) {
+        super(context, 15, 20, marginLeft, marginTop);
+        LayoutInflater.from(context).inflate(R.layout.card_back, this);
     }
 }
