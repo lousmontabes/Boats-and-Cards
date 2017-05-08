@@ -27,10 +27,10 @@ public class Player extends RectangularCollider {
      * MOVEMENT & POSITIONING
      */
     // Velocity
-    private final float MAX_VELOCITY = 50;
+    private final float MAX_VELOCITY = 40;
     private float velocity, idleVelocity;
     private float acceleration;
-    private float drag;
+    private float friction;
     private float rotationSpeed;
 
     // Position
@@ -71,7 +71,7 @@ public class Player extends RectangularCollider {
 
         velocity = 0;               // 10 pixels per frame
         acceleration = 2;           // Velocity increments 2 pixels/frame per frame (2px / frame^2)
-        drag = 2;                   // Drag further decelerates the player on deceleration.
+        friction = 1.5f;                   // friction further decelerates the player on deceleration.
         rotationSpeed = 10;         // 10 degrees per frame
 
         health = MAX_HEALTH;        // 100 units of current health
@@ -155,7 +155,7 @@ public class Player extends RectangularCollider {
 
     public void decelerate() {
 
-        float futureVelocity = velocity - acceleration - drag;
+        float futureVelocity = velocity - friction;
         if (futureVelocity >= 0) this.velocity = futureVelocity;
 
     }

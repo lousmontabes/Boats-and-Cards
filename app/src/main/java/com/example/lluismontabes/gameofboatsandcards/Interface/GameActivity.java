@@ -169,8 +169,10 @@ public class GameActivity extends AppCompatActivity {
     /**
      * SOUND
      **/
-    MediaPlayer pointSound;
     MediaPlayer backgroundMusic;
+    MediaPlayer pointSound;
+    MediaPlayer fireSound;
+    MediaPlayer hitSound;
 
     /**
      * VISUAL EFFECTS
@@ -378,8 +380,10 @@ public class GameActivity extends AppCompatActivity {
 
     private void initializeAudio() {
 
-        // Initialize score sound
+        // Initialize sound effects
         pointSound = MediaPlayer.create(getApplicationContext(), R.raw.point);
+        fireSound = MediaPlayer.create(getApplicationContext(), R.raw.fire);
+        hitSound = MediaPlayer.create(getApplicationContext(), R.raw.hit);
 
         // Initialize background music
         backgroundMusic = MediaPlayer.create(getApplicationContext(), R.raw.background_music);
@@ -406,7 +410,11 @@ public class GameActivity extends AppCompatActivity {
             Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY, baseDamage);
             GameActivity.this.activeProjectiles.add(projectile);
             GameActivity.this.activeColliders.add(projectile);
+
             layout.addView(projectile);
+
+            if (fireSound.isPlaying()) fireSound.stop();
+            fireSound.start();
 
             if (isEffectActive(Card.Effect.TRIPLE_SHOT)) {
 
@@ -527,10 +535,13 @@ public class GameActivity extends AppCompatActivity {
 
                 remotePlayer.boatImageView.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
                 remotePlayer.damage(p.getDamage());
-                showPlayerPopup(remotePlayer, "-" + p.getDamage() + " ♡", 500, false);
+                showPlayerPopup(remotePlayer, "-" + p.getDamage() + " ♡", 300, true);
 
                 layout.removeView(p);
                 projectileIterator.remove();
+
+                if (hitSound.isPlaying()) hitSound.stop();
+                hitSound.start();
 
             } else remotePlayer.boatImageView.setColorFilter(null);
 
@@ -649,7 +660,7 @@ public class GameActivity extends AppCompatActivity {
                 if (rightPressed) localPlayer.moveRight();
                 if (downPressed) localPlayer.moveDown();
 
-                // Starting position (doesn't work on player init for some reason)
+                // Starting position
                 if (currentFrame <= 10) setStartingPositions();
 
                 // Joystick controls
