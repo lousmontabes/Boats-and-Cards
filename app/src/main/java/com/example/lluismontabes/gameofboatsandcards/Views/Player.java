@@ -27,7 +27,10 @@ public class Player extends RectangularCollider {
      * MOVEMENT & POSITIONING
      */
     // Velocity
+    private final float MAX_VELOCITY = 80;
     private float velocity, idleVelocity;
+    private float acceleration;
+    private float drag;
     private float rotationSpeed;
 
     // Position
@@ -66,12 +69,14 @@ public class Player extends RectangularCollider {
         shadowImageView = (ImageView) findViewById(R.id.shadowImageView);
         shadowImageView.setColorFilter(getResources().getColor(R.color.shadow), android.graphics.PorterDuff.Mode.MULTIPLY);
 
-        velocity = 10;              // 10 pixels per frame
+        velocity = 0;               // 10 pixels per frame
+        acceleration = 1;           // Velocity increments 1 pixel/frame per frame (1px / frame^2)
+        drag = 2;                   // Drag further decelerates the player on deceleration.
         rotationSpeed = 10;         // 10 degrees per frame
 
-        health = MAX_HEALTH;               // 100 units of current health
+        health = MAX_HEALTH;        // 100 units of current health
 
-        fireCooldown = 0;    // 0 frames of current fire cooldown
+        fireCooldown = 0;           // 0 frames of current fire cooldown
         respawnTimer = 0;
 
         stunned = false;
@@ -108,6 +113,10 @@ public class Player extends RectangularCollider {
         return this.velocity;
     }
 
+    public float getAcceleration() {
+        return this.acceleration;
+    }
+
     public int getHealth() {
         return this.health;
     }
@@ -135,6 +144,24 @@ public class Player extends RectangularCollider {
     public void moveRight() {
         x = this.getX();
         this.setX(x + velocity);
+    }
+
+    public void accelerate() {
+
+        float futureVelocity = velocity + acceleration;
+        if (futureVelocity <= MAX_VELOCITY) this.velocity = futureVelocity;
+
+    }
+
+    public void decelerate() {
+
+        float futureVelocity = velocity - acceleration - drag;
+        if (futureVelocity >= 0) this.velocity = futureVelocity;
+
+    }
+
+    public void restoreVelocity() {
+        this.velocity = 0;
     }
 
     /**

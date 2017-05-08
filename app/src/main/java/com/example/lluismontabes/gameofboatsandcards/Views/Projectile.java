@@ -24,7 +24,7 @@ public class Projectile extends RoundCollider {
 
         setWillNotDraw(false);
 
-        this.velocity = 30;
+        this.velocity = 80;
         this.damage = damage;
         this.angle = angle;
         this.setX(originX - Graphics.toPixels(getContext(), 10));

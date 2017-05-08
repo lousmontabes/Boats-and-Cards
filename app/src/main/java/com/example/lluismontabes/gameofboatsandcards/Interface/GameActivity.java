@@ -90,7 +90,6 @@ public class GameActivity extends AppCompatActivity {
     boolean player2Inside = false;
     boolean running = false;
 
-
     // Control button boolean variables
     private boolean upPressed = false;
     private boolean leftPressed = false;
@@ -652,10 +651,22 @@ public class GameActivity extends AppCompatActivity {
 
                 // Starting position (doesn't work on player init for some reason)
                 if (currentFrame <= 10) setStartingPositions();
-                    // Joystick controls
-                    // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
-                else if (localPlayer.isAlive())
-                    localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+
+                // Joystick controls
+                // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
+                else if (localPlayer.isAlive()) {
+
+                    log(Float.toString(joystick.getCurrentIntensity()));
+
+                    if (joystick.getCurrentIntensity() != 0) {
+                        localPlayer.accelerate();
+                        localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+                    } else {
+                        localPlayer.decelerate();
+                        localPlayer.move(joystick.getCurrentAngle(), 0.4f);
+                    }
+
+                }
                 else {
                     localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
                     localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
@@ -677,7 +688,6 @@ public class GameActivity extends AppCompatActivity {
 
                 // Death check
                 if (localPlayer.getHealth() <= 0) localPlayer.die(isEffectActive(QUICK_REVIVE));
-
 
                 // Decrease cooldown to shoot again
                 localPlayer.decreaseFireCooldown();

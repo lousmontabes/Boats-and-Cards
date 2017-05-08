@@ -59,7 +59,7 @@ public class Joystick extends RelativeLayout {
 
                         // Calculate the current distance using Pythagoras' theorem:
                         // (Distance is limited to 90)
-                        Joystick.this.currentDistance = 10 + (float) Math.min(Math.hypot(y - centerY, x - centerX), centerX);
+                        Joystick.this.currentDistance = (float) Math.min(Math.hypot(y - centerY, x - centerX), centerX);
 
                         // Animate the joystick view:
                         Joystick.this.image.animate()
@@ -85,7 +85,7 @@ public class Joystick extends RelativeLayout {
                                 .setDuration(100)
                                 .start();
 
-                        Joystick.this.currentDistance = 10;
+                        Joystick.this.currentDistance = 0;
                         break;
 
                 }
