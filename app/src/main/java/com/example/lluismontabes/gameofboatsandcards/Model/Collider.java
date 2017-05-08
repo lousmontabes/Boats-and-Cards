@@ -31,7 +31,7 @@ public abstract class Collider extends RelativeLayout {
     abstract Point getCenter();
 
     /**
-     * Returns top-left (real) coordinates.
+     * Returns top-left coordinates (including margins).
      * @return  Top-left position of the Collider.
      */
     public Point getPosition() {

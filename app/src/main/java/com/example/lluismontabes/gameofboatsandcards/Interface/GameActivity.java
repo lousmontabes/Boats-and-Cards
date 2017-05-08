@@ -909,26 +909,32 @@ public class GameActivity extends AppCompatActivity {
         protected Void doInBackground(String... params) {
 
             while (connectionActive) {
-                /* SEND DATA */
-                getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?matchId=" + matchId
-                        + "&player=" + assignedPlayer
-                        + "&x=" + localX
-                        + "&y=" + localY, 2000);
 
-                /* RETRIEVE DATA */
-                //This returns a JSON object with a {"x": x,"y": y} pattern.
-                String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php?matchId=" + matchId
-                        + "&player=" + oppositePlayer, 2000);
+                if (currentFrame % 6 == 0){
 
-                System.out.println(currentFrame + ": " + data);
+                    /* SEND DATA */
+                    getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?matchId=" + matchId
+                            + "&player=" + assignedPlayer
+                            + "&x=" + localX
+                            + "&y=" + localY, 2000);
 
-                // Parse the JSON information into a Point object.
-                Point p = new Gson().fromJson(data, Point.class);
+                    /* RETRIEVE DATA */
+                    //This returns a JSON object with a {"x": x,"y": y} pattern.
+                    String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php?matchId=" + matchId
+                            + "&player=" + oppositePlayer, 2000);
 
-                // Set X and Y coordinates retrieved from JSON to the remoteX and remoteY global
-                // variables. These variables will be used to position remotePlayer on the next frame.
-                remoteX = p.x;
-                remoteY = p.y;
+                    System.out.println(currentFrame + ": " + data);
+
+                    // Parse the JSON information into a Point object.
+                    Point p = new Gson().fromJson(data, Point.class);
+
+                    // Set X and Y coordinates retrieved from JSON to the remoteX and remoteY global
+                    // variables. These variables will be used to position remotePlayer on the next frame.
+                    remoteX = p.x;
+                    remoteY = p.y;
+
+                }
+
             }
             return null;
         }
