@@ -804,7 +804,10 @@ public class GameActivity extends AppCompatActivity {
     private void handleEffects() {
         cardZone.reverseCards(isEffectActive(REVERSED_HAND));
         if (isEffectActive(DISCARD_ALL)) cardZone.discardAll();
-        if (isEffectActive(KO)) localPlayer.die(isEffectActive(QUICK_REVIVE));
+        if (isEffectActive(KO)) {
+            localPlayer.die(isEffectActive(QUICK_REVIVE));
+            addEffect(QUICK_REVIVE, 0);
+        }
         if (isEffectActive(FULL_RESTORATION)) {
             showPlayerPopup(localPlayer, "+" + (Player.MAX_HEALTH - localPlayer.getHealth()) + " ♡", 500, false);
             localPlayer.restoreHealth();
@@ -812,6 +815,10 @@ public class GameActivity extends AppCompatActivity {
         localPlayer.setStunned(isEffectActive(STUNNED));
         localPlayer.setBackwards(isEffectActive(REVERSED_CONTROLS));
         localPlayer.setSpeedUp(isEffectActive(SPEED_UP));
+        if (isEffectActive(RANDOM_WARP)) {
+            localPlayer.setX((float) (Math.random() * (layout.getWidth() - localPlayer.getWidth())));
+            localPlayer.setY((float) (Math.random() * (layout.getHeight() - localPlayer.getHeight())));
+        }
         if (isEffectActive(DISPEL)) removeAllEffects();
     }
 

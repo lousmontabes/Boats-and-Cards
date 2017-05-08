@@ -9,7 +9,7 @@ import com.example.lluismontabes.gameofboatsandcards.R;
 
 public class  Card {
 
-    public static final int TOTAL_CARD_NUMBER = 11;
+    public static final int TOTAL_CARD_NUMBER = 12;
 
     // Target of the effect of the card
     public static final class Target {
@@ -88,6 +88,10 @@ public class  Card {
                 return "YOU DIED";
             case 10:
                 return "Quick revive!";
+            case 11:
+                return "";
+            case 12:
+                return "Random warp!";
             default:
                 return "Carta ?";
         }
@@ -123,7 +127,7 @@ public class  Card {
         if (reversed) {
             return R.drawable.placeholder_reversed;
         }
-        switch(id) {
+        switch(1 + id % 6) {
             case 1:
                 return R.drawable.placeholder1;
             case 2:
@@ -165,6 +169,8 @@ public class  Card {
                 return Effect.QUICK_REVIVE;
             case 11:
                 return Effect.FULL_RESTORATION;
+            case 12:
+                return Effect.RANDOM_WARP;
             default:
                 throw new UnknownError();
         }

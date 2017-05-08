@@ -15,12 +15,12 @@ import com.example.lluismontabes.gameofboatsandcards.R;
 public class CardSpawn extends RectangularCollider {
 
     public CardSpawn(Context context) {
-        super(context, 15, 20, 40, 45);
-        LayoutInflater.from(context).inflate(R.layout.card_back, this);
+        super(context, 15, 20);
+        LayoutInflater.from(context).inflate(R.layout.card_back, this, true);
     }
 
     public CardSpawn(Context context, int marginLeft, int marginTop) {
         super(context, 15, 20, marginLeft, marginTop);
-        LayoutInflater.from(context).inflate(R.layout.card_back, this);
+        LayoutInflater.from(context).inflate(R.layout.card_back, this, true);
     }
 }
