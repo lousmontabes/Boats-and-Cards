@@ -172,6 +172,7 @@ public class GameActivity extends AppCompatActivity {
     boolean cardHasSpawned = false;
     private static final int MAX_CARD_COOLDOWN = 110;
     private static final int MIN_CARD_COOLDOWN = 100;
+    private static final int RESPAWN_CARD_COOLDOWN = 250;
 
     /**
      * SOUND
@@ -720,6 +721,7 @@ public class GameActivity extends AppCompatActivity {
 
                 //Card spawning
                 spawnCard();
+                checkCollisionCardSpawn();
 
                 // Effect management
                 handleEffects();
@@ -794,16 +796,24 @@ public class GameActivity extends AppCompatActivity {
     private void spawnCard() {
         if (!cardHasSpawned) {
             cardSpawn.setVisibility(View.VISIBLE);
-            cardSpawn.setX(layout.getWidth() / 4);
-            cardSpawn.setY(layout.getHeight() / 2);
             cardHasSpawned = true;
-        }    /*do {
-                card.setX((float)(Math.random() * (layout.getWidth() - card.getWidth())));
-                card.setY((float)(Math.random() * (layout.getHeight() - card.getHeight())));
-            } while (islandDomain.isColliding(card));*
+            do {
+                cardSpawn.setX((float)(Math.random() * (layout.getWidth() - cardSpawn.getWidth())));
+                cardSpawn.setY((float)(Math.random() * (layout.getHeight() - cardSpawn.getHeight())));
+            } while (islandDomain.isColliding(cardSpawn));
         } else {
             cardSpawnCooldown--;
-        }*/
+            if (cardSpawnCooldown == 0){
+                cardSpawnCooldown = RESPAWN_CARD_COOLDOWN;
+                cardHasSpawned = false;
+            }
+        }
+    }
+
+    private void checkCollisionCardSpawn(){
+        if (localPlayer.isColliding(cardSpawn)){
+            cardSpawn.setVisibility(View.GONE);
+        }
     }
 
     private void drawCard(Player player) {
