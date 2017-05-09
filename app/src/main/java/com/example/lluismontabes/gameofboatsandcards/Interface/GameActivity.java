@@ -701,9 +701,9 @@ public class GameActivity extends AppCompatActivity {
                     finishGame(FinishState.REMOTE_WON);
                 }
 
-                textViewCounterLocal.setTextColor(getResources().getColor(R.color.remoteCounterActive));
-                
             }
+
+            textViewCounterRemote.setTextColor(getResources().getColor(R.color.remoteCounterActive));
             
         }else{
             framesUntilTickRemote = fps / 2;
