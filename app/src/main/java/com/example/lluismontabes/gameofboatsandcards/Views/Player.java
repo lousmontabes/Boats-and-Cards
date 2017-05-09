@@ -218,14 +218,16 @@ public class Player extends RectangularCollider {
 
         angle = (float) Math.atan2(pathY, pathX);
 
-        float scaleX = (float) Math.cos(angle);
+        /*float scaleX = (float) Math.cos(angle);
         float scaleY = (float) Math.sin(angle);
 
-        float velocityX = scaleX * MAX_VELOCITY;
-        float velocityY = scaleY * MAX_VELOCITY;
+        float velocityX = scaleX * velocity;
+        float velocityY = scaleY * velocity;
 
         this.setX(x + velocityX);
-        this.setY(y + velocityY);
+        this.setY(y + velocityY);*/
+
+        move(angle, 0.4f);
 
         float convertedAngle = (float) Math.toDegrees(angle) + 90;
 
