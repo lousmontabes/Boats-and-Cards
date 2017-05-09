@@ -927,7 +927,7 @@ public class GameActivity extends AppCompatActivity {
 
             while (connectionActive) {
 
-                if ((currentFrame - lastFrameChecked == connectionFrequency) || !lastCheckSuccessful){
+                if (currentFrame - lastFrameChecked == connectionFrequency){
 
                     lastFrameChecked = currentFrame;
 
