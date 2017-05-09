@@ -64,7 +64,7 @@ public class GameActivity extends AppCompatActivity {
     boolean connectionActive = true;
     int connectionFrequency = 6;
     int lastFrameChecked = 0;
-    int latency;
+    float latency;
     boolean lastCheckSuccessful = false;
 
     // Online player positioning
@@ -75,6 +75,10 @@ public class GameActivity extends AppCompatActivity {
     int matchId;
     int assignedPlayer;
     int oppositePlayer;
+
+    // Online invasion and winning statuses
+    public enum Invader{NONE, LOCAL_PLAYER, REMOTE_PLAYER};
+    private enum FinishState{TIME_OUT, LOCAL_WON, REMOTE_WON};
 
     /**
      * DEBUGGING
@@ -93,8 +97,8 @@ public class GameActivity extends AppCompatActivity {
      * LOGIC VARIABLES
      **/
     // Gameplay
-    boolean player1Inside = false;
-    boolean player2Inside = false;
+    boolean localPlayerInside = false;
+    boolean remotePlayerInside = false;
     boolean running = false;
 
     // Control button boolean variables
@@ -122,8 +126,8 @@ public class GameActivity extends AppCompatActivity {
 
     // Timer and scoreboard
     TextView timer;
-    TextView textViewCounter1;
-    TextView textViewCounter2;
+    TextView textViewCounterLocal;
+    TextView textViewCounterRemote;
 
     // Images
     ImageView treasureImageView;
@@ -132,8 +136,8 @@ public class GameActivity extends AppCompatActivity {
      * STATISTICS
      **/
     // Scores
-    int score1 = 0;
-    int score2 = 0;
+    int localScore = 0;
+    int remoteScore = 0;
 
     // Time
     int currentFrame = 0;
@@ -141,8 +145,8 @@ public class GameActivity extends AppCompatActivity {
     int secondsLeft = 120;
 
     // Counters
-    byte framesUntilTick1 = fps / 2;
-    byte framesUntilTick2 = fps / 2;
+    byte framesUntilTickLocal = fps / 2;
+    byte framesUntilTickRemote = fps / 2;
 
     /**
      * COLLECTIONS
@@ -292,8 +296,8 @@ public class GameActivity extends AppCompatActivity {
 
         // Timer and scoreboard
         timer = (TextView) findViewById(R.id.timer);
-        textViewCounter1 = (TextView) findViewById(R.id.textViewCounter1);
-        textViewCounter2 = (TextView) findViewById(R.id.textViewCounter2);
+        textViewCounterLocal = (TextView) findViewById(R.id.textViewCounterLocal);
+        textViewCounterRemote = (TextView) findViewById(R.id.textViewCounterRemote);
 
         // Images
         treasureImageView = (ImageView) findViewById(R.id.treasureImageView);
@@ -556,22 +560,53 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Check if any player is colliding with the IslandDomain.
+     */
     private void checkIslandDomainCollisions() {
 
-        if (localPlayer.isColliding(islandDomain)) {
-            // Player 1 is colliding with islandDomain.
-            if (!player1Inside) {
-                // Player 1 was not inside before this collision.
-                islandDomain.toggleInvadedStatus();
-                player1Inside = !player1Inside;
+        // TODO: Make this method less spaghetti-y
+
+        boolean localPlayerColliding = localPlayer.isColliding(islandDomain);
+        boolean remotePlayerColliding = remotePlayer.isColliding(islandDomain);
+
+        if (localPlayerColliding && remotePlayerColliding){
+
+            // Do nothing - preference is for the player who invaded first.
+
+        } else if(localPlayerColliding){
+
+            // localPlayer is colliding with islandDomain.
+            if (!localPlayerInside) {
+
+                // localPlayer was not inside before this collision.
+                islandDomain.setInvadedBy(Invader.LOCAL_PLAYER);
+                localPlayerInside = true;
+            }
+
+        } else if(remotePlayerColliding) {
+
+            // remotePlayer is colliding with islandDomain.
+            if (!remotePlayerInside) {
+
+                // remotePlayer was not inside before this collision.
+                islandDomain.setInvadedBy(Invader.REMOTE_PLAYER);
+                remotePlayerInside = true;
             }
 
         } else {
-            // Player 1 is not colliding with islandDomain.
-            if (player1Inside) {
-                // Player 1 was inside before this collision.
-                islandDomain.toggleInvadedStatus();
-                player1Inside = !player1Inside;
+            
+            // No one is colliding with islandDomain.
+            islandDomain.setInvadedBy(Invader.NONE);
+
+            if (localPlayerInside) {
+                // localPlayer was inside before the current state.
+                localPlayerInside = false;
+            }
+
+            if (remotePlayerInside) {
+                // remotePlayer was inside before the current state.
+                remotePlayerInside = false;
             }
 
         }
@@ -585,10 +620,10 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void finishGame() {
-        if (score1 > score2) log("You win!");
-        else if (score1 < score2) log("You lose");
-        else if (score1 == score2) log("Draw!");
+    private void finishGame(FinishState state) {
+        if (localScore > remoteScore) log("You win!");
+        else if (localScore < remoteScore) log("You lose");
+        else if (localScore == remoteScore) log("Draw!");
         //TODO: go to the game end activity
     }
 
@@ -609,36 +644,70 @@ public class GameActivity extends AppCompatActivity {
 
             } else {
                 // Time ran out.
-                finishGame();
+                finishGame(FinishState.TIME_OUT);
             }
         }
 
-        if (player1Inside) {
+        if (localPlayerInside) {
 
-            if (--framesUntilTick1 == 0) {
+            if (--framesUntilTickLocal == 0) {
 
-                if (score1 < 100) {
+                if (localScore < 100) {
 
-                    score1++;
-                    framesUntilTick1 = fps / 2;
-                    textViewCounter1.setText(Integer.toString(score1) + "%");
+                    localScore++;
+                    framesUntilTickLocal = fps / 2;
+                    textViewCounterLocal.setText(Integer.toString(localScore) + "%");
 
                     showPlayerPopup(localPlayer, "+1", 250, true);
+
                     if (running) {
                         pointSound.start();
                     }
+
                 } else {
-                    // Player 1 reached 100% score.
-                    finishGame();
+                    // localPlayer reached 100% score.
+                    finishGame(FinishState.LOCAL_WON);
                 }
+
             }
 
-            textViewCounter1.setTextColor(getResources().getColor(R.color.counterTicking));
+            textViewCounterLocal.setTextColor(getResources().getColor(R.color.localCounterActive));
 
         } else {
-            framesUntilTick1 = fps / 2;
-            textViewCounter1.setTextColor(getResources().getColor(R.color.counterStopped));
+            framesUntilTickLocal = fps / 2;
+            textViewCounterLocal.setTextColor(getResources().getColor(R.color.counterStopped));
         }
+        
+        if (remotePlayerInside) {
+            
+            if (--framesUntilTickRemote == 0) {
+
+                if (remoteScore < 100) {
+
+                    remoteScore++;
+                    framesUntilTickRemote = fps / 2;
+                    textViewCounterRemote.setText(Integer.toString(remoteScore) + "%");
+
+                    showPlayerPopup(remotePlayer, "+1", 250, true);
+
+                    if (running) {
+                        pointSound.start();
+                    }
+
+                } else {
+                    // remotePlayer reached 100% score.
+                    finishGame(FinishState.REMOTE_WON);
+                }
+
+                textViewCounterLocal.setTextColor(getResources().getColor(R.color.remoteCounterActive));
+                
+            }
+            
+        }else{
+            framesUntilTickRemote = fps / 2;
+            textViewCounterRemote.setTextColor(getResources().getColor(R.color.counterStopped));
+        }
+        
     }
 
     // Retrieve online player's last action.
@@ -656,11 +725,6 @@ public class GameActivity extends AppCompatActivity {
 
                 // Garbage collector
                 destroyExcessiveViews();
-
-                // Point-and-click controls
-                if (remotePlayer.getX() == destX && remotePlayer.getY() == destY) moving = false;
-                if (moving) remotePlayer.moveTo(destX, destY);
-                remotePlayer.postInvalidate();
 
                 // Control buttons (currently unused)
                 if (upPressed) localPlayer.moveUp();
@@ -704,7 +768,7 @@ public class GameActivity extends AppCompatActivity {
                 checkProjectileCollisions();
 
                 // Death check
-                if (localPlayer.getHealth() <= 0) localPlayer.die(isEffectActive(QUICK_REVIVE));
+                checkPlayerHealth();
 
                 // Decrease cooldown to shoot again
                 localPlayer.decreaseFireCooldown();
@@ -737,6 +801,7 @@ public class GameActivity extends AppCompatActivity {
                 // Apply remote data to remotePlayer
                 //log(remotePosition.x + ", " + remotePosition.y);
                 log("PNG: " + latency);
+                remotePlayer.accelerate();
                 remotePlayer.moveTo(remotePosition.x, remotePosition.y);
 
                 //test CardZone
@@ -749,6 +814,19 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Check if a player has died.
+     */
+    private void checkPlayerHealth() {
+
+        if (localPlayer.getHealth() <= 0) localPlayer.die(isEffectActive(QUICK_REVIVE));
+        if (remotePlayer.getHealth() <= 0) remotePlayer.die(isEffectActive(QUICK_REVIVE));
+
+    }
+
+    /**
+     * Set starting position of players. (Bottom for player 1, top for player 2)
+     */
     private void setStartPositions() {
 
         int centerX = (layout.getWidth() - localPlayer.getWidth()) / 2;
@@ -927,7 +1005,7 @@ public class GameActivity extends AppCompatActivity {
 
             while (connectionActive) {
 
-                if (currentFrame - lastFrameChecked == connectionFrequency){
+                if ((currentFrame % connectionFrequency == 0) && (lastFrameChecked != currentFrame)){
 
                     lastFrameChecked = currentFrame;
 

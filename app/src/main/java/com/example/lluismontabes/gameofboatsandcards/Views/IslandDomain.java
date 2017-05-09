@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup;
 
+import com.example.lluismontabes.gameofboatsandcards.Interface.GameActivity;
 import com.example.lluismontabes.gameofboatsandcards.Model.RoundCollider;
 import com.example.lluismontabes.gameofboatsandcards.R;
 
@@ -57,18 +58,59 @@ public class IslandDomain extends RoundCollider {
         System.out.println("ISLA DIBUJADA");
     }
 
-    public void toggleInvadedStatus(){
+    public void toggleInvadedStatus(boolean invaderIsLocal){
 
         this.isInvaded = !isInvaded;
 
-        if (this.isInvaded) this.islandPaint.setColor(getResources().getColor(R.color.invadedIsland));
-        else this.islandPaint.setColor(getResources().getColor(R.color.uninvadedIsland));
+        if (isInvaded){
+
+            if(invaderIsLocal){
+                this.islandPaint.setColor(getResources().getColor(R.color.invadedIslandLocal));
+            }else{
+                this.islandPaint.setColor(getResources().getColor(R.color.invadedIslandRemote));
+            }
+
+        }else {
+            this.islandPaint.setColor(getResources().getColor(R.color.uninvadedIsland));
+        }
 
         this.invalidate();
 
     }
 
+    /**
+     * Graphically adapt island to invader. (NONE, LOCAL_PLAYER or REMOTE_PLAYER)
+     * @param invader
+     */
+    public void setInvadedBy(GameActivity.Invader invader){
 
+        // TODO: Generalize enum Invader to avoid having to get it from GameActivity.
+
+        /*
+         * 0: NO INVADER
+         * 1: localPlayer
+         * 2: remotePlayer
+         */
+
+        switch (invader) {
+
+            case NONE:
+                this.islandPaint.setColor(getResources().getColor(R.color.uninvadedIsland));
+                break;
+
+            case LOCAL_PLAYER:
+                this.islandPaint.setColor(getResources().getColor(R.color.invadedIslandLocal));
+                break;
+
+            case REMOTE_PLAYER:
+                this.islandPaint.setColor(getResources().getColor(R.color.invadedIslandRemote));
+                break;
+
+        }
+
+        this.invalidate();
+
+    }
 
 }
 
