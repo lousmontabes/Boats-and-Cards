@@ -350,11 +350,13 @@ public class GameActivity extends AppCompatActivity {
             }
         });
         cardZone = new CardZone(cardLayout, containerCard1, containerCard2, containerCard3);
-        cardSpawn = new CardSpawn(getApplicationContext());
+
+        cardSpawn = new CardSpawn(this);
         cardSpawn.setLayoutParams(new ViewGroup.LayoutParams((int) Graphics.toPixels(this, 15),
                 (int) Graphics.toPixels(this, 20)));
         cardSpawnCooldown = (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
         layout.addView(cardSpawn);
+
     }
 
     private void initializeIslandDomain(float radius) {
