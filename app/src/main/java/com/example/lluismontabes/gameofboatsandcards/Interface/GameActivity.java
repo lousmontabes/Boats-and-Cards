@@ -59,10 +59,19 @@ public class GameActivity extends AppCompatActivity {
     /**
      * ONLINE
      **/
+    // Connection
     RemoteDataTask remoteTask;
     boolean connectionActive = true;
+    int connectionFrequency = 6;
+    int lastFrameChecked = 0;
+    int latency;
+    boolean lastCheckSuccessful = false;
+
+    // Online player positioning
     Point remotePosition = new Point(0, 0);
     Point localPosition = new Point(0, 0);
+
+    // Online player and match IDs
     int matchId;
     int assignedPlayer;
     int oppositePlayer;
@@ -724,7 +733,8 @@ public class GameActivity extends AppCompatActivity {
                 localPosition.y = (int) localPlayer.getY();
 
                 // Apply remote data to remotePlayer
-                log(remotePosition.x + ", " + remotePosition.y);
+                //log(remotePosition.x + ", " + remotePosition.y);
+                log("PNG: " + latency);
                 remotePlayer.moveTo(remotePosition.x, remotePosition.y);
 
                 //test CardZone
@@ -907,7 +917,9 @@ public class GameActivity extends AppCompatActivity {
 
             while (connectionActive) {
 
-                if (currentFrame % 6 == 0){
+                if ((currentFrame - lastFrameChecked == connectionFrequency) || !lastCheckSuccessful){
+
+                    lastFrameChecked = currentFrame;
 
                     /* SEND DATA */
                     getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?matchId=" + matchId
@@ -929,6 +941,10 @@ public class GameActivity extends AppCompatActivity {
                     // variables. These variables will be used to position remotePlayer on the next frame.
                     if (p != null){
                         remotePosition = p;
+                        lastCheckSuccessful = true;
+                        latency = (currentFrame - lastFrameChecked) / 30;
+                    }else{
+                        lastCheckSuccessful = false;
                     }
 
                 }
