@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.lluismontabes.gameofboatsandcards.R;
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,9 +31,15 @@ import java.util.logging.Logger;
 public class MatchmakingActivity extends AppCompatActivity {
 
     private boolean connectionEstablished;
+
     private int queueIndex = 0;
     private int opponentIndex = 0;
+
     private int assignedPlayer;
+    private int assignedMatch = -1;
+
+    private String requestStatus = null;
+
     TextView textViewStatus;
 
     @Override
@@ -140,30 +147,43 @@ public class MatchmakingActivity extends AppCompatActivity {
 
     private void requestMatch(){
 
-        String json = getServerResponse("https://pis04-ub.herokuapp.com/check_match_requests.php", 2000);
+        String json = null;
+
+        while (json == null){
+            json = getServerResponse("https://pis04-ub.herokuapp.com/check_match_requests.php", 2000);
+        }
+
         ActionIndexPair response = new Gson().fromJson(json, ActionIndexPair.class);
 
-        if(response.action == 0){
+        switch (response.action) {
 
-            // No active match requests. The server created a match request.
-            // Wait for another player to join.
+            case REQUEST_CREATED:
 
-            assignedPlayer = 1; // The user will be player1 during the match.
-            waitForRequestResponse(response.index);
+                // No active match requests. The server created a match request.
+                // Wait for another player to join.
 
-        }else if(response.action == 1){
+                assignedPlayer = 1; // The user will be player1 during the match.
+                waitForRequestResponse(response.index);
 
-            // Joined an active match request.
-            // The user has been placed in a match with id response.index
+                break;
 
-            assignedPlayer = 2; // The user will be player2 during the match.
-            joinMatch(response.index);
+            case MATCH_JOINED:
 
-        }else{
+                // Joined an active match request.
+                // The user has been placed in a match with id response.index
 
-            // There was a problem creating or looking for a request.
+                assignedPlayer = 2; // The user will be player2 during the match.
+                joinMatch(response.index);
 
-            changeConnectionMessage("There was a problem finding a match. Please try again later.");
+                break;
+
+            case ERROR:
+            default:
+
+                // There was a problem creating or looking for a request.
+                changeConnectionMessage("There was a problem finding a match. Please try again later.");
+
+                break;
 
         }
 
@@ -173,39 +193,50 @@ public class MatchmakingActivity extends AppCompatActivity {
 
         changeConnectionMessage("In queue");
 
-        int response = Integer.parseInt(getServerResponse(
-                "https://pis04-ub.herokuapp.com/check_request_status.php?requestId=" + requestId,
-                2000));
+        // Wait for someone to answer the user's match request.
+        while (assignedMatch == -1 || requestStatus == null){
 
-        while(response == -1){
+            // -1 means no one has answered the match request.
+            // It's the default value of the variable assignedMatch.
 
-            // -1 means no one has answered the user's match request.
+            // A null requestStatus means the data couldn't be retrieved.
+            // It's the default value of the variable requestStatus.
 
-            response = Integer.parseInt(getServerResponse(
+            requestStatus = getServerResponse(
                     "https://pis04-ub.herokuapp.com/check_request_status.php?requestId=" + requestId,
-                    2000));
+                    2000);
+
+            // Do not attempt to parse if the data couldn't be retrieved.
+            if (requestStatus != null){
+                assignedMatch = Integer.parseInt(requestStatus);
+            }
 
         }
 
         // At this point someone has answered the user's match request and response contains
         // the match to which the user has been assigned.
 
-        confirmMatchRequest(requestId);
-        joinMatch(response);
+        joinMatch(assignedMatch);
 
     }
 
-    private void confirmMatchRequest(int requestId){
+    private boolean confirmMatchRequest(int requestId){
 
-        // TODO
+        // TODO: Implement this method.
+        return true;
 
     }
 
     private void cancelMatchRequest(int requestId){
-        // TODO
+
+        // TODO: Implement this method.
+
     }
 
     private void joinMatch(int matchId){
+
+        // TODO: Add comprovation that the user is still active.
+        // Only join the match if both users are active.
 
         changeConnectionMessage("Joining match with ID: " + matchId);
 
@@ -217,14 +248,23 @@ public class MatchmakingActivity extends AppCompatActivity {
 
     }
 
+    private enum Action {
+
+        // IMPORTANT: @SerializedName("n") makes it possible for Gson to parse the incoming
+        // JSON into an ActionIndexPair properly, as the action is received as an integer.
+
+        @SerializedName("0")
+        REQUEST_CREATED,
+        @SerializedName("1")
+        MATCH_JOINED,
+        @SerializedName("2")
+        ERROR
+    };
+
     private class ActionIndexPair{
 
-        private int action, index;
-
-        private ActionIndexPair(int a, int i){
-            this.action = a;
-            this.index = i;
-        }
+        private Action action;
+        private int index;
 
     }
 
