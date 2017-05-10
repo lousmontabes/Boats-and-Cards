@@ -5,10 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -171,6 +173,8 @@ public class GameActivity extends AppCompatActivity {
     ImageView containerCard2;
     ImageView containerCard3;
     CardSpawn cardSpawn;
+    Card cardSpawned;
+    boolean caught = true;
     int cardUsed = 0;
     int cardSpawnCooldown;
     boolean cardHasSpawned = false;
@@ -783,6 +787,7 @@ public class GameActivity extends AppCompatActivity {
                 if (secondsLeft % 6 == 5 && currentFrame % fps == 0) drawCard(localPlayer);
 
                 // Card usage
+                // Card usage
                 if (cardUsed != 0) useCard(localPlayer, cardUsed);
 
                 //Card spawning
@@ -875,8 +880,13 @@ public class GameActivity extends AppCompatActivity {
 
     private void spawnCard() {
         if (!cardHasSpawned) {
+            cardSpawned = new Card();
+            ImageView im = (ImageView) cardSpawn.findViewById(R.id.cardSpawn);
+            Drawable d  = ContextCompat.getDrawable(this,cardSpawned.getResourceID());
+            im.setImageDrawable(d);
             cardSpawn.setVisibility(View.VISIBLE);
             cardHasSpawned = true;
+            caught = false;
             do {
                 cardSpawn.setX((float)(Math.random() * (layout.getWidth() - cardSpawn.getWidth())));
                 cardSpawn.setY((float)(Math.random() * (layout.getHeight() - cardSpawn.getHeight())));
@@ -891,8 +901,10 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void checkCollisionCardSpawn(){
-        if (localPlayer.isColliding(cardSpawn)){
+        if (localPlayer.isColliding(cardSpawn) && !caught){
             cardSpawn.setVisibility(View.GONE);
+            cardZone.addCard(cardSpawned);
+            caught = true;
         }
     }
 
