@@ -178,7 +178,7 @@ public class GameActivity extends AppCompatActivity {
     int cardUsed = 0;
     int cardSpawnCooldown;
     boolean cardHasSpawned = false;
-    private static final int MAX_CARD_COOLDOWN = 110;
+    private static final int MAX_CARD_COOLDOWN = 500;
     private static final int MIN_CARD_COOLDOWN = 100;
     private static final int RESPAWN_CARD_COOLDOWN = 250;
 
@@ -627,10 +627,13 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void finishGame(FinishState state) {
-        if (localScore > remoteScore) log("You win!");
-        else if (localScore < remoteScore) log("You lose");
-        else if (localScore == remoteScore) log("Draw!");
-        //TODO: go to the game end activity
+        TextView results = (TextView) findViewById(R.id.resultsText);
+        if (localScore > remoteScore) results.setText(R.string.win);//log("You win!");
+        else if (localScore < remoteScore) results.setText(R.string.lose);//log("You lose");
+        else results.setText(R.string.draw);//log("Draw!");
+        Intent i = new Intent(GameActivity.this,GameEndActivity.class);
+        startActivity(i);
+        this.finishActivity(0);
     }
 
     private void advanceCounter() {
@@ -894,7 +897,7 @@ public class GameActivity extends AppCompatActivity {
         } else {
             cardSpawnCooldown--;
             if (cardSpawnCooldown == 0){
-                cardSpawnCooldown = RESPAWN_CARD_COOLDOWN;
+                cardSpawnCooldown = (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
                 cardHasSpawned = false;
             }
         }

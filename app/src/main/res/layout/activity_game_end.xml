@@ -15,7 +15,7 @@
             android:text="@string/win"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView3"
+            android:id="@+id/resultsText"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
@@ -27,7 +27,7 @@
             android:layout_height="25pt"
             android:textSize="11pt"
             android:layout_marginBottom="34dp"
-            android:id="@+id/button2"
+            android:id="@+id/mainMenuButton"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
 
@@ -36,8 +36,8 @@
             android:layout_width="100pt"
             android:layout_height="25pt"
             android:textSize="11pt"
-            android:id="@+id/button"
-            android:layout_above="@+id/button2"
+            android:id="@+id/newGameButton"
+            android:layout_above="@+id/mainMenuButton"
             android:layout_centerHorizontal="true" />
     </RelativeLayout>
 

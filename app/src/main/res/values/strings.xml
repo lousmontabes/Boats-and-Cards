@@ -18,7 +18,8 @@
     <string name="counterInitValue">100</string>
 
     <string name="win">A winner is you!</string>
-    <string name="lose">You lose!</string>
+    <string name="lose">You lose! You get nothing!</string>
+    <string name="draw">Unlikely draw</string>
     <string name="next">New Game</string>
     <string name="returnToMenu">Main Menu</string>
 
