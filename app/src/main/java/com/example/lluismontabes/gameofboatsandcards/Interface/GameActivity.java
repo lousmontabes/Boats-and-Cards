@@ -775,6 +775,7 @@ public class GameActivity extends AppCompatActivity {
                         localPlayer.decelerate();
                         localPlayer.move(joystick.getCurrentAngle(), 0.4f);
                     }
+                    keepInBounds(localPlayer);
 
                 } else {
                     localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
@@ -919,6 +920,7 @@ public class GameActivity extends AppCompatActivity {
                 cardSpawnCooldown = (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
                 cardHasSpawned = false;
             }
+            caught = true;
         } else {
             if (cardVisivilityTimer > CARD_VISIBLE_TIME - 48) {
                 if (cardVisivilityTimer % 6 < 3) {
@@ -931,17 +933,9 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isInBounds(Collider c) {
-        boolean inBoundX = false;
-        boolean inBoundY = false;
-
-        if (c instanceof RoundCollider) {
-            RoundCollider rc = (RoundCollider) c;
-            inBoundX = rc.getCenter().x >= rc.getRadius() && rc.getCenter().x <= layout.getWidth() - rc.getRadius();
-            inBoundY = rc.getCenter().y >= rc.getRadius() && rc.getCenter().y <= layout.getHeight() - rc.getRadius();
-        }
-
-        return inBoundX && inBoundY;
+    private void keepInBounds(Player p) {
+        p.setX(Math.min(Math.max(p.getX(), 0), layout.getWidth() - p.getWidth()));
+        p.setY(Math.min(Math.max(p.getY(), 0), layout.getHeight() - p.getHeight()));
     }
 
     private void checkCollisionCardSpawn() {
