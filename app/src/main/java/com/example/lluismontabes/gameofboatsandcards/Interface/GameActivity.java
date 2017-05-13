@@ -20,6 +20,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 
+import com.example.lluismontabes.gameofboatsandcards.Model.RoundCollider;
 import com.example.lluismontabes.gameofboatsandcards.Views.Card;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardSpawn;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardZone;
@@ -79,8 +80,17 @@ public class GameActivity extends AppCompatActivity {
     int oppositePlayer;
 
     // Online invasion and winning statuses
-    public enum Invader{NONE, LOCAL_PLAYER, REMOTE_PLAYER};
-    private enum FinishState{TIME_OUT, LOCAL_WON, REMOTE_WON};
+    public enum Invader {
+        NONE, LOCAL_PLAYER, REMOTE_PLAYER
+    }
+
+
+    public enum GameState {UNFINISHED, LOCAL_WON, REMOTE_WON, DRAW}
+
+    static GameState gs = GameState.UNFINISHED;
+    public static GameState getGameState() {
+        return gs;
+    }
 
     /**
      * DEBUGGING
@@ -145,6 +155,7 @@ public class GameActivity extends AppCompatActivity {
     int currentFrame = 0;
     int seconds = 0;
     int secondsLeft = 120;
+    boolean gameFinished;
 
     // Counters
     byte framesUntilTickLocal = fps / 2;
@@ -177,10 +188,11 @@ public class GameActivity extends AppCompatActivity {
     boolean caught = true;
     int cardUsed = 0;
     int cardSpawnCooldown;
+    int cardVisivilityTimer;
     boolean cardHasSpawned = false;
     private static final int MAX_CARD_COOLDOWN = 500;
     private static final int MIN_CARD_COOLDOWN = 100;
-    private static final int RESPAWN_CARD_COOLDOWN = 250;
+    private static final int CARD_VISIBLE_TIME = 300;
 
     /**
      * SOUND
@@ -209,6 +221,7 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
         running = true;
+        gameFinished = false;
 
         /**
          * INITIALIZATION
@@ -359,6 +372,7 @@ public class GameActivity extends AppCompatActivity {
         cardSpawn.setLayoutParams(new ViewGroup.LayoutParams((int) Graphics.toPixels(this, 15),
                 (int) Graphics.toPixels(this, 20)));
         cardSpawnCooldown = (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
+        cardVisivilityTimer = 0;
         layout.addView(cardSpawn);
 
     }
@@ -390,8 +404,6 @@ public class GameActivity extends AppCompatActivity {
 
         layout.addView(localPlayer);
         layout.addView(remotePlayer);
-
-        drawCard(localPlayer);
 
         System.out.println(activePlayers);
     }
@@ -431,8 +443,8 @@ public class GameActivity extends AppCompatActivity {
 
             layout.addView(projectile);
 
-            if (fireSound.isPlaying()) fireSound.stop();
-            fireSound.start();
+            /*if (fireSound.isPlaying()) fireSound.stop();
+            fireSound.start();*/
 
             if (isEffectActive(Card.Effect.TRIPLE_SHOT)) {
 
@@ -576,11 +588,11 @@ public class GameActivity extends AppCompatActivity {
         boolean localPlayerColliding = localPlayer.isColliding(islandDomain);
         boolean remotePlayerColliding = remotePlayer.isColliding(islandDomain);
 
-        if (localPlayerColliding && remotePlayerColliding){
+        if (localPlayerColliding && remotePlayerColliding) {
 
             // Do nothing - preference is for the player who invaded first.
 
-        } else if(localPlayerColliding){
+        } else if (localPlayerColliding) {
 
             // localPlayer is colliding with islandDomain.
             if (!localPlayerInside) {
@@ -590,7 +602,7 @@ public class GameActivity extends AppCompatActivity {
                 localPlayerInside = true;
             }
 
-        } else if(remotePlayerColliding) {
+        } else if (remotePlayerColliding) {
 
             // remotePlayer is colliding with islandDomain.
             if (!remotePlayerInside) {
@@ -601,7 +613,7 @@ public class GameActivity extends AppCompatActivity {
             }
 
         } else {
-            
+
             // No one is colliding with islandDomain.
             islandDomain.setInvadedBy(Invader.NONE);
 
@@ -626,14 +638,22 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void finishGame(FinishState state) {
-        TextView results = (TextView) findViewById(R.id.resultsText);
-        if (localScore > remoteScore) results.setText(R.string.win);//log("You win!");
-        else if (localScore < remoteScore) results.setText(R.string.lose);//log("You lose");
-        else results.setText(R.string.draw);//log("Draw!");
-        Intent i = new Intent(GameActivity.this,GameEndActivity.class);
-        startActivity(i);
-        this.finishActivity(0);
+    private void finishGame() {
+        if (!gameFinished) {
+            gameFinished = true;
+            Intent i = new Intent(GameActivity.this, GameEndActivity.class);
+
+            if (localScore > remoteScore) {
+                gs = GameState.LOCAL_WON;
+            } else if (localScore < remoteScore) {
+                gs = GameState.REMOTE_WON;
+            } else {
+                gs = GameState.DRAW;
+            }
+
+            startActivity(i);
+            finish();
+        }
     }
 
     private void advanceCounter() {
@@ -653,7 +673,7 @@ public class GameActivity extends AppCompatActivity {
 
             } else {
                 // Time ran out.
-                finishGame(FinishState.TIME_OUT);
+                finishGame();
             }
         }
 
@@ -675,7 +695,7 @@ public class GameActivity extends AppCompatActivity {
 
                 } else {
                     // localPlayer reached 100% score.
-                    finishGame(FinishState.LOCAL_WON);
+                    finishGame();
                 }
 
             }
@@ -686,9 +706,9 @@ public class GameActivity extends AppCompatActivity {
             framesUntilTickLocal = fps / 2;
             textViewCounterLocal.setTextColor(getResources().getColor(R.color.counterStopped));
         }
-        
+
         if (remotePlayerInside) {
-            
+
             if (--framesUntilTickRemote == 0) {
 
                 if (remoteScore < 100) {
@@ -705,18 +725,18 @@ public class GameActivity extends AppCompatActivity {
 
                 } else {
                     // remotePlayer reached 100% score.
-                    finishGame(FinishState.REMOTE_WON);
+                    finishGame();
                 }
 
             }
 
             textViewCounterRemote.setTextColor(getResources().getColor(R.color.remoteCounterActive));
-            
-        }else{
+
+        } else {
             framesUntilTickRemote = fps / 2;
             textViewCounterRemote.setTextColor(getResources().getColor(R.color.counterStopped));
         }
-        
+
     }
 
     // Retrieve online player's last action.
@@ -744,8 +764,8 @@ public class GameActivity extends AppCompatActivity {
                 // Starting position
                 if (currentFrame <= 10) setStartPositions();
 
-                // Joystick controls
-                // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
+                    // Joystick controls
+                    // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
                 else if (localPlayer.isAlive()) {
 
                     if (joystick.getCurrentIntensity() != 0) {
@@ -756,8 +776,7 @@ public class GameActivity extends AppCompatActivity {
                         localPlayer.move(joystick.getCurrentAngle(), 0.4f);
                     }
 
-                }
-                else {
+                } else {
                     localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
                     localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
                     localPlayer.respawn();
@@ -786,10 +805,8 @@ public class GameActivity extends AppCompatActivity {
                 checkIslandDomainCollisions();
 
                 // Card collecting
-                // TODO: canviar per condició de col·lisió
-                if (secondsLeft % 6 == 5 && currentFrame % fps == 0) drawCard(localPlayer);
+                //if (secondsLeft % 6 == 5 && currentFrame % fps == 0) drawCard(localPlayer);
 
-                // Card usage
                 // Card usage
                 if (cardUsed != 0) useCard(localPlayer, cardUsed);
 
@@ -841,7 +858,7 @@ public class GameActivity extends AppCompatActivity {
 
         int centerX = (layout.getWidth() - localPlayer.getWidth()) / 2;
 
-        if (assignedPlayer == 1 || assignedPlayer == -1){
+        if (assignedPlayer == 1 || assignedPlayer == -1) {
 
             // Spawn local player at bottom position
             localPlayer.setX(centerX);
@@ -851,7 +868,7 @@ public class GameActivity extends AppCompatActivity {
             remotePlayer.setX(centerX);
             remotePlayer.setY(0);
 
-        }else if(assignedPlayer == 2) {
+        } else if (assignedPlayer == 2) {
 
             // Spawn local player at bottom position
             remotePlayer.setX(centerX);
@@ -885,28 +902,51 @@ public class GameActivity extends AppCompatActivity {
         if (!cardHasSpawned) {
             cardSpawned = new Card();
             ImageView im = (ImageView) cardSpawn.findViewById(R.id.cardSpawn);
-            Drawable d  = ContextCompat.getDrawable(this,cardSpawned.getResourceID());
+            Drawable d = ContextCompat.getDrawable(this, cardSpawned.getResourceID());
             im.setImageDrawable(d);
             cardSpawn.setVisibility(View.VISIBLE);
             cardHasSpawned = true;
             caught = false;
+            cardVisivilityTimer = 0;
             do {
-                cardSpawn.setX((float)(Math.random() * (layout.getWidth() - cardSpawn.getWidth())));
-                cardSpawn.setY((float)(Math.random() * (layout.getHeight() - cardSpawn.getHeight())));
-            } while (islandDomain.isColliding(cardSpawn));
-        } else {
+                cardSpawn.setX((float) (Math.random() * (layout.getWidth() - cardSpawn.getWidth())));
+                cardSpawn.setY((float) (Math.random() * (layout.getHeight() - cardSpawn.getHeight())));
+            } while (islandDomain.isColliding(cardSpawn) || localPlayer.isColliding(cardSpawn) || remotePlayer.isColliding(cardSpawn));
+        } else if (caught || cardVisivilityTimer > CARD_VISIBLE_TIME) {
             cardSpawnCooldown--;
-            if (cardSpawnCooldown == 0){
+            cardSpawn.setVisibility(View.GONE);
+            if (cardSpawnCooldown == 0) {
                 cardSpawnCooldown = (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
                 cardHasSpawned = false;
             }
+        } else {
+            if (cardVisivilityTimer > CARD_VISIBLE_TIME - 48) {
+                if (cardVisivilityTimer % 6 < 3) {
+                    cardSpawn.setVisibility(View.INVISIBLE);
+                } else {
+                    cardSpawn.setVisibility(View.VISIBLE);
+                }
+            }
+            cardVisivilityTimer++;
         }
     }
 
-    private void checkCollisionCardSpawn(){
-        if (localPlayer.isColliding(cardSpawn) && !caught){
-            cardSpawn.setVisibility(View.GONE);
-            cardZone.addCard(cardSpawned);
+    private boolean isInBounds(Collider c) {
+        boolean inBoundX = false;
+        boolean inBoundY = false;
+
+        if (c instanceof RoundCollider) {
+            RoundCollider rc = (RoundCollider) c;
+            inBoundX = rc.getCenter().x >= rc.getRadius() && rc.getCenter().x <= layout.getWidth() - rc.getRadius();
+            inBoundY = rc.getCenter().y >= rc.getRadius() && rc.getCenter().y <= layout.getHeight() - rc.getRadius();
+        }
+
+        return inBoundX && inBoundY;
+    }
+
+    private void checkCollisionCardSpawn() {
+        if (localPlayer.isColliding(cardSpawn) && !caught && cardZone.getCardList().size() < 3) {
+            drawCard(localPlayer);
             caught = true;
         }
     }
@@ -914,11 +954,9 @@ public class GameActivity extends AppCompatActivity {
     private void drawCard(Player player) {
         //TODO: use Deck class for card drawing
         // (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
-        if (cardZone.getCardList().size() < 3) {
-            Card card = new Card();
-            cardZone.addCard(card);
-            log(Integer.toString(card.getId()));
-        }
+        cardZone.addCard(cardSpawned);
+        log(Integer.toString(cardSpawned.getId()));
+
     }
 
     private void useCard(Player player, int n) {
@@ -1022,7 +1060,7 @@ public class GameActivity extends AppCompatActivity {
 
             while (connectionActive) {
 
-                if ((currentFrame % connectionFrequency == 0) && (lastFrameChecked != currentFrame)){
+                if ((currentFrame % connectionFrequency == 0) && (lastFrameChecked != currentFrame)) {
 
                     lastFrameChecked = currentFrame;
 
@@ -1044,11 +1082,11 @@ public class GameActivity extends AppCompatActivity {
 
                     // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
                     // variables. These variables will be used to position remotePlayer on the next frame.
-                    if (p != null){
+                    if (p != null) {
                         remotePosition = p;
                         lastCheckSuccessful = true;
                         latency = (currentFrame - lastFrameChecked) / 30;
-                    }else{
+                    } else {
                         lastCheckSuccessful = false;
                     }
 

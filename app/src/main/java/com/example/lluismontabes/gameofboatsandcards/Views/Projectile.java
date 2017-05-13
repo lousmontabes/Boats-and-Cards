@@ -60,8 +60,8 @@ public class Projectile extends RoundCollider {
         float scaleX = (float) Math.cos(this.angle);
         float scaleY = (float) Math.sin(this.angle);
 
-        float velocityX = scaleX * this.velocity;
-        float velocityY = scaleY * this.velocity;
+        float velocityX = Graphics.toPixels(getContext(), scaleX * this.velocity);
+        float velocityY = Graphics.toPixels(getContext(), scaleY * this.velocity);
 
         this.setX(x + velocityX);
         this.setY(y + velocityY);
