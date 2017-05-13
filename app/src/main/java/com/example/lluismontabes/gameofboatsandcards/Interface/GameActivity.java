@@ -488,7 +488,7 @@ public class GameActivity extends AppCompatActivity {
                 .setMessage("Are you sure you want to forfeit?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        GameActivity.super.onBackPressed();
+                        GameActivity.this.finish();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
