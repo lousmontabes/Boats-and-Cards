@@ -1,5 +1,6 @@
 package com.example.lluismontabes.gameofboatsandcards.Interface;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -481,6 +483,22 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        new AlertDialog.Builder(GameActivity.this)
+                .setTitle("Exit Game")
+                .setMessage("Are you sure you want to forfeit?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        GameActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+
         // TODO: Notify server that the local player has left the match.
     }
 
