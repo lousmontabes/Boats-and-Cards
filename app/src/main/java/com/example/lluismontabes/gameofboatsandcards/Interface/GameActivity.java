@@ -215,7 +215,7 @@ public class GameActivity extends AppCompatActivity {
     int cardUsed = 0;
     int cardSpawnCooldown;
     int cardVisibilityTimer;
-    boolean cardHasSpawned = false;
+    boolean cardHasSpawned = true;
     private static final int MAX_CARD_COOLDOWN = 500;
     private static final int MIN_CARD_COOLDOWN = 100;
     private static final int CARD_VISIBLE_TIME = 300;
@@ -520,7 +520,8 @@ public class GameActivity extends AppCompatActivity {
                 .setMessage("Are you sure you want to forfeit?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        GameActivity.this.finish();
+                        gameFinished = true;
+                        finish();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1124,6 +1125,7 @@ public class GameActivity extends AppCompatActivity {
         if (isEffectActive(KO)) {
             localPlayer.die(isEffectActive(QUICK_REVIVE));
             addEffect(QUICK_REVIVE, 0);
+            activateEventFlag(Event.LOCAL_PLAYER_DIED);
         }
         if (isEffectActive(FULL_RESTORATION)) {
             showPlayerPopup(localPlayer, "+" + (Player.MAX_HEALTH - localPlayer.getHealth()) + " ♡", 500, false);

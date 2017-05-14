@@ -255,6 +255,7 @@ public class Player extends RectangularCollider {
             setAlpha(1);
             alive = true;
             setAngle(0);
+            velocity = 0;
         }
     }
 
