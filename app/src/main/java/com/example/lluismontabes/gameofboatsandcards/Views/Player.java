@@ -174,6 +174,8 @@ public class Player extends RectangularCollider {
 
         if (!stunned && alive) {
 
+            this.angle = angle;
+
             x = this.getX();
             y = this.getY();
 
@@ -231,7 +233,7 @@ public class Player extends RectangularCollider {
 
         float convertedAngle = (float) Math.toDegrees(angle) + 90;
 
-        if (Math.abs(pathX) > 10 || Math.abs(pathY) > 10) this.setRotation(convertedAngle);
+        //if (Math.abs(pathX) > 10 || Math.abs(pathY) > 10) this.setRotation(convertedAngle);
 
     }
 
