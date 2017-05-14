@@ -470,7 +470,10 @@ public class GameActivity extends AppCompatActivity {
 
             layout.addView(projectile);
 
-            if (player == localPlayer) shotsFiredStats++;
+            if (player == localPlayer){
+                activateEventFlag(Event.LOCAL_PLAYER_FIRED);
+                shotsFiredStats++;
+            }
 
             /*if (fireSound.isPlaying()) fireSound.stop();
             fireSound.start();*/
