@@ -978,6 +978,9 @@ public class GameActivity extends AppCompatActivity {
         localActiveEvent = event;
         localEventIndex++;
 
+        System.out.println("Activating event " + event.ordinal());
+        System.out.println("Index: " + localEventIndex);
+
     }
 
     /**
