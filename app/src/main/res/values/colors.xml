@@ -8,7 +8,8 @@
     <color name="uninvadedIsland">#64ffffff</color>
     <color name="invadedIslandLocal">#6400ff2a</color>
     <color name="invadedIslandRemote">#64ff0000</color>
-    <color name="localCounterActive">#44FF44</color>
-    <color name="remoteCounterActive">#FF0000</color>
+    <color name="localCounterActive">#44ff44</color>
+    <color name="remoteCounterActive">#ff0000</color>
+    <color name="draw">#ffea00</color>
     <color name="counterStopped">#FFFFFF</color>
 </resources>

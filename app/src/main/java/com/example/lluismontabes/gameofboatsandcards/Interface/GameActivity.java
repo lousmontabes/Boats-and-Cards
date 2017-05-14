@@ -22,7 +22,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 
-import com.example.lluismontabes.gameofboatsandcards.Model.RoundCollider;
 import com.example.lluismontabes.gameofboatsandcards.Views.Card;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardSpawn;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardZone;
@@ -36,6 +35,7 @@ import com.example.lluismontabes.gameofboatsandcards.Views.Projectile;
 import com.example.lluismontabes.gameofboatsandcards.R;
 import com.example.lluismontabes.gameofboatsandcards.Views.Trace;
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -81,18 +81,34 @@ public class GameActivity extends AppCompatActivity {
     int assignedPlayer;
     int oppositePlayer;
 
+    // Online match events
+    // IMPORTANT: @SerializedName("n") makes it possible for Gson to parse the incoming
+    // JSON into an EventIndexPair properly, as the Event is received as an integer.
+    private enum Event {
+        @SerializedName("0") NONE,
+        @SerializedName("1") LOCAL_PLAYER_DIED,
+        @SerializedName("2") REMOTE_PLAYER_DIED,
+        @SerializedName("3") LOCAL_PLAYER_RESPAWNED,
+        @SerializedName("4") REMOTE_PLAYER_RESPAWNED,
+        @SerializedName("5") LOCAL_PLAYER_FIRED,
+        @SerializedName("6") REMOTE_PLAYER_FIRED,
+        @SerializedName("7") LOCAL_PLAYER_DAMAGED,
+        @SerializedName("8") REMOTE_PLAYER_DAMAGED,
+        @SerializedName("9") LOCAL_PLAYER_USED_CARD,
+        @SerializedName("10") REMOTE_PLAYER_USED_CARD
+    }
+    private Event localActiveEvent = Event.NONE;
+    private int localEventIndex = 0;
+    private int lastReadLocalEventIndex = 0;
+
+    private Event remoteActiveEvent = Event.NONE;
+    private int remoteEventIndex = 0;
+    private int lastReadRemoteEventIndex = 0;
+
     // Online invasion and winning statuses
-    public enum Invader {
-        NONE, LOCAL_PLAYER, REMOTE_PLAYER
-    }
-
-
-    public enum GameState {UNFINISHED, LOCAL_WON, REMOTE_WON, DRAW}
-
-    static GameState gs = GameState.UNFINISHED;
-    public static GameState getGameState() {
-        return gs;
-    }
+    public enum Invader {NONE, LOCAL_PLAYER, REMOTE_PLAYER}
+    public enum GameState {UNFINISHED, TIME_OUT, LOCAL_WON, REMOTE_WON, DRAW}
+    private GameState currentGameState = GameState.UNFINISHED;
 
     /**
      * DEBUGGING
@@ -163,6 +179,14 @@ public class GameActivity extends AppCompatActivity {
     byte framesUntilTickLocal = fps / 2;
     byte framesUntilTickRemote = fps / 2;
 
+    // Misc
+    int killsStats = 0;
+    int deathsStats = 0;
+    int shotsFiredStats = 0;
+    int shotsHitStats = 0;
+    int shotsReceivedStats = 0;
+    int cardsUsedStats = 0;
+
     /**
      * COLLECTIONS
      **/
@@ -190,7 +214,7 @@ public class GameActivity extends AppCompatActivity {
     boolean caught = true;
     int cardUsed = 0;
     int cardSpawnCooldown;
-    int cardVisivilityTimer;
+    int cardVisibilityTimer;
     boolean cardHasSpawned = false;
     private static final int MAX_CARD_COOLDOWN = 500;
     private static final int MIN_CARD_COOLDOWN = 100;
@@ -227,7 +251,7 @@ public class GameActivity extends AppCompatActivity {
 
         /**
          * INITIALIZATION
-         */
+         **/
         initializeOnlineParameters();
         initializeLayoutViews();
         initializeCards();
@@ -374,7 +398,7 @@ public class GameActivity extends AppCompatActivity {
         cardSpawn.setLayoutParams(new ViewGroup.LayoutParams((int) Graphics.toPixels(this, 15),
                 (int) Graphics.toPixels(this, 20)));
         cardSpawnCooldown = (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
-        cardVisivilityTimer = 0;
+        cardVisibilityTimer = 0;
         layout.addView(cardSpawn);
 
     }
@@ -429,6 +453,7 @@ public class GameActivity extends AppCompatActivity {
     private void localPlayerShoot() {
 
         if (localPlayer.canShoot()) {
+
             float pW = localPlayer.getWidth();
             float pH = localPlayer.getHeight();
             float oX = localPlayer.getX() + pW / 2;
@@ -445,6 +470,8 @@ public class GameActivity extends AppCompatActivity {
 
             layout.addView(projectile);
 
+            shotsFiredStats++;
+
             /*if (fireSound.isPlaying()) fireSound.stop();
             fireSound.start();*/
 
@@ -460,6 +487,8 @@ public class GameActivity extends AppCompatActivity {
 
                 layout.addView(projectileL);
                 layout.addView(projectileR);
+
+                shotsFiredStats += 2;
             }
 
             localPlayer.restoreFireCooldown();
@@ -658,16 +687,19 @@ public class GameActivity extends AppCompatActivity {
 
     private void finishGame() {
         if (!gameFinished) {
+
             gameFinished = true;
             Intent i = new Intent(GameActivity.this, GameEndActivity.class);
 
             if (localScore > remoteScore) {
-                gs = GameState.LOCAL_WON;
+                currentGameState = GameState.LOCAL_WON;
             } else if (localScore < remoteScore) {
-                gs = GameState.REMOTE_WON;
+                currentGameState = GameState.REMOTE_WON;
             } else {
-                gs = GameState.DRAW;
+                currentGameState = GameState.DRAW;
             }
+
+            i.putExtra("gameState", currentGameState);
 
             startActivity(i);
             finish();
@@ -757,11 +789,6 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    // Retrieve online player's last action.
-    private void retrieveRemoteAction() {
-
-    }
-
     // Method that gets called every frame.
     private void refresh() {
         runOnUiThread(new Runnable() {
@@ -782,25 +809,9 @@ public class GameActivity extends AppCompatActivity {
                 // Starting position
                 if (currentFrame <= 10) setStartPositions();
 
-                    // Joystick controls
-                    // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
-                else if (localPlayer.isAlive()) {
-
-                    if (joystick.getCurrentIntensity() != 0) {
-                        localPlayer.accelerate();
-                        localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
-                    } else {
-                        localPlayer.decelerate();
-                        localPlayer.move(joystick.getCurrentAngle(), 0.4f);
-                    }
-                    keepInBounds(localPlayer);
-
-                } else {
-                    localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
-                    localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
-                    localPlayer.respawn();
-                    joystick.resetCurrentAngle();
-                }
+                // Joystick controls
+                // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
+                else moveLocalPlayer();
 
                 // Player 2 controls
                 //retrieveRemoteAction();
@@ -861,12 +872,58 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
+     * Move local player according to joystick input.
+     */
+    private void moveLocalPlayer() {
+
+        if (localPlayer.isAlive()) {
+
+            if (joystick.getCurrentIntensity() != 0) {
+                localPlayer.accelerate();
+                localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+            } else {
+                localPlayer.decelerate();
+                localPlayer.move(joystick.getCurrentAngle(), 0.4f);
+            }
+
+            keepInBounds(localPlayer);
+
+        } else {
+            localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
+            localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
+            localPlayer.respawn();
+            joystick.resetCurrentAngle();
+        }
+
+    }
+
+    /**
      * Check if a player has died.
      */
     private void checkPlayerHealth() {
 
-        if (localPlayer.getHealth() <= 0) localPlayer.die(isEffectActive(QUICK_REVIVE));
-        if (remotePlayer.getHealth() <= 0) remotePlayer.die(isEffectActive(QUICK_REVIVE));
+        if (localPlayer.getHealth() <= 0) {
+
+            localPlayer.die(isEffectActive(QUICK_REVIVE));
+            activateEventFlag(Event.LOCAL_PLAYER_DIED);
+
+            deathsStats++;
+        }
+
+        if (remotePlayer.getHealth() <= 0) {
+
+            remotePlayer.die(isEffectActive(QUICK_REVIVE));
+            activateEventFlag(Event.REMOTE_PLAYER_DIED);
+
+            killsStats++;
+        }
+
+    }
+
+    private void activateEventFlag(Event event) {
+
+        localActiveEvent = event;
+        localEventIndex++;
 
     }
 
@@ -926,12 +983,12 @@ public class GameActivity extends AppCompatActivity {
             cardSpawn.setVisibility(View.VISIBLE);
             cardHasSpawned = true;
             caught = false;
-            cardVisivilityTimer = 0;
+            cardVisibilityTimer = 0;
             do {
                 cardSpawn.setX((float) (Math.random() * (layout.getWidth() - cardSpawn.getWidth())));
                 cardSpawn.setY((float) (Math.random() * (layout.getHeight() - cardSpawn.getHeight())));
             } while (islandDomain.isColliding(cardSpawn) || localPlayer.isColliding(cardSpawn) || remotePlayer.isColliding(cardSpawn));
-        } else if (caught || cardVisivilityTimer > CARD_VISIBLE_TIME) {
+        } else if (caught || cardVisibilityTimer > CARD_VISIBLE_TIME) {
             cardSpawnCooldown--;
             cardSpawn.setVisibility(View.GONE);
             if (cardSpawnCooldown == 0) {
@@ -940,14 +997,14 @@ public class GameActivity extends AppCompatActivity {
             }
             caught = true;
         } else {
-            if (cardVisivilityTimer > CARD_VISIBLE_TIME - 48) {
-                if (cardVisivilityTimer % 6 < 3) {
+            if (cardVisibilityTimer > CARD_VISIBLE_TIME - 48) {
+                if (cardVisibilityTimer % 6 < 3) {
                     cardSpawn.setVisibility(View.INVISIBLE);
                 } else {
                     cardSpawn.setVisibility(View.VISIBLE);
                 }
             }
-            cardVisivilityTimer++;
+            cardVisibilityTimer++;
         }
     }
 
@@ -999,7 +1056,11 @@ public class GameActivity extends AppCompatActivity {
             }
 
             showPlayerPopup(localPlayer, usedCard.getEffectName(), 1000, false);
+
+            cardsUsedStats++;
+
         }
+
         cardUsed = 0;
 
     }
@@ -1076,37 +1137,103 @@ public class GameActivity extends AppCompatActivity {
 
                     lastFrameChecked = currentFrame;
 
-                    /* SEND DATA */
-                    getJSON("https://pis04-ub.herokuapp.com/send_local_action.php?matchId=" + matchId
-                            + "&player=" + assignedPlayer
-                            + "&x=" + localPosition.x
-                            + "&y=" + localPosition.y, 2000);
+                    // Send movement data
+                    sendLocalPositionData();
 
-                    /* RETRIEVE DATA */
-                    //This returns a JSON object with a {"x": x,"y": y} pattern.
-                    String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_action.php?matchId=" + matchId
-                            + "&player=" + oppositePlayer, 2000);
+                    // Retrieve position data
+                    retrieveRemotePositionData();
 
-                    System.out.println(currentFrame + ": " + data);
+                    // Send event flag data
+                    sendLocalEventData();
 
-                    // Parse the JSON information into a Point object.
-                    Point p = new Gson().fromJson(data, Point.class);
-
-                    // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
-                    // variables. These variables will be used to position remotePlayer on the next frame.
-                    if (p != null) {
-                        remotePosition = p;
-                        lastCheckSuccessful = true;
-                        latency = (currentFrame - lastFrameChecked) / 30;
-                    } else {
-                        lastCheckSuccessful = false;
-                    }
+                    // Retrieve event flag data
+                    retrieveRemoteEventData();
 
                 }
 
             }
+
             return null;
+
         }
+
+        private void sendLocalEventData() {
+
+            if (localEventIndex > lastReadLocalEventIndex){
+
+                int eventNumber = localActiveEvent.ordinal();
+
+                getJSON("https://pis04-ub.herokuapp.com/send_local_event.php?matchId=" + matchId
+                        + "&player=" + oppositePlayer
+                        + "&event=" + eventNumber
+                        + "&eventIndex=" + localEventIndex,
+                        2000);
+
+                lastReadLocalEventIndex = localEventIndex;
+
+            }
+
+        }
+
+        private void retrieveRemoteEventData(){
+
+            //This returns a JSON object with a {"eventIndex": int, "event": int} pattern.
+            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_event.php?matchId=" + matchId
+                    + "&player=" + oppositePlayer, 2000);
+
+            System.out.println(currentFrame + ": REMOTE EVENT " + data);
+
+            // Parse the JSON information into an EventIndexPair object.
+            EventIndexPair p = new Gson().fromJson(data, EventIndexPair.class);
+
+            // Set event and eventIndex variables retrieved from JSON to the remoteActiveEvent and
+            // remoteEventIndex global variables.
+            // These variables will be used to process events locally on the next frame.
+            if (p != null){
+                if (p.eventIndex > remoteEventIndex){
+
+                    remoteActiveEvent = p.event;
+                    remoteEventIndex = p.eventIndex;
+
+                }
+            }
+
+        }
+
+        private void sendLocalPositionData() {
+
+            getJSON("https://pis04-ub.herokuapp.com/send_local_position.php?matchId=" + matchId
+                    + "&player=" + assignedPlayer
+                    + "&x=" + localPosition.x
+                    + "&y=" + localPosition.y, 2000);
+
+        }
+
+        private void retrieveRemotePositionData() {
+
+            //This returns a JSON object with a {"x": int,"y": int} pattern.
+            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_position.php?matchId=" + matchId
+                    + "&player=" + oppositePlayer, 2000);
+
+            System.out.println(currentFrame + ": " + data);
+
+            // Parse the JSON information into a Point object.
+            Point p = new Gson().fromJson(data, Point.class);
+
+            // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
+            // variables. These variables will be used to position remotePlayer on the next frame.
+            if (p != null) {
+
+                remotePosition = p;
+
+                lastCheckSuccessful = true;
+                latency = (currentFrame - lastFrameChecked) / 30;
+            } else {
+                lastCheckSuccessful = false;
+            }
+
+        }
+
     }
 
     /**
@@ -1160,4 +1287,10 @@ public class GameActivity extends AppCompatActivity {
         }
         return null;
     }
+
+    private class EventIndexPair{
+        int eventIndex;
+        Event event;
+    }
+
 }

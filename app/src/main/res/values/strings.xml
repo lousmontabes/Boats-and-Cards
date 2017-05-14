@@ -10,16 +10,16 @@
     <string name="creditsButtonText">Credits</string>
     <string name="exitButtonText">Exit</string>
 
-    <string name="copyrightDisclaimer">©2017 Projecte Integrat de Software UB\nAll rights reserved</string>
+    <string name="copyrightDisclaimer">Projecte integrat de Software\nUniversitat de Barcelona</string>
     <string name="comingSoon">Soon™</string>
     <string name="credits">Jo\n(i algunes persones més)</string>
     <string name="title_activity_settings">Settings</string>
     
     <string name="counterInitValue">100</string>
 
-    <string name="win">A winner is you!</string>
-    <string name="lose">You lose! You get nothing!</string>
-    <string name="draw">Unlikely draw</string>
+    <string name="win">Victory!</string>
+    <string name="lose">Defeat</string>
+    <string name="draw">Draw</string>
     <string name="next">New Game</string>
     <string name="returnToMenu">Main Menu</string>
 
