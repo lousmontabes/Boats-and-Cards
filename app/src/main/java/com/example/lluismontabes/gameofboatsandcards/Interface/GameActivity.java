@@ -295,7 +295,7 @@ public class GameActivity extends AppCompatActivity {
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (cardUsed == 0) localPlayerShoot();
+                if (cardUsed == 0) playerShoot(localPlayer);
                 // UNIMPLEMENTED: Point-and-click movement
                 //moveObjectTo(localPlayer, event.getX(), event.getY());
                 return false;
@@ -450,48 +450,48 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void localPlayerShoot() {
+    private void playerShoot(Player player) {
 
-        if (localPlayer.canShoot()) {
+        if (player.canShoot()) {
 
-            float pW = localPlayer.getWidth();
-            float pH = localPlayer.getHeight();
-            float oX = localPlayer.getX() + pW / 2;
-            float oY = localPlayer.getY() + pH / 2;
+            float pW = player.getWidth();
+            float pH = player.getHeight();
+            float oX = player.getX() + pW / 2;
+            float oY = player.getY() + pH / 2;
             int baseDamage = 20;
 
             if (isEffectActive(Card.Effect.ATTACK_UP)) {
                 baseDamage *= 2;
             }
 
-            Projectile projectile = new Projectile(GameActivity.this, joystick.getCurrentAngle(), oX, oY, baseDamage);
+            Projectile projectile = new Projectile(GameActivity.this, player.getAngle(), oX, oY, baseDamage);
             GameActivity.this.activeProjectiles.add(projectile);
             GameActivity.this.activeColliders.add(projectile);
 
             layout.addView(projectile);
 
-            shotsFiredStats++;
+            if (player == localPlayer) shotsFiredStats++;
 
             /*if (fireSound.isPlaying()) fireSound.stop();
             fireSound.start();*/
 
             if (isEffectActive(Card.Effect.TRIPLE_SHOT)) {
 
-                Projectile projectileL = new Projectile(GameActivity.this, joystick.getCurrentAngle() - .3f, oX, oY, baseDamage);
+                Projectile projectileL = new Projectile(GameActivity.this, player.getAngle() - .3f, oX, oY, baseDamage);
                 GameActivity.this.activeProjectiles.add(projectileL);
                 GameActivity.this.activeColliders.add(projectileL);
 
-                Projectile projectileR = new Projectile(GameActivity.this, joystick.getCurrentAngle() + .3f, oX, oY, baseDamage);
+                Projectile projectileR = new Projectile(GameActivity.this, player.getAngle() + .3f, oX, oY, baseDamage);
                 GameActivity.this.activeProjectiles.add(projectileR);
                 GameActivity.this.activeColliders.add(projectileR);
 
                 layout.addView(projectileL);
                 layout.addView(projectileR);
 
-                shotsFiredStats += 2;
+                if (player == localPlayer) shotsFiredStats += 2;
             }
 
-            localPlayer.restoreFireCooldown();
+            player.restoreFireCooldown();
         }
 
     }
@@ -700,6 +700,11 @@ public class GameActivity extends AppCompatActivity {
             }
 
             i.putExtra("gameState", currentGameState);
+            i.putExtra("killsStats", killsStats);
+            i.putExtra("deathsStats", deathsStats);
+            i.putExtra("shotsFiredStats", shotsFiredStats);
+            i.putExtra("cardsUsedStats", cardsUsedStats);
+            i.putExtra("shotsHitStats", shotsHitStats);
 
             startActivity(i);
             finish();
@@ -864,11 +869,56 @@ public class GameActivity extends AppCompatActivity {
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
 
+                // Process remote events
+                handleRemoteEvent();
+
                 // Environmental effects
                 showDripplets();
 
             }
         });
+    }
+
+    /**
+     * Handle remote event prevoiusly retreived from server.
+     */
+    private void handleRemoteEvent() {
+
+        if (remoteEventIndex > lastReadRemoteEventIndex){
+
+            switch(remoteActiveEvent){
+
+                // NOTICE: These Events are retrieved from the server, sent by the other player.
+                // Therefore, every LOCAL event will refer to the sender, that is, the remotePlayer
+                // from the point of view of this method.
+
+                case REMOTE_PLAYER_DIED:
+                    localPlayer.die(isEffectActive(Card.Effect.QUICK_REVIVE));
+                    break;
+
+                case REMOTE_PLAYER_DAMAGED:
+                    // TODO: Check real damage inflicted.
+                    localPlayer.damage(20);
+                    break;
+
+                case LOCAL_PLAYER_RESPAWNED:
+                    // TODO
+                    break;
+
+                case LOCAL_PLAYER_FIRED:
+                    playerShoot(remotePlayer);
+                    break;
+
+                case LOCAL_PLAYER_USED_CARD:
+                    // TODO
+                    break;
+
+            }
+
+            remoteEventIndex = lastReadRemoteEventIndex;
+
+        }
+
     }
 
     /**

@@ -22,49 +22,64 @@ public class GameEndActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_end);
 
-        TextView results = (TextView) findViewById(R.id.resultsText);
+        TextView resultTextView = (TextView) findViewById(R.id.resultsText);
+
         TextView localScoreTextView = (TextView) findViewById(R.id.localScoreTextView);
         TextView remoteScoreTextView = (TextView) findViewById(R.id.remoteScoreTextView);
+
         TextView killsTextView = (TextView) findViewById(R.id.killsTextView);
         TextView deathsTextView = (TextView) findViewById(R.id.deathsTextView);
         TextView shotsFiredTextView = (TextView) findViewById(R.id.shotsFiredTextView);
         TextView cardsUsedTextView = (TextView) findViewById(R.id.cardsUsedTextView);
 
+        Button newGameButton = (Button) findViewById(R.id.newGameButton);
+        Button mainMenuButton = (Button) findViewById(R.id.mainMenuButton);
+
         Intent intent = getIntent();
         GameActivity.GameState finishState = (GameActivity.GameState) intent.getSerializableExtra("gameState");
 
+        int killsStats = intent.getIntExtra("killsStats", 0);
+        int deathsStats = intent.getIntExtra("deathsStats", 0);
+        int shotsFiredStats = intent.getIntExtra("shotsFiredStats", 0);
+        int shotsHitStats = intent.getIntExtra("shotsHitStats", 0);
+        int cardsUsedStats = intent.getIntExtra("cardsUsedStats", 0);
+
         switch (finishState) {
             case LOCAL_WON:
-                results.setText(R.string.win);
-                results.setTextColor(getResources().getColor(R.color.localCounterActive));
+                resultTextView.setText(R.string.win);
+                resultTextView.setTextColor(getResources().getColor(R.color.localCounterActive));
                 localScoreTextView.setTextColor(getResources().getColor(R.color.localCounterActive));
                 break;
+
             case REMOTE_WON:
-                results.setText(R.string.lose);
-                results.setTextColor(getResources().getColor(R.color.remoteCounterActive));
+                resultTextView.setText(R.string.lose);
+                resultTextView.setTextColor(getResources().getColor(R.color.remoteCounterActive));
                 remoteScoreTextView.setTextColor(getResources().getColor(R.color.remoteCounterActive));
                 break;
+
             case DRAW:
-                results.setText(R.string.draw);
-                results.setTextColor(getResources().getColor(R.color.draw));
+                resultTextView.setText(R.string.draw);
+                resultTextView.setTextColor(getResources().getColor(R.color.draw));
                 break;
         }
 
-        Button currentButton = (Button) findViewById(R.id.newGameButton);
+        killsTextView.setText(killsStats);
+        deathsTextView.setText(deathsStats);
+        shotsFiredTextView.setText(shotsFiredStats);
+        cardsUsedTextView.setText(cardsUsedStats);
 
-        currentButton.setOnClickListener(new View.OnClickListener(){
+        newGameButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "TODO", Toast.LENGTH_SHORT).show();
             }
         });
 
-        currentButton = (Button) findViewById(R.id.mainMenuButton);
-
-        currentButton.setOnClickListener(new View.OnClickListener(){
+        mainMenuButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 onBackPressed();
             }
         });
+
     }
 
 }
