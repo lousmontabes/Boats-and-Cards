@@ -63,10 +63,10 @@ public class GameEndActivity extends AppCompatActivity {
                 break;
         }
 
-        killsTextView.setText(killsStats);
-        deathsTextView.setText(deathsStats);
-        shotsFiredTextView.setText(shotsFiredStats);
-        cardsUsedTextView.setText(cardsUsedStats);
+        killsTextView.setText(Integer.toString(killsStats));
+        deathsTextView.setText(Integer.toString(deathsStats));
+        shotsFiredTextView.setText(Integer.toString(shotsFiredStats));
+        cardsUsedTextView.setText(Integer.toString(cardsUsedStats));
 
         newGameButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
