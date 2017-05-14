@@ -99,11 +99,11 @@ public class GameActivity extends AppCompatActivity {
     }
     private Event localActiveEvent = Event.NONE;
     private int localEventIndex = 0;
-    private int lastReadLocalEventIndex = 0;
+    private int lastReadLocalEventIndex = -1;
 
     private Event remoteActiveEvent = Event.NONE;
     private int remoteEventIndex = 0;
-    private int lastReadRemoteEventIndex = 0;
+    private int lastReadRemoteEventIndex = -1;
 
     // Online invasion and winning statuses
     public enum Invader {NONE, LOCAL_PLAYER, REMOTE_PLAYER}
@@ -978,9 +978,6 @@ public class GameActivity extends AppCompatActivity {
         localActiveEvent = event;
         localEventIndex++;
 
-        System.out.println("Activating event " + event.ordinal());
-        System.out.println("Index: " + localEventIndex);
-
     }
 
     /**
@@ -1220,7 +1217,7 @@ public class GameActivity extends AppCompatActivity {
                 int eventNumber = localActiveEvent.ordinal();
 
                 getJSON("https://pis04-ub.herokuapp.com/send_local_event.php?matchId=" + matchId
-                        + "&player=" + oppositePlayer
+                        + "&player=" + assignedPlayer
                         + "&event=" + eventNumber
                         + "&eventIndex=" + localEventIndex,
                         2000);
@@ -1247,6 +1244,8 @@ public class GameActivity extends AppCompatActivity {
             // These variables will be used to process events locally on the next frame.
             if (p != null){
                 if (p.eventIndex > remoteEventIndex){
+
+                    System.out.println("This event is new");
 
                     remoteActiveEvent = p.event;
                     remoteEventIndex = p.eventIndex;
