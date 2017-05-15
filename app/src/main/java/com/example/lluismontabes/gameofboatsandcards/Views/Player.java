@@ -28,8 +28,10 @@ public class Player extends RectangularCollider {
      */
     // Velocity
     private final float MAX_VELOCITY = 40;
+    private final float MAX_ROTATION_SPEED = 45;
     private float velocity, idleVelocity;
     private float acceleration;
+    private float rotationAcceleration;
     private float friction;
     private float rotationSpeed;
     private float currentMaxAngle;
@@ -72,9 +74,12 @@ public class Player extends RectangularCollider {
         shadowImageView.setColorFilter(getResources().getColor(R.color.shadow), android.graphics.PorterDuff.Mode.MULTIPLY);
 
         velocity = 0;               // 10 pixels per frame
+        rotationSpeed = 0;          // 10 degrees per frame
+
         acceleration = 2;           // Velocity increments 2 pixels/frame per frame (2px / frame^2)
+        rotationAcceleration = 1;
         friction = 1.5f;                   // friction further decelerates the player on deceleration.
-        rotationSpeed = 10;         // 10 degrees per frame
+
         currentMaxAngle = rotationSpeed;
         currentMinAngle = -rotationSpeed;
 
@@ -165,6 +170,7 @@ public class Player extends RectangularCollider {
 
         float futureVelocity = velocity - friction;
         if (futureVelocity >= 0) this.velocity = futureVelocity;
+        this.rotationSpeed = 0;
 
     }
 
@@ -242,12 +248,15 @@ public class Player extends RectangularCollider {
 
         //angle = this.getRotation();
 
+        float futureRotationSpeed = rotationSpeed + rotationAcceleration;
+        if (futureRotationSpeed <= MAX_ROTATION_SPEED) this.rotationSpeed = futureRotationSpeed;
+
         float a2 = angle + Math.max(currentMinAngle, Math.min(a, currentMaxAngle));
         this.setRotation(a2);
+
         angle = a2;
         currentMaxAngle = angle + rotationSpeed;
         currentMinAngle = angle - rotationSpeed;
-
 
         /*if (angle - a < rotationSpeed) {
             angle = this.getRotation() + rotationSpeed;
