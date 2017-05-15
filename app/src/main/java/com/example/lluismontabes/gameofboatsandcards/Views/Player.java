@@ -104,6 +104,10 @@ public class Player extends RectangularCollider {
         this.alive = alive;
     }
 
+    public void setMaxVelocity(){
+        this.velocity = MAX_VELOCITY;
+    }
+
     // GETTERS
     public float getAngle() {
         return angle;

@@ -73,6 +73,7 @@ public class GameActivity extends AppCompatActivity {
     boolean lastCheckSuccessful = false;
 
     // Online player positioning
+    Point lastRemotePosition = new Point(0, 0);
     Point remotePosition = new Point(0, 0);
     Point localPosition = new Point(0, 0);
 
@@ -416,6 +417,8 @@ public class GameActivity extends AppCompatActivity {
 
         localPlayer = new Player(GameActivity.this, null);
         remotePlayer = new Player(GameActivity.this, null);
+
+        remotePlayer.setMaxVelocity();
 
         //localPlayer.showHitbox();
 
@@ -867,14 +870,18 @@ public class GameActivity extends AppCompatActivity {
                 // Apply remote data to remotePlayer
                 //log(remotePosition.x + ", " + remotePosition.y);
                 log("PNG: " + latency);
-                remotePlayer.accelerate();
-                remotePlayer.moveTo(remotePosition.x, remotePosition.y);
+                if (remotePosition != lastRemotePosition){
+                    remotePlayer.moveTo(remotePosition.x, remotePosition.y);
+                    lastRemotePosition = remotePosition;
+                }
 
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
 
                 // Process remote events
-                handleRemoteEvent();
+                if (remoteActiveEvent != null){
+                    handleRemoteEvent();
+                }
 
                 // Environmental effects
                 showDripplets();
@@ -915,6 +922,10 @@ public class GameActivity extends AppCompatActivity {
 
                 case LOCAL_PLAYER_USED_CARD:
                     // TODO
+                    break;
+
+                case NONE:
+                default:
                     break;
 
             }
