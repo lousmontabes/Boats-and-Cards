@@ -32,6 +32,8 @@ public class Player extends RectangularCollider {
     private float acceleration;
     private float friction;
     private float rotationSpeed;
+    private float currentMaxAngle;
+    private float currentMinAngle;
 
     // Position
     private float x;
@@ -73,6 +75,8 @@ public class Player extends RectangularCollider {
         acceleration = 2;           // Velocity increments 2 pixels/frame per frame (2px / frame^2)
         friction = 1.5f;                   // friction further decelerates the player on deceleration.
         rotationSpeed = 10;         // 10 degrees per frame
+        currentMaxAngle = rotationSpeed;
+        currentMinAngle = -rotationSpeed;
 
         health = MAX_HEALTH;        // 100 units of current health
 
@@ -169,22 +173,22 @@ public class Player extends RectangularCollider {
     }
 
     /**
-     * Moves Player in the specified angle.
+     * Moves Player in the specified a.
      *
-     * @param angle     Angle in which to move the Player.
+     * @param a     Angle in which to move the Player.
      * @param intensity Multiplier (from 0.0 to 1.0) of the velocity.
      */
-    public void move(float angle, float intensity) {
+    public void move(float a, float intensity) {
 
         if (!stunned && alive) {
 
-            this.angle = angle;
+            this.angle = a;
 
             x = this.getX();
             y = this.getY();
 
-            float scaleX = (float) Math.cos(angle);
-            float scaleY = (float) Math.sin(angle);
+            float scaleX = (float) Math.cos(a);
+            float scaleY = (float) Math.sin(a);
 
             float modifier = 1;
 
@@ -200,11 +204,11 @@ public class Player extends RectangularCollider {
 
             this.setX(x + velocityX);
             this.setY(y + velocityY);
-            this.setRotation((float) Math.toDegrees(angle) + 90);
+            this.rotateTo((float) Math.toDegrees(a) + 90);
 
             // Move shadow with player
-            shadowImageView.setY(-45 * (float) Math.sin(angle));
-            shadowImageView.setX(45 * (float) Math.cos(angle));
+            shadowImageView.setY(-45 * (float) Math.sin(a));
+            shadowImageView.setX(45 * (float) Math.cos(a));
         }
     }
 
@@ -224,16 +228,9 @@ public class Player extends RectangularCollider {
 
         angle = (float) Math.atan2(pathY, pathX);
 
-        /*float scaleX = (float) Math.cos(angle);
-        float scaleY = (float) Math.sin(angle);
-
-        float velocityX = scaleX * velocity;
-        float velocityY = scaleY * velocity;
-
-        this.setX(x + velocityX);
-        this.setY(y + velocityY);*/
-
-        move(angle, 0.4f);
+        if (Math.abs(pathX) > 0 || Math.abs(pathY) > 0){
+            move(angle, 0.4f);
+        }
 
         float convertedAngle = (float) Math.toDegrees(angle) + 90;
 
@@ -243,12 +240,19 @@ public class Player extends RectangularCollider {
 
     public void rotateTo(float a) {
 
-        angle = this.getRotation();
+        //angle = this.getRotation();
 
-        if (angle != a) {
-            if (Math.abs(angle - a) < rotationSpeed) this.setRotation(angle);
-            else this.setRotation(angle + rotationSpeed);
-        }
+        float a2 = angle + Math.max(currentMinAngle, Math.min(a, currentMaxAngle));
+        this.setRotation(a2);
+        angle = a2;
+        currentMaxAngle = angle + rotationSpeed;
+        currentMinAngle = angle - rotationSpeed;
+
+
+        /*if (angle - a < rotationSpeed) {
+            angle = this.getRotation() + rotationSpeed;
+            this.setRotation(angle);
+        }*/
 
     }
 

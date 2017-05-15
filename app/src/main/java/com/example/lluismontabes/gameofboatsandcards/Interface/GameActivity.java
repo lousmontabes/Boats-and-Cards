@@ -870,10 +870,7 @@ public class GameActivity extends AppCompatActivity {
                 // Apply remote data to remotePlayer
                 //log(remotePosition.x + ", " + remotePosition.y);
                 log("PNG: " + latency);
-                if (remotePosition != lastRemotePosition){
-                    remotePlayer.moveTo(remotePosition.x, remotePosition.y);
-                    lastRemotePosition = remotePosition;
-                }
+                remotePlayer.moveTo(remotePosition.x, remotePosition.y);
 
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
