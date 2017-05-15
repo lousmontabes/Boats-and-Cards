@@ -161,6 +161,9 @@ public class Player extends RectangularCollider {
 
     public void accelerate() {
 
+        float futureRotationSpeed = rotationSpeed + rotationAcceleration;
+        if (futureRotationSpeed <= MAX_ROTATION_SPEED) this.rotationSpeed = futureRotationSpeed;
+
         float futureVelocity = velocity + acceleration;
         if (futureVelocity <= MAX_VELOCITY) this.velocity = futureVelocity;
 
@@ -170,7 +173,8 @@ public class Player extends RectangularCollider {
 
         float futureVelocity = velocity - friction;
         if (futureVelocity >= 0) this.velocity = futureVelocity;
-        this.rotationSpeed = 0;
+        if (futureVelocity < friction) this.velocity = 0;
+        restoreRotationSpeed();
 
     }
 
@@ -178,10 +182,14 @@ public class Player extends RectangularCollider {
         this.velocity = 0;
     }
 
+    public void restoreRotationSpeed() {
+        this.rotationSpeed = 0;
+    }
+
     /**
      * Moves Player in the specified a.
      *
-     * @param a     Angle in which to move the Player.
+     * @param a         Angle in which to move the Player.
      * @param intensity Multiplier (from 0.0 to 1.0) of the velocity.
      */
     public void move(float a, float intensity) {
@@ -210,7 +218,8 @@ public class Player extends RectangularCollider {
 
             this.setX(x + velocityX);
             this.setY(y + velocityY);
-            this.rotateTo((float) Math.toDegrees(a) + 90);
+            this.setRotation((float) Math.toDegrees(a) + 90);
+            //this.rotateTo((float) Math.toDegrees(a) + 90);
 
             // Move shadow with player
             shadowImageView.setY(-45 * (float) Math.sin(a));
@@ -248,20 +257,15 @@ public class Player extends RectangularCollider {
 
         //angle = this.getRotation();
 
-        float futureRotationSpeed = rotationSpeed + rotationAcceleration;
-        if (futureRotationSpeed <= MAX_ROTATION_SPEED) this.rotationSpeed = futureRotationSpeed;
-
         float a2 = angle + Math.max(currentMinAngle, Math.min(a, currentMaxAngle));
         this.setRotation(a2);
 
         angle = a2;
-        currentMaxAngle = angle + rotationSpeed;
-        currentMinAngle = angle - rotationSpeed;
 
-        /*if (angle - a < rotationSpeed) {
-            angle = this.getRotation() + rotationSpeed;
-            this.setRotation(angle);
-        }*/
+        System.out.println(angle);
+
+        currentMaxAngle = a2 + rotationSpeed;
+        currentMinAngle = a2 - rotationSpeed;
 
     }
 

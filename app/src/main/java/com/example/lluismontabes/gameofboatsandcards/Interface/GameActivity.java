@@ -104,7 +104,7 @@ public class GameActivity extends AppCompatActivity {
 
     private Event remoteActiveEvent = Event.NONE;
     private int remoteEventIndex = 0;
-    private int lastReadRemoteEventIndex = -1;
+    private int lastReadRemoteEventIndex = 0;
 
     // Online invasion and winning statuses
     public enum Invader {NONE, LOCAL_PLAYER, REMOTE_PLAYER}
