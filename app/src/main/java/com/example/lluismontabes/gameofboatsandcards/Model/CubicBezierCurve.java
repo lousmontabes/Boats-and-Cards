@@ -42,7 +42,7 @@ public class CubicBezierCurve {
         double x = arg0 * p0.x + arg1 * p1.x + arg2 * p2.x + arg3 * p3.x;
         double y = arg0 * p0.y + arg1 * p1.y + arg2 * p2.y + arg3 * p3.y;
 
-        return new Point(x, y);
+        return new Point((int) x,(int) y);
 
     }
 
