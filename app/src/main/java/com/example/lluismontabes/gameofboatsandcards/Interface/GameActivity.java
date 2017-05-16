@@ -73,6 +73,7 @@ public class GameActivity extends AppCompatActivity {
     boolean lastCheckSuccessful = false;
 
     // Online player positioning
+    Point lastRemotePosition = new Point(0, 0);
     Point remotePosition = new Point(0, 0);
     Point localPosition = new Point(0, 0);
 
@@ -103,7 +104,7 @@ public class GameActivity extends AppCompatActivity {
 
     private Event remoteActiveEvent = Event.NONE;
     private int remoteEventIndex = 0;
-    private int lastReadRemoteEventIndex = -1;
+    private int lastReadRemoteEventIndex = 0;
 
     // Online invasion and winning statuses
     public enum Invader {NONE, LOCAL_PLAYER, REMOTE_PLAYER}
@@ -215,7 +216,7 @@ public class GameActivity extends AppCompatActivity {
     int cardUsed = 0;
     int cardSpawnCooldown;
     int cardVisibilityTimer;
-    boolean cardHasSpawned = false;
+    boolean cardHasSpawned = true;
     private static final int MAX_CARD_COOLDOWN = 500;
     private static final int MIN_CARD_COOLDOWN = 100;
     private static final int CARD_VISIBLE_TIME = 300;
@@ -417,6 +418,8 @@ public class GameActivity extends AppCompatActivity {
         localPlayer = new Player(GameActivity.this, null);
         remotePlayer = new Player(GameActivity.this, null);
 
+        remotePlayer.setMaxVelocity();
+
         //localPlayer.showHitbox();
 
         ViewGroup.LayoutParams playerParams = new ViewGroup.LayoutParams((int) Graphics.toPixels(this, 60),
@@ -520,7 +523,8 @@ public class GameActivity extends AppCompatActivity {
                 .setMessage("Are you sure you want to forfeit?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        GameActivity.this.finish();
+                        gameFinished = true;
+                        finish();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -684,7 +688,10 @@ public class GameActivity extends AppCompatActivity {
     private void destroyExcessiveViews() {
 
         // Popups: max 4
-        if (activePopups.size() > 4) activePopups.remove(0);
+        if (activePopups.size() > 4) layout.removeView(activePopups.remove(0));
+
+        // Projectiles: max 10
+        if (activeProjectiles.size() > 18) layout.removeView(activeProjectiles.remove(0));
 
     }
 
@@ -866,14 +873,13 @@ public class GameActivity extends AppCompatActivity {
                 // Apply remote data to remotePlayer
                 //log(remotePosition.x + ", " + remotePosition.y);
                 log("PNG: " + latency);
-                remotePlayer.accelerate();
                 remotePlayer.moveTo(remotePosition.x, remotePosition.y);
 
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
 
                 // Process remote events
-                handleRemoteEvent();
+                if (remoteActiveEvent != null) handleRemoteEvent();
 
                 // Environmental effects
                 showDripplets();
@@ -914,6 +920,10 @@ public class GameActivity extends AppCompatActivity {
 
                 case LOCAL_PLAYER_USED_CARD:
                     // TODO
+                    break;
+
+                case NONE:
+                default:
                     break;
 
             }
@@ -1102,10 +1112,6 @@ public class GameActivity extends AppCompatActivity {
                     addEffect(effect, duration);
                     break;
 
-                case Card.Target.TRAP:
-                    //TODO: implemantar trampes
-                    break;
-
             }
 
             showPlayerPopup(localPlayer, usedCard.getEffectName(), 1000, false);
@@ -1120,10 +1126,11 @@ public class GameActivity extends AppCompatActivity {
 
     private void handleEffects() {
         cardZone.reverseCards(isEffectActive(REVERSED_HAND));
-        if (isEffectActive(DISCARD_ALL)) cardZone.discardAll();
+        if (isEffectActive(DISCARD_ONE)) cardZone.discardOne();
         if (isEffectActive(KO)) {
             localPlayer.die(isEffectActive(QUICK_REVIVE));
             addEffect(QUICK_REVIVE, 0);
+            activateEventFlag(Event.LOCAL_PLAYER_DIED);
         }
         if (isEffectActive(FULL_RESTORATION)) {
             showPlayerPopup(localPlayer, "+" + (Player.MAX_HEALTH - localPlayer.getHealth()) + " ♡", 500, false);

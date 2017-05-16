@@ -149,8 +149,8 @@ public class CardZone {
         return c;
     }
 
-    public void discardAll() {
-        cardList.clear();
+    public void discardOne() {
+        if (!cardList.isEmpty()) cardList.remove((int) (Math.random() * cardList.size()));
         updateContainers();
     }
 
