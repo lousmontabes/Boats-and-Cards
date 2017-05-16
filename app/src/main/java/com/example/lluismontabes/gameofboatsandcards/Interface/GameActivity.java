@@ -22,6 +22,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 
+import com.example.lluismontabes.gameofboatsandcards.Model.CubicBezierCurve;
 import com.example.lluismontabes.gameofboatsandcards.Views.Card;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardSpawn;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardZone;

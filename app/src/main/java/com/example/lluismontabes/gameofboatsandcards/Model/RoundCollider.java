@@ -74,7 +74,7 @@ public abstract class RoundCollider extends Collider {
         hitboxPaint.setColor(Color.MAGENTA);
         hitboxPaint.setStyle(Paint.Style.STROKE);
 
-        canvas.drawRect(getPosition().x, getPosition().y, getPosition().x + getWidth(), getPosition().y + getHeight(), hitboxPaint);
+        canvas.drawRect(getHitboxPosition().x, getHitboxPosition().y, getHitboxPosition().x + getWidth(), getHitboxPosition().y + getHeight(), hitboxPaint);
     }
 
 }

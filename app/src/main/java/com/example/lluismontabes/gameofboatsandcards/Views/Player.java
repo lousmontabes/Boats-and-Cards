@@ -1,6 +1,7 @@
 package com.example.lluismontabes.gameofboatsandcards.Views;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
@@ -118,6 +119,10 @@ public class Player extends RectangularCollider {
     }
 
     // GETTERS
+    public Point getPosition(){
+        return new Point((int) (this.getX()), (int) (this.getY()));
+    }
+
     public float getAngle() {
         return angle;
     }
@@ -225,6 +230,15 @@ public class Player extends RectangularCollider {
             shadowImageView.setY(-45 * (float) Math.sin(a));
             shadowImageView.setX(45 * (float) Math.cos(a));
         }
+    }
+
+    /**
+     * Moves the Player towatds the specified point.
+     * Does the same as calling moveTo(x, y).
+     * @param p Destination point.
+     */
+    public void moveTo(Point p){
+        this.moveTo(p.x, p.y);
     }
 
     /**

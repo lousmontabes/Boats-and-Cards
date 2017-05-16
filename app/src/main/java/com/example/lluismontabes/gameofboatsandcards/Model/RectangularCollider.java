@@ -122,7 +122,7 @@ public abstract class RectangularCollider extends Collider {
         hitboxPaint.setColor(Color.MAGENTA);
         hitboxPaint.setStyle(Paint.Style.STROKE);
 
-        canvas.drawRect(getPosition().x, getPosition().y, getPosition().x + getWidth(), getPosition().y + getHeight(), hitboxPaint);
+        canvas.drawRect(getHitboxPosition().x, getHitboxPosition().y, getHitboxPosition().x + getWidth(), getHitboxPosition().y + getHeight(), hitboxPaint);
 
     }
 
@@ -133,7 +133,7 @@ public abstract class RectangularCollider extends Collider {
         hitboxPaint.setColor(Color.MAGENTA);
         hitboxPaint.setStyle(Paint.Style.FILL);
 
-        canvas.drawRect(getPosition().x, getPosition().y, getPosition().x + Graphics.toPixels(getContext(), w), getPosition().y + Graphics.toPixels(getContext(), h), hitboxPaint);
+        canvas.drawRect(getHitboxPosition().x, getHitboxPosition().y, getHitboxPosition().x + Graphics.toPixels(getContext(), w), getHitboxPosition().y + Graphics.toPixels(getContext(), h), hitboxPaint);
         canvas.drawCircle(getCenter().x, getCenter().y, 10, hitboxPaint);
         */
     }

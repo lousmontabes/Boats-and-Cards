@@ -31,10 +31,11 @@ public abstract class Collider extends RelativeLayout {
     abstract Point getCenter();
 
     /**
-     * Returns top-left coordinates (including margins).
-     * @return  Top-left position of the Collider.
+     * Returns top-left coordinates of the hitbox.
+     * (ie. top-left coordinates of the Collider excluding the margins).
+     * @return  Top-left position of the Collider0s hitbox.
      */
-    public Point getPosition() {
+    public Point getHitboxPosition() {
         Point p = new Point((int)this.getX() + marginLeft, (int)this.getY() + marginTop);
         return p;
     }
