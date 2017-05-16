@@ -247,9 +247,11 @@ public class Player extends RectangularCollider {
             move(angle, 0.4f);
         }
 
-        float convertedAngle = (float) Math.toDegrees(angle) + 90;
+    }
 
-        //if (Math.abs(pathX) > 10 || Math.abs(pathY) > 10) this.setRotation(convertedAngle);
+    public float getInterpolatedAngle(float origin, float end, float p){
+
+        return (end - origin) * p + origin;
 
     }
 

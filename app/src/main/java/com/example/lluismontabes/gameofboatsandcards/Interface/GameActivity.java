@@ -688,7 +688,10 @@ public class GameActivity extends AppCompatActivity {
     private void destroyExcessiveViews() {
 
         // Popups: max 4
-        if (activePopups.size() > 4) activePopups.remove(0);
+        if (activePopups.size() > 4) layout.removeView(activePopups.remove(0));
+
+        // Projectiles: max 10
+        if (activeProjectiles.size() > 18) layout.removeView(activeProjectiles.remove(0));
 
     }
 
@@ -876,9 +879,7 @@ public class GameActivity extends AppCompatActivity {
                 improveVisibilityCardZone(180, 140, 90);
 
                 // Process remote events
-                if (remoteActiveEvent != null){
-                    handleRemoteEvent();
-                }
+                if (remoteActiveEvent != null) handleRemoteEvent();
 
                 // Environmental effects
                 showDripplets();
