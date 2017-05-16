@@ -879,7 +879,7 @@ public class GameActivity extends AppCompatActivity {
 
                     //remotePlayer.moveTo(remotePosition);
                 }
-                remoteCurve.set(remotePlayer.getPosition(), remotePosition, remotePlayer.getAngle(), remoteAngle);
+                remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getAngle()), remoteAngle);
                 remotePlayer.moveInCurve(remoteCurve);
 
                 //remotePlayer.moveInCurve();
