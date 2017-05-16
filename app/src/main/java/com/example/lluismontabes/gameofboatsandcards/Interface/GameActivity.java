@@ -1112,9 +1112,6 @@ public class GameActivity extends AppCompatActivity {
                     addEffect(effect, duration);
                     break;
 
-                case Card.Target.TRAP:
-                    //TODO: implemantar trampes
-                    break;
 
             }
 
@@ -1130,7 +1127,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void handleEffects() {
         cardZone.reverseCards(isEffectActive(REVERSED_HAND));
-        if (isEffectActive(DISCARD_ALL)) cardZone.discardAll();
+        if (isEffectActive(DISCARD_ONE)) cardZone.discardOne();
         if (isEffectActive(KO)) {
             localPlayer.die(isEffectActive(QUICK_REVIVE));
             addEffect(QUICK_REVIVE, 0);

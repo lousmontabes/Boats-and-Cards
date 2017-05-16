@@ -16,25 +16,22 @@ public class  Card {
         public static final int SELF = 0;
         public static final int OPPONENT = 1;
         public static final int ALL = 2;
-        public static final int RANDOM = 3;
-        public static final int TRAP = 4;
     }
 
     // Possible effects of the cards
     public static final class Effect {
         public static final int SPEED_UP = 0;
         public static final int ATTACK_UP = 1;
-        public static final int DEFENSE_UP = 2;
+        public static final int FULL_RESTORATION = 2;
         public static final int STUNNED = 3;
         public static final int REVERSED_HAND = 4;
-        public static final int DISCARD_ALL = 5;
+        public static final int DISCARD_ONE = 5;
         public static final int REVERSED_CONTROLS = 6;
         public static final int TRIPLE_SHOT = 7;
         public static final int DISPEL = 8;
         public static final int KO = 9;
         public static final int QUICK_REVIVE = 10;
         public static final int RANDOM_WARP = 11;
-        public static final int FULL_RESTORATION = 12;
     }
 
     private int target;
@@ -77,7 +74,7 @@ public class  Card {
             case 4:
                 return "Cards reversed!";
             case 5:
-                return "All cards discarded!";
+                return "One card discarded!";
             case 6:
                 return "Backwards!";
             case 7:
@@ -110,10 +107,6 @@ public class  Card {
                 return Target.OPPONENT;
             case 3:
                 return Target.ALL;
-            case 4:
-                return Target.RANDOM;
-            case 5:
-                return Target.TRAP;
             default:
                 throw new UnknownError();
         }*/
@@ -125,21 +118,33 @@ public class  Card {
 
     public int getResourceID() {
         if (reversed) {
-            return R.drawable.placeholder_reversed;
+            return R.drawable.reversed_card;
         }
-        switch(1 + id % 6) {
+        switch(id) {
             case 1:
-                return R.drawable.placeholder1;
+                return R.drawable.attack_up;
             case 2:
-                return R.drawable.placeholder2;
+                return R.drawable.stunned;
             case 3:
-                return R.drawable.placeholder3;
+                return R.drawable.speed_up;
             case 4:
-                return R.drawable.placeholder4;
+                return R.drawable.reversed_hand;
             case 5:
-                return R.drawable.placeholder5;
+                return R.drawable.discard_one;
             case 6:
-                return R.drawable.placeholder6;
+                return R.drawable.backwards;
+            case 7:
+                return R.drawable.multishot;
+            case 8:
+                return R.drawable.placeholder3;
+            case 9:
+                return R.drawable.placeholder3;
+            case 10:
+                return R.drawable.placeholder4;
+            case 11:
+                return R.drawable.placeholder5;
+            case 12:
+                return R.drawable.rand_warp;
             default:
                 return R.drawable.void_card_resized;
         }
@@ -156,7 +161,7 @@ public class  Card {
             case 4:
                 return Effect.REVERSED_HAND;
             case 5:
-                return Effect.DISCARD_ALL;
+                return Effect.DISCARD_ONE;
             case 6:
                 return Effect.REVERSED_CONTROLS;
             case 7:
