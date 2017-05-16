@@ -1112,7 +1112,6 @@ public class GameActivity extends AppCompatActivity {
                     addEffect(effect, duration);
                     break;
 
-
             }
 
             showPlayerPopup(localPlayer, usedCard.getEffectName(), 1000, false);
