@@ -2,6 +2,7 @@ package com.example.lluismontabes.gameofboatsandcards.Model;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.util.TypedValue;
 
 /**
@@ -52,6 +53,19 @@ public final class Graphics {
     public static float toDp(Context c, float px){
         final float scale = c.getResources().getDisplayMetrics().density;
         return (px / scale) + 0.5f;
+    }
+
+    /**
+     * Returns parametric equations (y = n1 * parameter; x = n2 * parameter) of the
+     * Bezier curve defined by 4 points.
+     * @param p1 Point 1.
+     * @param p2 Point 2.
+     * @param p3 Point 3.
+     * @param p4 Point 4.
+     * @return
+     */
+    public static Point getBezierCurve(Point p1, Point p2, Point p3, Point p4){
+
     }
 
 }
