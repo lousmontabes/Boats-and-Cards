@@ -77,6 +77,9 @@ public class GameActivity extends AppCompatActivity {
     Point lastRemotePosition = new Point(0, 0);
     Point remotePosition = new Point(0, 0);
     Point localPosition = new Point(0, 0);
+    float remoteAngle = 0;
+    float localAngle = 0;
+
 
     // Online player and match IDs
     int matchId;
@@ -829,9 +832,6 @@ public class GameActivity extends AppCompatActivity {
                 // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
                 else moveLocalPlayer();
 
-                // Player 2 controls
-                //retrieveRemoteAction();
-
                 // Projectile movement
                 for (Projectile p : activeProjectiles) p.move();
 
@@ -850,9 +850,6 @@ public class GameActivity extends AppCompatActivity {
                 // islandDomain collisions
                 checkIslandDomainCollisions();
 
-                // Card collecting
-                //if (secondsLeft % 6 == 5 && currentFrame % fps == 0) drawCard(localPlayer);
-
                 // Card usage
                 if (cardUsed != 0) useCard(localPlayer, cardUsed);
 
@@ -868,13 +865,11 @@ public class GameActivity extends AppCompatActivity {
                 advanceCounter();
 
                 // Prepare local data to send to server
-                localPosition.x = (int) localPlayer.getX();
-                localPosition.y = (int) localPlayer.getY();
+                localPosition.set((int) localPlayer.getX(), (int) localPlayer.getY());
+                localAngle = localPlayer.getAngle();
 
-                // Apply remote data to remotePlayer
-                //log(remotePosition.x + ", " + remotePosition.y);
-                log("PNG: " + latency);
-                remotePlayer.moveTo(remotePosition.x, remotePosition.y);
+                // Move remotePlayer to the retrieved position
+                remotePlayer.moveTo(remotePosition);
 
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
@@ -1198,10 +1193,10 @@ public class GameActivity extends AppCompatActivity {
 
                     lastFrameChecked = currentFrame;
 
-                    // Send movement data
+                    // Send position & angle data
                     sendLocalPositionData();
 
-                    // Retrieve position data
+                    // Retrieve position & angle data
                     retrieveRemotePositionData();
 
                     // Send event flag data
@@ -1268,7 +1263,9 @@ public class GameActivity extends AppCompatActivity {
             getJSON("https://pis04-ub.herokuapp.com/send_local_position.php?matchId=" + matchId
                     + "&player=" + assignedPlayer
                     + "&x=" + localPosition.x
-                    + "&y=" + localPosition.y, 2000);
+                    + "&y=" + localPosition.y
+                    + "&angle=" + localAngle,
+                    2000);
 
         }
 
@@ -1281,13 +1278,14 @@ public class GameActivity extends AppCompatActivity {
             System.out.println(currentFrame + ": " + data);
 
             // Parse the JSON information into a Point object.
-            Point p = new Gson().fromJson(data, Point.class);
+            PointAnglePair p = new Gson().fromJson(data, PointAnglePair.class);
 
             // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
             // variables. These variables will be used to position remotePlayer on the next frame.
             if (p != null) {
 
-                remotePosition = p;
+                remotePosition.set(p.x, p.y);
+                remoteAngle = p.angle;
 
                 lastCheckSuccessful = true;
                 latency = (currentFrame - lastFrameChecked) / 30;
@@ -1354,6 +1352,14 @@ public class GameActivity extends AppCompatActivity {
     private class EventIndexPair{
         int eventIndex;
         Event event;
+    }
+
+    private class PointAnglePair{
+        int x;
+        int y;
+        float angle;
+
+
     }
 
 }
