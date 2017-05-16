@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.widget.ImageView;
 
 import com.example.lluismontabes.gameofboatsandcards.Model.Collider;
+import com.example.lluismontabes.gameofboatsandcards.Model.CubicBezierCurve;
 import com.example.lluismontabes.gameofboatsandcards.Model.RectangularCollider;
 import com.example.lluismontabes.gameofboatsandcards.R;
 
@@ -42,6 +43,9 @@ public class Player extends RectangularCollider {
     private float x;
     private float y;
     private float angle;
+
+    // Parameter for curved movement
+    float p = 0;
 
     /**
      * HEALTH & GAMEPLAY PARAMETERS
@@ -98,6 +102,11 @@ public class Player extends RectangularCollider {
     }
 
     // SETTERS
+    public void setPosition(Point p){
+        this.setX(p.x);
+        this.setY(p.y);
+    }
+
     public void setAngle(float a) {
         this.angle = a;
     }
@@ -263,10 +272,14 @@ public class Player extends RectangularCollider {
 
     }
 
-    public float getInterpolatedAngle(float origin, float end, float p){
-
-        return (end - origin) * p + origin;
-
+    /**
+     * Moves the player following a specified CubicBezierCurve.
+     * @param curve CubicBezierCurve to follow.
+     */
+    public void moveInCurve(CubicBezierCurve curve) {
+        p += 0.025f;
+        this.setRotation(curve.getAngleAt(p % 1));
+        this.setPosition(curve.getPointAt(p % 1));
     }
 
     public void rotateTo(float a) {

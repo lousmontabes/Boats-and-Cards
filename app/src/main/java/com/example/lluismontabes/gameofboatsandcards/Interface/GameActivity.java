@@ -80,6 +80,8 @@ public class GameActivity extends AppCompatActivity {
     float remoteAngle = 0;
     float localAngle = 0;
 
+    // Remote player curve path
+    CubicBezierCurve remoteCurve = new CubicBezierCurve();
 
     // Online player and match IDs
     int matchId;
@@ -866,10 +868,21 @@ public class GameActivity extends AppCompatActivity {
 
                 // Prepare local data to send to server
                 localPosition.set((int) localPlayer.getX(), (int) localPlayer.getY());
-                localAngle = localPlayer.getAngle();
+                localAngle = (float) Math.toDegrees(localPlayer.getAngle());
 
                 // Move remotePlayer to the retrieved position
-                remotePlayer.moveTo(remotePosition);
+                if (remotePosition != lastRemotePosition){
+                    System.out.println("New remote position detected");
+
+                    lastRemotePosition = remotePosition;
+
+
+                    //remotePlayer.moveTo(remotePosition);
+                }
+                remoteCurve.set(remotePlayer.getPosition(), remotePosition, remotePlayer.getAngle(), remoteAngle);
+                remotePlayer.moveInCurve(remoteCurve);
+
+                //remotePlayer.moveInCurve();
 
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
@@ -1267,6 +1280,8 @@ public class GameActivity extends AppCompatActivity {
                     + "&angle=" + localAngle,
                     2000);
 
+            System.out.println(localAngle);
+
         }
 
         private void retrieveRemotePositionData() {
@@ -1289,6 +1304,7 @@ public class GameActivity extends AppCompatActivity {
 
                 lastCheckSuccessful = true;
                 latency = (currentFrame - lastFrameChecked) / 30;
+
             } else {
                 lastCheckSuccessful = false;
             }
