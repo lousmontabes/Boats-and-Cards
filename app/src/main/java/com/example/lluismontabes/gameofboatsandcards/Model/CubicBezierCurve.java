@@ -13,8 +13,8 @@ public class CubicBezierCurve {
     private Point p2; // Support point 2
     private Point p3; // Finishing point
 
-    private float a;
-    private float b;
+    private float a;  // Starting angle
+    private float b;  // Finishing angle
 
     /**
      * Constructor that takes the 4 points as parameters.
@@ -29,8 +29,8 @@ public class CubicBezierCurve {
         this.p2 = p2;
         this.p3 = p3;
         // TODO: Proof-check the following:
-        this.a = (float) Math.atan2((p1.y - p0.y), (p1.x - p0.x));
-        this.b = (float) Math.atan2((p2.y - p3.y), (p2.x - p3.x));
+        this.a = (float) Math.atan2((p1.y - p0.y), (p1.x - p0.x)) + 90;
+        this.b = (float) Math.atan2((p2.y - p3.y), (p2.x - p3.x)) + 90;
     }
 
     /**
@@ -43,8 +43,10 @@ public class CubicBezierCurve {
      */
     public CubicBezierCurve(Point p0, Point p3, float a, float b){
         this.p0 = p0;
-        this.p1 = new Point((int) (p0.x + 40 * Math.cos(Math.toRadians(a))), (int) (p0.y + 40 * Math.sin(Math.toRadians(a))));
-        this.p2 = new Point((int) (p3.x + 40 * Math.cos(Math.toRadians(b))), (int) (p3.y + 40 * Math.sin(Math.toRadians(b))));
+        //this.p1 = new Point((int) (p0.x + 40 * Math.cos(Math.toRadians(a))), (int) (p0.y + 40 * Math.sin(Math.toRadians(a))));
+        //this.p2 = new Point((int) (p3.x + 40 * Math.cos(Math.toRadians(b))), (int) (p3.y + 40 * Math.sin(Math.toRadians(b))));
+        this.p1 = p0;
+        this.p2 = p3;
         this.p3 = p3;
     }
 
@@ -65,8 +67,8 @@ public class CubicBezierCurve {
         this.p2 = new Point(x2, y2);
         this.p3 = new Point(x3, y3);
         // TODO: Proof-check the following:
-        this.a = (float) Math.atan2((y1 - y0), (x1 - x0));
-        this.b = (float) Math.atan2((y2 - y3), (x2 - x3));
+        this.a = (float) Math.atan2((y1 - y0), (x1 - x0)) + 90;
+        this.b = (float) Math.atan2((y2 - y3), (x2 - x3)) + 90;
     }
 
     public CubicBezierCurve(){
@@ -74,8 +76,8 @@ public class CubicBezierCurve {
         this.p1 = new Point();
         this.p2 = new Point();
         this.p3 = new Point();
-        this.a = 0;
-        this.b = 0;
+        this.a = 90;
+        this.b = 90;
     }
 
     /**
@@ -87,10 +89,13 @@ public class CubicBezierCurve {
      */
     public void set(Point p0, Point p3, float a, float b){
         this.p0 = p0;
-        this.p1 = new Point((int) (p0.x + 40 * Math.cos(Math.toRadians(a))), (int) (p0.y + 40 * Math.sin(Math.toRadians(a))));
-        this.p2 = new Point((int) (p3.x + 40 * Math.cos(Math.toRadians(b))), (int) (p3.y + 40 * Math.sin(Math.toRadians(b))));
+        //this.p1 = new Point((int) (p0.x + 40 * Math.cos(Math.toRadians(a))), (int) (p0.y + 40 * Math.sin(Math.toRadians(a))));
+        //this.p2 = new Point((int) (p3.x + 40 * Math.cos(Math.toRadians(b))), (int) (p3.y + 40 * Math.sin(Math.toRadians(b))));
+        this.p1 = p0;
+        this.p2 = p3;
         this.p3 = p3;
-
+        this.a = a + 90;
+        this.b = b + 90;
         //System.out.println("New Bezier curve: " + p0 + " - " + p1 + " - " + p2 + " - " + p3);
     }
 
@@ -118,8 +123,8 @@ public class CubicBezierCurve {
      * @param t Parameter.
      * @return  Corresponding angle.
      */
-    public float getAngleAt(float t){
-        return (b - a) * t + b;
+    public float getAngleAt(float t) {
+        return (b - a) * t + a;
     }
 
 }
