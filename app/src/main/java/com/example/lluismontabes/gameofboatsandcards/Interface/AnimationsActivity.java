@@ -33,6 +33,7 @@ public class AnimationsActivity extends Activity {
     // very frequently.
     private int mShortAnimationDuration;
 
+
     //num clicks
     private int clicks = 0;
 
@@ -40,7 +41,8 @@ public class AnimationsActivity extends Activity {
     private final Rect startBounds = new Rect();
 
     private ImageView expandedImageView;
-    private ImageView image2;
+    private ImageView reverseImage;
+    private View thumbView;
     private boolean isFirstImage = true;
 
     /**
@@ -53,8 +55,41 @@ public class AnimationsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zoom);
 
-        image2 = (ImageView) findViewById(R.id.image2);
-        image2.setVisibility(View.GONE);
+        final ImageView reverse_of_multishot = (ImageView) findViewById(R.id.reverse_of_multishot);
+        reverse_of_multishot.setVisibility(View.GONE);
+
+        final ImageView reverse_of_reversed_hand = (ImageView) findViewById(R.id.reverse_of_reversed_hand);
+        reverse_of_reversed_hand.setVisibility(View.GONE);
+
+        final ImageView reverse_of_attack_up = (ImageView) findViewById(R.id.reverse_of_attack_up);
+        reverse_of_attack_up.setVisibility(View.GONE);
+
+        final ImageView reverse_of_rand_warp = (ImageView) findViewById(R.id.reverse_of_rand_warp);
+        reverse_of_rand_warp.setVisibility(View.GONE);
+
+        final ImageView reverse_of_backwards = (ImageView) findViewById(R.id.reverse_of_backwards);
+        reverse_of_backwards.setVisibility(View.GONE);
+
+        final ImageView reverse_of_discard_one = (ImageView) findViewById(R.id.reverse_of_discard_one);
+        reverse_of_discard_one.setVisibility(View.GONE);
+
+        final ImageView reverse_of_speed_up = (ImageView) findViewById(R.id.reverse_of_speed_up);
+        reverse_of_speed_up.setVisibility(View.GONE);
+
+        final ImageView reverse_of_stunned = (ImageView) findViewById(R.id.reverse_of_stunned);
+        reverse_of_stunned.setVisibility(View.GONE);
+
+        final ImageView reverse_of_full_restoration = (ImageView) findViewById(R.id.reverse_of_full_restoration);
+        reverse_of_full_restoration.setVisibility(View.GONE);
+
+        final ImageView reverse_of_dispel = (ImageView) findViewById(R.id.reverse_of_dispel);
+        reverse_of_dispel.setVisibility(View.GONE);
+
+        final ImageView reverse_of_ko = (ImageView) findViewById(R.id.reverse_of_ko);
+        reverse_of_ko.setVisibility(View.GONE);
+
+        final ImageView reverse_of_quick_revive = (ImageView) findViewById(R.id.reverse_of_quick_revive);
+        reverse_of_quick_revive.setVisibility(View.GONE);
 
         //Descomentar para visualizar card-flip animation
         //getFragmentManager().beginTransaction().add(R.id.container,new CardFrontFragment()).commit();
@@ -65,7 +100,108 @@ public class AnimationsActivity extends Activity {
         thumb1View.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                zoomImageFromThumb(thumb1View, R.drawable.image1);
+                expandedImageView.setVisibility(View.GONE);
+                reverseImage = reverse_of_multishot;
+                zoomImageFromThumb(thumb1View, R.drawable.multishot_collection2);
+            }
+        });
+
+        final View thumb2View = findViewById(R.id.thumb_button_2);
+        thumb2View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_reversed_hand;
+                zoomImageFromThumb(thumb2View, R.drawable.reversed_hand_collection);
+            }
+        });
+
+        final View thumb3View = findViewById(R.id.thumb_button_3);
+        thumb3View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_attack_up;
+                zoomImageFromThumb(thumb3View, R.drawable.attack_up_collection);
+            }
+        });
+
+        final View thumb4View = findViewById(R.id.thumb_button_4);
+        thumb4View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_rand_warp;
+                zoomImageFromThumb(thumb4View, R.drawable.rand_warp_collection);
+            }
+        });
+
+        final View thumb5View = findViewById(R.id.thumb_button_5);
+        thumb5View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_backwards;
+                zoomImageFromThumb(thumb5View, R.drawable.backwards_collection);
+            }
+        });
+
+        final View thumb6View = findViewById(R.id.thumb_button_6);
+        thumb6View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_discard_one;
+                zoomImageFromThumb(thumb6View, R.drawable.discard_one_collection);
+            }
+        });
+
+        final View thumb7View = findViewById(R.id.thumb_button_7);
+        thumb7View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_speed_up;
+                zoomImageFromThumb(thumb7View, R.drawable.speed_up_collection);
+            }
+        });
+
+        final View thumb8View = findViewById(R.id.thumb_button_8);
+        thumb8View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_stunned;
+                zoomImageFromThumb(thumb8View, R.drawable.stunned_collection);
+            }
+        });
+
+        final View thumb9View = findViewById(R.id.thumb_button_9);
+        thumb9View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_full_restoration;
+                zoomImageFromThumb(thumb9View, R.drawable.stunned_collection);
+            }
+        });
+
+        final View thumb10View = findViewById(R.id.thumb_button_10);
+        thumb10View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_dispel;
+                zoomImageFromThumb(thumb10View, R.drawable.stunned_collection);
+            }
+        });
+
+        final View thumb11View = findViewById(R.id.thumb_button_11);
+        thumb11View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_ko;
+                zoomImageFromThumb(thumb11View, R.drawable.stunned_collection);
+            }
+        });
+
+        final View thumb12View = findViewById(R.id.thumb_button_12);
+        thumb12View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverseImage = reverse_of_quick_revive;
+                zoomImageFromThumb(thumb12View, R.drawable.stunned_collection);
             }
         });
 
@@ -80,6 +216,8 @@ public class AnimationsActivity extends Activity {
         if (mCurrentAnimator != null) {
             mCurrentAnimator.cancel();
         }
+
+        this.thumbView = thumbView;
 
         // Load the high-resolution "zoomed-in" image.
         expandedImageView = (ImageView) findViewById(R.id.expanded_image);
@@ -97,6 +235,7 @@ public class AnimationsActivity extends Activity {
         // properties (X, Y).
         thumbView.getGlobalVisibleRect(startBounds); // startBounds ahora contiene coordenadas de la miniatura en el layout root
         findViewById(R.id.container).getGlobalVisibleRect(finalBounds, globalOffset); // la imagen expandida ocupará el 'contenedor' y finalbounds se settea con sus coordenadas y el punto globalOffset (coordenadas X,Y origen)
+
         startBounds.offset(-globalOffset.x, -globalOffset.y);
         finalBounds.offset(-globalOffset.x, -globalOffset.y);
 
@@ -121,7 +260,6 @@ public class AnimationsActivity extends Activity {
             startBounds.top -= deltaHeight;
             startBounds.bottom += deltaHeight;
         }
-        System.out.println(startBounds.width()+" "+startBounds.height());
 
         // Hide the thumbnail and show the zoomed-in view. When the animation
         // begins, it will position the zoomed-in view in the place of the
@@ -146,6 +284,7 @@ public class AnimationsActivity extends Activity {
                 .with(ObjectAnimator.ofFloat(expandedImageView, View.SCALE_X,
                         startScale, 1f)).with(ObjectAnimator.ofFloat(expandedImageView,
                 View.SCALE_Y, startScale, 1f));
+        //set.setDuration(mShortAnimationDuration);
         set.setDuration(mShortAnimationDuration);
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
@@ -184,7 +323,7 @@ public class AnimationsActivity extends Activity {
                             //flipCard();
 
                             //Implementation of flip animation between double ImageView instead of Fragments
-
+                            System.out.println("1 CLICK!");
                             if (isFirstImage) {
                                 applyRotation(0, 90);
                                 isFirstImage = !isFirstImage;
@@ -257,10 +396,10 @@ public class AnimationsActivity extends Activity {
         rotation.setDuration(500);
         rotation.setFillAfter(true);
         rotation.setInterpolator(new AccelerateInterpolator());
-        rotation.setAnimationListener(new DisplayNextView(isFirstImage, expandedImageView, image2));
+        rotation.setAnimationListener(new DisplayNextView(isFirstImage, expandedImageView, reverseImage));
 
         if (isFirstImage) {expandedImageView.startAnimation(rotation);}
-        else {image2.startAnimation(rotation);}
+        else {reverseImage.startAnimation(rotation);}
 
 
 

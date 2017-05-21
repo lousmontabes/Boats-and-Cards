@@ -13,26 +13,6 @@
         android:layout_height="match_parent"
         android:background="@drawable/sea">
 
-        <Button
-            android:text="@string/playButtonText"
-            android:textSize="11pt"
-            android:layout_width="100pt"
-            android:layout_height="25pt"
-            android:id="@+id/playButton"
-            android:layout_marginBottom="74dp"
-            android:layout_alignBottom="@+id/textView2"
-            android:layout_centerHorizontal="true" />
-
-        <TextView
-            android:text="@string/settingsButtonText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/settingsTextView"
-            android:layout_alignTop="@+id/playButton"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="53dp"
-            android:padding="10dp" />
-
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -63,6 +43,34 @@
             android:layout_alignBottom="@+id/imageView"
             android:layout_centerHorizontal="true"
             android:text="This is a button that bypasses the online functionality that won't be here on the final version of this app" />
+
+        <Button
+            android:text="@string/playButtonText"
+            android:textSize="11pt"
+            android:layout_width="100pt"
+            android:layout_height="25pt"
+            android:id="@+id/playButton"
+            android:layout_marginBottom="80dp"
+            android:layout_above="@+id/textView2"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:text="@string/settingsButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/settingsTextView"
+            android:padding="10dp"
+            android:layout_above="@+id/textView2"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:text="Collection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="38dp"
+            android:layout_above="@+id/textView2"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/collectionButton"/>
 
     </RelativeLayout>
 

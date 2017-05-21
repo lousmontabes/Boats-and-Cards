@@ -19,6 +19,7 @@ public class MainMenuActivity extends AppCompatActivity {
         Button playButton = (Button) findViewById(R.id.playButton);
         TextView settingsTextView = (TextView) findViewById(R.id.settingsTextView);
         Button debugButton = (Button) findViewById(R.id.button3);
+        Button collectionButton = (Button) findViewById(R.id.collectionButton);
 
         playButton.setOnClickListener(new View.OnClickListener()
         {
@@ -48,6 +49,18 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 // Start GameActivity
                 Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
+                startActivity(i);
+
+
+            }
+        });
+
+        collectionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Start AnimationsActivity (Collection)
+                Intent i = new Intent(MainMenuActivity.this, AnimationsActivity.class);
                 startActivity(i);
 
             }
