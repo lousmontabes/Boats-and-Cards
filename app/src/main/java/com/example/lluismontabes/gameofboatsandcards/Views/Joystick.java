@@ -51,8 +51,8 @@ public class Joystick extends RelativeLayout {
                         centerX = area.getWidth()/2 - image.getWidth()/2;
                         centerY = area.getHeight()/2 - image.getHeight()/2;
 
-                        x = event.getX();// + dx;
-                        y = event.getY();// + dy;
+                        x = event.getX() - image.getWidth()/2;// + dx;
+                        y = event.getY() - image.getHeight()/2;// + dy;
 
                         // Calculate the current angle using the arctangent:
                         Joystick.this.currentAngle = (float) Math.atan2((y - centerY), (x - centerX));

@@ -12,39 +12,42 @@
         android:gravity="center"
         android:padding="16dp">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/thumb_button_1"
-            android:layout_width="82dp"
-            android:layout_marginRight="5dp"
+            android:layout_width="67dp"
             android:src="@drawable/multishot"
             android:scaleType="fitXY"
             android:contentDescription="@string/description_image_1"
-            android:layout_height="112dp" />
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
-        <ImageButton
+        <ImageView
             android:id="@+id/thumb_button_2"
-            android:layout_width="82dp"
-            android:layout_marginRight="5dp"
+            android:layout_width="67dp"
             android:src="@drawable/reversed_hand"
             android:scaleType="fitXY"
-            android:layout_height="112dp"/>
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_3"
             android:src="@drawable/attack_up"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_4"
             android:src="@drawable/rand_warp"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
-
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
     </LinearLayout>
 
@@ -55,37 +58,41 @@
         android:gravity="center"
         android:layout_marginTop="140dp">
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_5"
             android:src="@drawable/backwards"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_6"
             android:src="@drawable/discard_one"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_7"
             android:src="@drawable/speed_up"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_8"
             android:src="@drawable/stunned"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
 
     </LinearLayout>
@@ -96,38 +103,41 @@
         android:layout_marginTop="260dp"
         android:gravity="center">
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_9"
             android:src="@drawable/placeholder_reversed"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_10"
             android:src="@drawable/placeholder_reversed"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_11"
             android:src="@drawable/placeholder_reversed"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
-        <ImageButton
-            android:layout_width="82dp"
-            android:layout_height="112dp"
+        <ImageView
+            android:layout_width="67dp"
+            android:layout_height="90dp"
             android:id="@+id/thumb_button_12"
             android:src="@drawable/placeholder_reversed"
             android:scaleType="fitXY"
-            android:layout_marginRight="5dp"/>
-
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
 
     </LinearLayout>
 

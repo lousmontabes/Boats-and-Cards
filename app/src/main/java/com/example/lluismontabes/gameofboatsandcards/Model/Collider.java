@@ -28,7 +28,7 @@ public abstract class Collider extends RelativeLayout {
      * Return center coordinates.
      * @return  Center position of the Collider.
      */
-    abstract Point getCenter();
+    public abstract Point getCenter();
 
     /**
      * Returns top-left coordinates of the hitbox.

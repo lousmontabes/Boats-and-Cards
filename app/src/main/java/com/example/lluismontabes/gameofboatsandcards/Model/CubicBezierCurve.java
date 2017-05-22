@@ -2,6 +2,8 @@ package com.example.lluismontabes.gameofboatsandcards.Model;
 
 import android.graphics.Point;
 
+import com.example.lluismontabes.gameofboatsandcards.Interface.GameActivity;
+
 /**
  * Created by Lous on 16/05/2017.
  */
@@ -48,6 +50,9 @@ public class CubicBezierCurve {
         this.p1 = p0;
         this.p2 = p3;
         this.p3 = p3;
+
+        this.a = a;
+        this.b = b;
     }
 
     /**
@@ -84,19 +89,21 @@ public class CubicBezierCurve {
      * Changes the properties of the Bezier curve.
      * @param p0 Starting point.
      * @param p3 Finishing point.
-     * @param a  Starting angle.
-     * @param b  Finishing angle.
+     * @param a  Starting angle in rad.
+     * @param b  Finishing angle in rad.
      */
     public void set(Point p0, Point p3, float a, float b){
         this.p0 = p0;
         //this.p1 = new Point((int) (p0.x + 40 * Math.cos(Math.toRadians(a))), (int) (p0.y + 40 * Math.sin(Math.toRadians(a))));
         //this.p2 = new Point((int) (p3.x + 40 * Math.cos(Math.toRadians(b))), (int) (p3.y + 40 * Math.sin(Math.toRadians(b))));
-        this.p1 = p0;
-        this.p2 = p3;
+        this.p1 = new Point(p0);
+        p1.offset(100 * (int) Math.cos(a), 100 * (int) Math.sin(a));
+        this.p2 = new Point(p3);
+        p2.offset(100 * (int) Math.cos(b), 100 * (int) Math.sin(b));
         this.p3 = p3;
-        this.a = a + 90;
-        this.b = b + 90;
-        //System.out.println("New Bezier curve: " + p0 + " - " + p1 + " - " + p2 + " - " + p3);
+        this.a = a;
+        this.b = b;
+        GameActivity.log("New Bezier curve:\nP0: " + p0 + " - P1: " + p1 + " - P2: " + p2 + " - P3: " + p3 + "\nα:" + this.a + " - β:" + this.b);
     }
 
     /**

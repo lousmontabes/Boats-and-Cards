@@ -3,6 +3,9 @@ package com.example.lluismontabes.gameofboatsandcards.Views;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.example.lluismontabes.gameofboatsandcards.Model.Collider;
+import com.example.lluismontabes.gameofboatsandcards.Model.RoundCollider;
+
 import java.util.ArrayList;
 
 import static android.view.View.GONE;
@@ -79,9 +82,9 @@ public class CardZone {
     //values of Alpha {0,1,2,...,255} , where 255 is No Transparent and 0 Totally Transparent
     //maxDistance define the distance from card zone starts to get transparent
     //minDistance define the distance at the transparency gets its minimum value and doesn't get smaller values
-    public void improveVisibility(Player player, float maxDistance, float minDistance, int minAlpha) {
-        float positionPlayerX = player.getCenter().x;
-        float positionPlayerY = player.getCenter().y;
+    public void improveVisibility(Collider collider, float maxDistance, float minDistance, int minAlpha) {
+        float positionPlayerX = collider.getCenter().x;
+        float positionPlayerY = collider.getCenter().y;
 
         int[] location1 = new int[2];
         containerCard1.getLocationOnScreen(location1);
