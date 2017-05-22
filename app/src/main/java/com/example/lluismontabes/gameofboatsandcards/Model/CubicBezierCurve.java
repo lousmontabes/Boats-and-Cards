@@ -103,7 +103,7 @@ public class CubicBezierCurve {
         this.p3 = p3;
         this.a = a;
         this.b = b;
-        GameActivity.log("New Bezier curve:\nP0: " + p0 + " - P1: " + p1 + " - P2: " + p2 + " - P3: " + p3 + "\nα:" + this.a + " - β:" + this.b);
+        System.out.println("New Bezier curve:\nP0: " + p0 + " - P1: " + p1 + " - P2: " + p2 + " - P3: " + p3 + "\nα:" + this.a + " - β:" + this.b);
     }
 
     /**

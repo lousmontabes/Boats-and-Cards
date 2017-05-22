@@ -73,8 +73,12 @@ public class GameActivity extends AppCompatActivity {
     float latency;
     boolean lastCheckSuccessful = false;
 
+    // Synchronization
+    boolean localPlayerReady = false;
+    boolean remotePlayerReady = false;
+
     // Online player positioning
-    Point lastRemotePosition = new Point(0, 0);
+    Point lastReadRemotePosition = new Point(0, 0);
     Point remotePosition = new Point(0, 0);
     Point localPosition = new Point(0, 0);
     float remoteAngle = 0;
@@ -92,19 +96,18 @@ public class GameActivity extends AppCompatActivity {
     // IMPORTANT: @SerializedName("n") makes it possible for Gson to parse the incoming
     // JSON into an EventIndexPair properly, as the Event is received as an integer.
     private enum Event {
-        @SerializedName("0")NONE,
-        @SerializedName("1")LOCAL_PLAYER_DIED,
-        @SerializedName("2")REMOTE_PLAYER_DIED,
-        @SerializedName("3")LOCAL_PLAYER_RESPAWNED,
-        @SerializedName("4")REMOTE_PLAYER_RESPAWNED,
-        @SerializedName("5")LOCAL_PLAYER_FIRED,
-        @SerializedName("6")REMOTE_PLAYER_FIRED,
-        @SerializedName("7")LOCAL_PLAYER_DAMAGED,
-        @SerializedName("8")REMOTE_PLAYER_DAMAGED,
-        @SerializedName("9")LOCAL_PLAYER_USED_CARD,
-        @SerializedName("10")REMOTE_PLAYER_USED_CARD
+        @SerializedName("0") NONE,
+        @SerializedName("1") LOCAL_PLAYER_DIED,
+        @SerializedName("2") REMOTE_PLAYER_DIED,
+        @SerializedName("3") LOCAL_PLAYER_RESPAWNED,
+        @SerializedName("4") REMOTE_PLAYER_RESPAWNED,
+        @SerializedName("5") LOCAL_PLAYER_FIRED,
+        @SerializedName("6") REMOTE_PLAYER_FIRED,
+        @SerializedName("7") LOCAL_PLAYER_DAMAGED,
+        @SerializedName("8") REMOTE_PLAYER_DAMAGED,
+        @SerializedName("9") LOCAL_PLAYER_USED_CARD,
+        @SerializedName("10") REMOTE_PLAYER_USED_CARD
     }
-
     private Event localActiveEvent = Event.NONE;
     private int localEventIndex = 0;
     private int lastReadLocalEventIndex = -1;
@@ -114,21 +117,17 @@ public class GameActivity extends AppCompatActivity {
     private int lastReadRemoteEventIndex = 0;
 
     // Online invasion and winning statuses
-    public enum Invader {
-        NONE, LOCAL_PLAYER, REMOTE_PLAYER
-    }
-
+    public enum Invader {NONE, LOCAL_PLAYER, REMOTE_PLAYER}
     public enum GameState {UNFINISHED, TIME_OUT, LOCAL_WON, REMOTE_WON, DRAW}
-
     private GameState currentGameState = GameState.UNFINISHED;
 
     /**
      * DEBUGGING
      **/
     // Log index and TextView
-    static int logIndex = 0;
-    static TextView log;
-    static TextView frameLog;
+    int logIndex = 0;
+    TextView log;
+    TextView frameLog;
 
     /**
      * GAME DATA
@@ -288,12 +287,24 @@ public class GameActivity extends AppCompatActivity {
         // Start game loop
         startRefreshTimer();
 
+        localPlayerReady = true;
+
     }
 
     private void startRemoteTask() {
 
         remoteTask = new RemoteDataTask();
         remoteTask.execute();
+
+    }
+
+    private void waitForRemotePlayerReady() {
+
+        while (!remotePlayerReady){
+
+            System.out.println("Waiting for remotePlayer to be ready");
+
+        }
 
     }
 
@@ -484,7 +495,7 @@ public class GameActivity extends AppCompatActivity {
 
             layout.addView(projectile);
 
-            if (player == localPlayer) {
+            if (player == localPlayer){
                 activateEventFlag(Event.LOCAL_PLAYER_FIRED);
                 shotsFiredStats++;
             }
@@ -555,9 +566,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     // Displays a message on the game log
-    public static void log(String message) {
-        log.setText(Float.toString(logIndex) + ": " + message);
-        logIndex++;
+    private void log(String message) {
+        this.log.setText(Float.toString(this.logIndex) + ": " + message);
+        this.logIndex++;
     }
 
     private void moveObjectTo(View object, float x, float y) {
@@ -835,8 +846,8 @@ public class GameActivity extends AppCompatActivity {
                 // Starting position
                 if (currentFrame <= 10) setStartPositions();
 
-                    // Joystick controls
-                    // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
+                // Joystick controls
+                // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
                 else moveLocalPlayer();
 
                 // Projectile movement
@@ -876,23 +887,21 @@ public class GameActivity extends AppCompatActivity {
                 localAngle = (float) Math.toDegrees(localPlayer.getAngle());
 
                 // Move remotePlayer to the retrieved position
-                if (remotePosition != lastRemotePosition) {
+                if (remotePosition != lastReadRemotePosition){
                     System.out.println("New remote position detected");
 
-                    lastRemotePosition = remotePosition;
+                    lastReadRemotePosition = remotePosition;
 
 
                     //remotePlayer.moveTo(remotePosition);
                 }
-                if (currentFrame % 6 == 0) {
-                    remoteCurve.set(remotePlayer.getPosition(), remotePosition, remotePlayer.getAngle(), (float) Math.toRadians(remoteAngle));
-                }
+                remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getAngle()), remoteAngle);
                 remotePlayer.moveInCurve(remoteCurve);
 
                 //remotePlayer.moveInCurve();
 
                 //test CardZone
-                improveVisibilityCardZone(380, 240, 90);
+                improveVisibilityCardZone(180, 140, 90);
 
                 // Process remote events
                 if (remoteActiveEvent != null) handleRemoteEvent();
@@ -909,9 +918,9 @@ public class GameActivity extends AppCompatActivity {
      */
     private void handleRemoteEvent() {
 
-        if (remoteEventIndex > lastReadRemoteEventIndex) {
+        if (remoteEventIndex > lastReadRemoteEventIndex){
 
-            switch (remoteActiveEvent) {
+            switch(remoteActiveEvent){
 
                 // NOTICE: These Events are retrieved from the server, sent by the other player.
                 // Therefore, every LOCAL event will refer to the sender, that is, the remotePlayer
@@ -1066,8 +1075,7 @@ public class GameActivity extends AppCompatActivity {
             do {
                 cardSpawn.setX((float) (Math.random() * (layout.getWidth() - cardSpawn.getWidth())));
                 cardSpawn.setY((float) (Math.random() * (layout.getHeight() - cardSpawn.getHeight())));
-            }
-            while (islandDomain.isColliding(cardSpawn) || localPlayer.isColliding(cardSpawn) || remotePlayer.isColliding(cardSpawn));
+            } while (islandDomain.isColliding(cardSpawn) || localPlayer.isColliding(cardSpawn) || remotePlayer.isColliding(cardSpawn));
         } else if (caught || cardVisibilityTimer > CARD_VISIBLE_TIME) {
             cardSpawnCooldown--;
             cardSpawn.setVisibility(View.GONE);
@@ -1185,8 +1193,6 @@ public class GameActivity extends AppCompatActivity {
 
     private void improveVisibilityCardZone(float maxDistance, float minDistance, int minAlpha) {
         cardZone.improveVisibility(localPlayer, maxDistance, minDistance, minAlpha);
-        cardZone.improveVisibility(remotePlayer, maxDistance, minDistance, minAlpha);
-        cardZone.improveVisibility(cardSpawn, maxDistance, minDistance, minAlpha);
     }
 
     /**
@@ -1196,8 +1202,14 @@ public class GameActivity extends AppCompatActivity {
     public class RefreshTask extends TimerTask {
         @Override
         public void run() {
-            refresh();
-            layout.postInvalidate();
+            if (localPlayerReady && remotePlayerReady){
+
+                // Start the game loop only once both players have posted their
+                // ready signals to the server and these signals have been retrieved.
+
+                refresh();
+                layout.postInvalidate();
+            }
         }
     }
 
@@ -1210,23 +1222,33 @@ public class GameActivity extends AppCompatActivity {
 
         protected Void doInBackground(String... params) {
 
+            notifyLocalPlayerReady();
+
             while (connectionActive) {
 
-                if ((currentFrame % connectionFrequency == 0) && (lastFrameChecked != currentFrame)) {
+                if (!remotePlayerReady){
 
-                    lastFrameChecked = currentFrame;
+                    checkRemotePlayerReady();
 
-                    // Send position & angle data
-                    sendLocalPositionData();
+                }else {
 
-                    // Retrieve position & angle data
-                    retrieveRemotePositionData();
+                    if ((currentFrame % connectionFrequency == 0) && (lastFrameChecked != currentFrame)) {
 
-                    // Send event flag data
-                    sendLocalEventData();
+                        lastFrameChecked = currentFrame;
 
-                    // Retrieve event flag data
-                    retrieveRemoteEventData();
+                        // Send position & angle data
+                        sendLocalPositionData();
+
+                        // Retrieve position & angle data
+                        retrieveRemotePositionData();
+
+                        // Send event flag data
+                        sendLocalEventData();
+
+                        // Retrieve event flag data
+                        retrieveRemoteEventData();
+
+                    }
 
                 }
 
@@ -1236,16 +1258,42 @@ public class GameActivity extends AppCompatActivity {
 
         }
 
+        private void notifyLocalPlayerReady(){
+
+            // Set the playerX_ready column to 1 on the server database.
+
+            getJSON("https://pis04-ub.herokuapp.com/send_local_ready.php?matchId=" + matchId
+                    + "&player=" + assignedPlayer
+                    + "&ready=" + 1, 2000);
+
+        }
+
+        private void checkRemotePlayerReady(){
+
+            // This returns a JSON object with a {"ready": int} pattern.
+            // This int represents a boolean status and will be either 0 or 1.
+
+            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_ready.php?matchId=" + matchId
+                    + "&player=" + oppositePlayer, 2000);
+
+            int ready = new Gson().fromJson(data, int.class);
+
+            if (ready == 1){
+                remotePlayerReady = true;
+            }
+
+        }
+
         private void sendLocalEventData() {
 
-            if (localEventIndex > lastReadLocalEventIndex) {
+            if (localEventIndex > lastReadLocalEventIndex){
 
                 int eventNumber = localActiveEvent.ordinal();
 
                 getJSON("https://pis04-ub.herokuapp.com/send_local_event.php?matchId=" + matchId
-                                + "&player=" + assignedPlayer
-                                + "&event=" + eventNumber
-                                + "&eventIndex=" + localEventIndex,
+                        + "&player=" + assignedPlayer
+                        + "&event=" + eventNumber
+                        + "&eventIndex=" + localEventIndex,
                         2000);
 
                 lastReadLocalEventIndex = localEventIndex;
@@ -1254,7 +1302,7 @@ public class GameActivity extends AppCompatActivity {
 
         }
 
-        private void retrieveRemoteEventData() {
+        private void retrieveRemoteEventData(){
 
             //This returns a JSON object with a {"eventIndex": int, "event": int} pattern.
             String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_event.php?matchId=" + matchId
@@ -1268,8 +1316,8 @@ public class GameActivity extends AppCompatActivity {
             // Set event and eventIndex variables retrieved from JSON to the remoteActiveEvent and
             // remoteEventIndex global variables.
             // These variables will be used to process events locally on the next frame.
-            if (p != null) {
-                if (p.eventIndex > remoteEventIndex) {
+            if (p != null){
+                if (p.eventIndex > remoteEventIndex){
 
                     System.out.println("This event is new");
 
@@ -1284,10 +1332,10 @@ public class GameActivity extends AppCompatActivity {
         private void sendLocalPositionData() {
 
             getJSON("https://pis04-ub.herokuapp.com/send_local_position.php?matchId=" + matchId
-                            + "&player=" + assignedPlayer
-                            + "&x=" + localPosition.x
-                            + "&y=" + localPosition.y
-                            + "&angle=" + localAngle,
+                    + "&player=" + assignedPlayer
+                    + "&x=" + localPosition.x
+                    + "&y=" + localPosition.y
+                    + "&angle=" + localAngle,
                     2000);
 
             System.out.println(localAngle);
@@ -1375,12 +1423,12 @@ public class GameActivity extends AppCompatActivity {
         return null;
     }
 
-    private class EventIndexPair {
+    private class EventIndexPair{
         int eventIndex;
         Event event;
     }
 
-    private class PointAnglePair {
+    private class PointAnglePair{
         int x;
         int y;
         float angle;

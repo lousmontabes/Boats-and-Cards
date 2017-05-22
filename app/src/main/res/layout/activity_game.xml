@@ -29,7 +29,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/timer"
                 android:gravity="center"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:fontFamily="sans-serif" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -87,6 +88,22 @@
             android:id="@+id/treasureImageView"
             android:layout_width="70dp"
             android:layout_height="70dp" />
+
+        <TextView
+            android:text="Getting started..."
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/centerTextView"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textStyle="normal|bold|italic"
+            android:fontFamily="sans-serif-condensed"
+            android:shadowDx="50"
+            android:shadowDy="50"
+            android:shadowColor="@color/shadow"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="42sp"
+            android:textAllCaps="false" />
 
     </RelativeLayout>
 
