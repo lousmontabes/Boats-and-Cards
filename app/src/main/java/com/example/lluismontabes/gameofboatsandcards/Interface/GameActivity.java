@@ -68,7 +68,7 @@ public class GameActivity extends AppCompatActivity {
     // Connection
     RemoteDataTask remoteTask;
     boolean connectionActive = true;
-    int connectionFrequency = 6;
+    int connectionFrequency = 1;
     int lastFrameChecked = 0;
     float latency;
     boolean lastCheckSuccessful = false;
@@ -542,16 +542,16 @@ public class GameActivity extends AppCompatActivity {
     public void onBackPressed() {
         new AlertDialog.Builder(GameActivity.this)
                 .setTitle("Exit Game")
-                .setMessage("Are you sure you want to forfeit?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setMessage("Are you sure you want to quit the match? This will result in a loss.")
+                .setNegativeButton("No, continue playing", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setPositiveButton("Yes, quit", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         gameFinished = true;
                         finish();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -739,6 +739,8 @@ public class GameActivity extends AppCompatActivity {
             i.putExtra("shotsHitStats", shotsHitStats);
 
             startActivity(i);
+
+            connectionActive = false;
             finish();
         }
     }
@@ -891,14 +893,10 @@ public class GameActivity extends AppCompatActivity {
                     System.out.println("New remote position detected");
 
                     lastReadRemotePosition = remotePosition;
-
-
-                    //remotePlayer.moveTo(remotePosition);
                 }
-                remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getAngle()), remoteAngle);
-                remotePlayer.moveInCurve(remoteCurve);
-
-                //remotePlayer.moveInCurve();
+                //remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
+                //remotePlayer.moveInCurve(remoteCurve);
+                remotePlayer.moveTo(remotePosition);
 
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
@@ -1216,6 +1214,8 @@ public class GameActivity extends AppCompatActivity {
     // Asynchronous task that retrieves the remote player's actions
     public class RemoteDataTask extends AsyncTask<String, String, Void> {
 
+        private boolean running = true;
+
         protected void onPreExecute() {
             super.onPreExecute();
         }
@@ -1435,8 +1435,6 @@ public class GameActivity extends AppCompatActivity {
         int x;
         int y;
         float angle;
-
-
     }
 
 }
