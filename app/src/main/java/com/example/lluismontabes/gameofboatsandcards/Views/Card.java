@@ -140,11 +140,11 @@ public class  Card {
             case 8:
                 return R.drawable.placeholder3;
             case 9:
-                return R.drawable.placeholder3;
+                return R.drawable.ko;
             case 10:
-                return R.drawable.placeholder4;
+                return R.drawable.quick_revive;
             case 11:
-                return R.drawable.placeholder5;
+                return R.drawable.full_heal;
             case 12:
                 return R.drawable.rand_warp;
             default:
