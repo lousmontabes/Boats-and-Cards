@@ -1276,7 +1276,7 @@ public class GameActivity extends AppCompatActivity {
             String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_ready.php?matchId=" + matchId
                     + "&player=" + oppositePlayer, 2000);
 
-            int ready = new Gson().fromJson(data, int.class);
+            int ready = Integer.parseInt(data);
 
             if (ready == 1){
                 remotePlayerReady = true;
