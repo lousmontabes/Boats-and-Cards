@@ -249,7 +249,7 @@ public class GameActivity extends AppCompatActivity {
     /**
      * CARDS & CARD EFFECTS
      **/
-    private int[] cardEffects;
+    private short[] cardEffects;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -310,7 +310,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initializeCardEffects() {
-        cardEffects = new int[Card.TOTAL_CARD_NUMBER * 2];
+        cardEffects = new short[Card.TOTAL_CARD_NUMBER * 2];
     }
 
     private void initializeListeners() {
@@ -1127,26 +1127,27 @@ public class GameActivity extends AppCompatActivity {
         if (player.isAlive()) {
             Card usedCard = cardZone.removeCard(n);
 
-            int effect = usedCard.getEffect();
-            int duration = usedCard.getDuration();
+            Card.Effect effect = usedCard.getEffect();
 
             switch (usedCard.getTarget()) {
 
-                case Card.Target.SELF:
-                    addEffect(effect, duration);
+                case SELF:
+                    addEffect(effect);
                     break;
 
-                case Card.Target.OPPONENT:
-                    addEffect(effect, duration);
+                case OPPONENT:
+                    addEffect(effect);
                     break;
 
-                case Card.Target.ALL:
-                    addEffect(effect, duration);
+                case ALL:
+                    addEffect(effect);
                     break;
 
             }
 
-            showPlayerPopup(localPlayer, usedCard.getEffectName(), 1000, false);
+            if (usedCard.getEffect() != FULL_RESTORATION) { // Case handled separately
+                showPlayerPopup(localPlayer, usedCard.getEffect().getName(), 1000, false);
+            }
 
             cardsUsedStats++;
 
@@ -1161,7 +1162,7 @@ public class GameActivity extends AppCompatActivity {
         if (isEffectActive(DISCARD_ONE)) cardZone.discardOne();
         if (isEffectActive(KO)) {
             localPlayer.die(isEffectActive(QUICK_REVIVE));
-            addEffect(QUICK_REVIVE, 0);
+            removeEffect(QUICK_REVIVE);
             activateEventFlag(Event.LOCAL_PLAYER_DIED);
         }
         if (isEffectActive(FULL_RESTORATION)) {
@@ -1190,12 +1191,16 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void addEffect(int effect, int duration) {
-        cardEffects[effect] = duration;
+    private void addEffect(Card.Effect effect) {
+        cardEffects[effect.ordinal()] = effect.getDuration();
     }
 
-    private boolean isEffectActive(Card.Effect e) {
-        return cardEffects[e] != 0;
+    private void removeEffect(Card.Effect effect) {
+        cardEffects[effect.ordinal()] = 0;
+    }
+
+    private boolean isEffectActive(Card.Effect effect) {
+        return cardEffects[effect.ordinal()] != 0;
     }
 
     private void improveVisibilityCardZone(float maxDistance, float minDistance, int minAlpha) {

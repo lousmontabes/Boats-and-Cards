@@ -1,9 +1,9 @@
 package com.example.lluismontabes.gameofboatsandcards.Views;
 
 
-import android.support.annotation.NonNull;
-
 import com.example.lluismontabes.gameofboatsandcards.R;
+
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Target.*;
 
 
 /**
@@ -21,43 +21,54 @@ public class Card {
 
     // Possible effects of the cards
     public enum Effect {
-        SPEED_UP, ATTACK_UP, FULL_RESTORATION,
-        STUNNED, REVERSED_HAND, DISCARD_ONE,
-        REVERSED_CONTROLS, TRIPLE_SHOT, DISPEL,
-        KO, QUICK_REVIVE, RANDOM_WARP
+        SPEED_UP(MEDIUM, "Speed up!"),
+        ATTACK_UP(MEDIUM, "Attack up!"),
+        FULL_RESTORATION(INSTANT, ""),
+        STUNNED(SHORT, "Immobilized!"),
+        REVERSED_HAND(LONG, "Cards reversed!"),
+        DISCARD_ONE(INSTANT, "One card discarded!"),
+        REVERSED_CONTROLS(MEDIUM, "Backwards!"),
+        TRIPLE_SHOT(MEDIUM, "Multi-shot!"),
+        DISPEL(INSTANT, "All effects removed!"),
+        KO(INSTANT, "YOU DIED"),
+        QUICK_REVIVE(INFINITE, "Quick revive!"),
+        RANDOM_WARP(INSTANT, "Random warp!");
+
+        private short duration;
+        private String name;
+
+        Effect(short duration, String name) {
+            this.duration = duration;
+            this.name = name;
+        }
+
+        public short getDuration() {
+            return duration;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
-    // Length of the duration of the effects, in frames
-    public static final class Duration {
-        public static final short INSTANT = 1;
-        public static final short SHORT = 60; // 2 seconds
-        public static final short MEDIUM = 180; // 6 seconds
-        public static final short LONG = 450; // 15 seconds
-        public static final short INFINITE = -1;
-    }
+
+    //Duration constants, in frames
+    public static final short INSTANT = 1;
+    public static final short SHORT = 60; // 2 seconds
+    public static final short MEDIUM = 180; // 6 seconds
+    public static final short LONG = 450; // 15 seconds
+    public static final short INFINITE = -1;
 
     private Target target;
     private byte id;
     private Effect effect;
-    private short duration;
-    private String effectName;
     private boolean reversed;
-
-    public Effect getEffect() {
-        return effect;
-    }
-
-    public short getDuration() {
-        return duration;
-    }
 
     /**
      * Random card constructor.
      */
     public Card() {
-        id = (byte) (Math.random() * TOTAL_CARD_NUMBER + 1);
+        id = (byte) (Math.random() * TOTAL_CARD_NUMBER);
         effect = getEffect(id);
-        duration = getDuration(effect);
-        effectName = getEffectName(effect);
         target = getTarget(effect);
         reversed = false;
     }
@@ -70,8 +81,6 @@ public class Card {
     public Card(byte id) {
         this.id = id;
         effect = getEffect(id);
-        duration = getDuration(effect);
-        effectName = getEffectName(effect);
         target = getTarget(effect);
         reversed = false;
     }
@@ -80,49 +89,18 @@ public class Card {
         return id;
     }
 
-    public static String getEffectName(Effect effect) {
-        switch (effect) {
-            case ATTACK_UP:
-                return "Attack up!";
-            case STUNNED:
-                return "Immobilized!";
-            case SPEED_UP:
-                return "Speed up!";
-            case REVERSED_HAND:
-                return "Cards reversed!";
-            case DISCARD_ONE:
-                return "One card discarded!";
-            case REVERSED_CONTROLS:
-                return "Backwards!";
-            case TRIPLE_SHOT:
-                return "Multi-shot!";
-            case DISPEL:
-                return "All effects removed!";
-            case KO:
-                return "YOU DIED";
-            case QUICK_REVIVE:
-                return "Quick revive!";
-            case FULL_RESTORATION:
-                return "";
-            case RANDOM_WARP:
-                return "Random warp!";
-            default:
-                return "Carta ?";
-        }
-    }
-
-    public String getEffectName() {
-        return effectName;
+    public Effect getEffect() {
+        return effect;
     }
 
     public static Target getTarget(Effect effect) {
-        switch(effect) {
+        switch (effect) {
             case ATTACK_UP:
             case SPEED_UP:
             case FULL_RESTORATION:
             case TRIPLE_SHOT:
             case QUICK_REVIVE:
-                return Target.SELF;
+                return SELF;
             case STUNNED:
             case REVERSED_HAND:
             case REVERSED_CONTROLS:
@@ -201,32 +179,6 @@ public class Card {
                 return Effect.FULL_RESTORATION;
             case 12:
                 return Effect.RANDOM_WARP;
-            default:
-                throw new UnknownError();
-        }
-    }
-
-    public static short getDuration(Effect effect) {
-        switch (effect) {
-            //TODO: specify the duration of all effects
-            // Duration in frames
-            case FULL_RESTORATION:
-            case DISCARD_ONE:
-            case DISPEL:
-            case KO:
-            case RANDOM_WARP:
-                return Duration.INSTANT;
-            case STUNNED:
-                return Duration.SHORT;
-            case SPEED_UP:
-            case ATTACK_UP:
-            case TRIPLE_SHOT:
-            case REVERSED_CONTROLS:
-                return Duration.MEDIUM;
-            case REVERSED_HAND:
-                return Duration.LONG;
-            case QUICK_REVIVE:
-                return Duration.INFINITE;
             default:
                 throw new UnknownError();
         }
