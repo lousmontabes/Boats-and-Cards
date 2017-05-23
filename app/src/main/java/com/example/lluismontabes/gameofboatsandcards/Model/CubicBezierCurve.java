@@ -101,8 +101,8 @@ public class CubicBezierCurve {
         this.p2 = new Point(p3);
         p2.offset(100 * (int) Math.cos(b), 100 * (int) Math.sin(b));
         this.p3 = p3;
-        this.a = a;
-        this.b = b;
+        this.a = a + (float) Math.PI / 2;
+        this.b = b + (float) Math.PI / 2;
         System.out.println("New Bezier curve:\nP0: " + p0 + " - P1: " + p1 + " - P2: " + p2 + " - P3: " + p3 + "\nα:" + this.a + " - β:" + this.b);
     }
 

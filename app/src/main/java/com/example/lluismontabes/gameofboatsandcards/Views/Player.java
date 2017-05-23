@@ -279,7 +279,7 @@ public class Player extends RectangularCollider {
     public void moveInCurve(CubicBezierCurve curve) {
         p += 0.025f;
         this.setRotation(curve.getAngleAt(p % 1));
-        this.setPosition(curve.getPointAt(p % 1));
+        this.moveTo(curve.getPointAt(p % 1));
     }
 
     public void rotateTo(float a) {

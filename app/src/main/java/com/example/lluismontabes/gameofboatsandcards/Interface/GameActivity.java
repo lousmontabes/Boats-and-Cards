@@ -81,6 +81,7 @@ public class GameActivity extends AppCompatActivity {
     Point lastReadRemotePosition = new Point(0, 0);
     Point remotePosition = new Point(0, 0);
     Point localPosition = new Point(0, 0);
+    float lastReadRemoteAngle = 0;
     float remoteAngle = 0;
     float localAngle = 0;
 
@@ -766,7 +767,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }
 
-        if (localPlayerInside) {
+        if (localPlayerInside && !remotePlayerInside) {
 
             if (--framesUntilTickLocal == 0) {
 
@@ -796,7 +797,7 @@ public class GameActivity extends AppCompatActivity {
             textViewCounterLocal.setTextColor(getResources().getColor(R.color.counterStopped));
         }
 
-        if (remotePlayerInside) {
+        if (remotePlayerInside && !localPlayerInside) {
 
             if (--framesUntilTickRemote == 0) {
 
@@ -888,15 +889,23 @@ public class GameActivity extends AppCompatActivity {
                 localPosition.set((int) localPlayer.getX(), (int) localPlayer.getY());
                 localAngle = (float) Math.toDegrees(localPlayer.getAngle());
 
+                if (currentFrame % 10 == 9) remoteCurve.set(lastReadRemotePosition, remotePosition, lastReadRemoteAngle, remoteAngle);
+
                 // Move remotePlayer to the retrieved position
                 if (remotePosition != lastReadRemotePosition){
                     System.out.println("New remote position detected");
 
                     lastReadRemotePosition = remotePosition;
                 }
+                if (remoteAngle != lastReadRemoteAngle){
+                    System.out.println("New remote angle detected");
+
+                    lastReadRemoteAngle = remoteAngle;
+                }
                 //remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
-                //remotePlayer.moveInCurve(remoteCurve);
-                remotePlayer.moveTo(remotePosition);
+                remotePlayer.moveInCurve(remoteCurve);
+
+                //remotePlayer.moveTo(remotePosition);
 
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
@@ -1185,7 +1194,7 @@ public class GameActivity extends AppCompatActivity {
         cardEffects[effect] = duration;
     }
 
-    private boolean isEffectActive(int e) {
+    private boolean isEffectActive(Card.Effect e) {
         return cardEffects[e] != 0;
     }
 

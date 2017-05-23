@@ -5,91 +5,106 @@ import android.support.annotation.NonNull;
 
 import com.example.lluismontabes.gameofboatsandcards.R;
 
+
 /**
  * Created by olekboad13.alumnes on 31/03/17.
  */
 
-public class  Card {
+public class Card {
 
-    public static final int TOTAL_CARD_NUMBER = 12;
+    public static final byte TOTAL_CARD_NUMBER = 12;
 
     // Target of the effect of the card
-    public static final class Target {
-        public static final int SELF = 0;
-        public static final int OPPONENT = 1;
-        public static final int ALL = 2;
+    public enum Target {
+        SELF, OPPONENT, ALL
     }
 
     // Possible effects of the cards
-    public static final class Effect {
-        public static final int SPEED_UP = 0;
-        public static final int ATTACK_UP = 1;
-        public static final int FULL_RESTORATION = 2;
-        public static final int STUNNED = 3;
-        public static final int REVERSED_HAND = 4;
-        public static final int DISCARD_ONE = 5;
-        public static final int REVERSED_CONTROLS = 6;
-        public static final int TRIPLE_SHOT = 7;
-        public static final int DISPEL = 8;
-        public static final int KO = 9;
-        public static final int QUICK_REVIVE = 10;
-        public static final int RANDOM_WARP = 11;
+    public enum Effect {
+        SPEED_UP, ATTACK_UP, FULL_RESTORATION,
+        STUNNED, REVERSED_HAND, DISCARD_ONE,
+        REVERSED_CONTROLS, TRIPLE_SHOT, DISPEL,
+        KO, QUICK_REVIVE, RANDOM_WARP
+    }
+    // Length of the duration of the effects, in frames
+    public static final class Duration {
+        public static final short INSTANT = 1;
+        public static final short SHORT = 60; // 2 seconds
+        public static final short MEDIUM = 180; // 6 seconds
+        public static final short LONG = 450; // 15 seconds
+        public static final short INFINITE = -1;
     }
 
-    private int target;
-    private int id;
+    private Target target;
+    private byte id;
+    private Effect effect;
+    private short duration;
     private String effectName;
     private boolean reversed;
+
+    public Effect getEffect() {
+        return effect;
+    }
+
+    public short getDuration() {
+        return duration;
+    }
 
     /**
      * Random card constructor.
      */
     public Card() {
-        id = (int) (Math.random() * TOTAL_CARD_NUMBER) + 1;
-        effectName = getEffectName(id);
-        target = getTarget(id);
+        id = (byte) (Math.random() * TOTAL_CARD_NUMBER + 1);
+        effect = getEffect(id);
+        duration = getDuration(effect);
+        effectName = getEffectName(effect);
+        target = getTarget(effect);
         reversed = false;
     }
 
     /**
      * Specific card constructor.
-     * @param id    Type of the card to create.
+     *
+     * @param id Type of the card to create.
      */
-    public Card(int id) {
+    public Card(byte id) {
         this.id = id;
-        effectName = getEffectName(id);
-        target = getTarget(id);
+        effect = getEffect(id);
+        duration = getDuration(effect);
+        effectName = getEffectName(effect);
+        target = getTarget(effect);
+        reversed = false;
     }
 
-    public int getId() {
+    public byte getId() {
         return id;
     }
 
-    public static String getEffectName(int id) {
-        switch(id) {
-            case 1:
+    public static String getEffectName(Effect effect) {
+        switch (effect) {
+            case ATTACK_UP:
                 return "Attack up!";
-            case 2:
+            case STUNNED:
                 return "Immobilized!";
-            case 3:
+            case SPEED_UP:
                 return "Speed up!";
-            case 4:
+            case REVERSED_HAND:
                 return "Cards reversed!";
-            case 5:
+            case DISCARD_ONE:
                 return "One card discarded!";
-            case 6:
+            case REVERSED_CONTROLS:
                 return "Backwards!";
-            case 7:
+            case TRIPLE_SHOT:
                 return "Multi-shot!";
-            case 8:
+            case DISPEL:
                 return "All effects removed!";
-            case 9:
+            case KO:
                 return "YOU DIED";
-            case 10:
+            case QUICK_REVIVE:
                 return "Quick revive!";
-            case 11:
+            case FULL_RESTORATION:
                 return "";
-            case 12:
+            case RANDOM_WARP:
                 return "Random warp!";
             default:
                 return "Carta ?";
@@ -100,21 +115,29 @@ public class  Card {
         return effectName;
     }
 
-    public static int getTarget(int id) {
-        return Target.SELF;
-        /*switch(id) {
-            case 1:
+    public static Target getTarget(Effect effect) {
+        switch(effect) {
+            case ATTACK_UP:
+            case SPEED_UP:
+            case FULL_RESTORATION:
+            case TRIPLE_SHOT:
+            case QUICK_REVIVE:
                 return Target.SELF;
-            case 2:
+            case STUNNED:
+            case REVERSED_HAND:
+            case REVERSED_CONTROLS:
+            case DISCARD_ONE:
                 return Target.OPPONENT;
-            case 3:
+            case DISPEL:
+            case KO:
+            case RANDOM_WARP:
                 return Target.ALL;
             default:
                 throw new UnknownError();
-        }*/
+        }
     }
 
-    public int getTarget() {
+    public Target getTarget() {
         return target;
     }
 
@@ -122,37 +145,37 @@ public class  Card {
         if (reversed) {
             return R.drawable.reversed_card;
         }
-        switch(id) {
-            case 1:
+        switch (effect) {
+            case ATTACK_UP:
                 return R.drawable.attack_up;
-            case 2:
+            case STUNNED:
                 return R.drawable.stunned;
-            case 3:
+            case SPEED_UP:
                 return R.drawable.speed_up;
-            case 4:
+            case REVERSED_HAND:
                 return R.drawable.reversed_hand;
-            case 5:
+            case DISCARD_ONE:
                 return R.drawable.discard_one;
-            case 6:
+            case REVERSED_CONTROLS:
                 return R.drawable.backwards;
-            case 7:
+            case TRIPLE_SHOT:
                 return R.drawable.multishot;
-            case 8:
+            case DISPEL:
                 return R.drawable.placeholder3;
-            case 9:
+            case KO:
                 return R.drawable.ko;
-            case 10:
+            case QUICK_REVIVE:
                 return R.drawable.quick_revive;
-            case 11:
+            case FULL_RESTORATION:
                 return R.drawable.full_heal;
-            case 12:
+            case RANDOM_WARP:
                 return R.drawable.rand_warp;
             default:
-                return R.drawable.void_card_resized;
+                throw new UnknownError();
         }
     }
 
-    public int getEffect() {
+    public static Effect getEffect(byte id) {
         switch (id) {
             case 1:
                 return Effect.ATTACK_UP;
@@ -183,20 +206,29 @@ public class  Card {
         }
     }
 
-    public int getDuration() {
-        switch (id) {
+    public static short getDuration(Effect effect) {
+        switch (effect) {
             //TODO: specify the duration of all effects
             // Duration in frames
-            case 5:
-            case 8:
-            case 9:
-            case 11:
-            case 12:
-                return 1;//Instant
-            case 10:
-                return -1;//Infinite
+            case FULL_RESTORATION:
+            case DISCARD_ONE:
+            case DISPEL:
+            case KO:
+            case RANDOM_WARP:
+                return Duration.INSTANT;
+            case STUNNED:
+                return Duration.SHORT;
+            case SPEED_UP:
+            case ATTACK_UP:
+            case TRIPLE_SHOT:
+            case REVERSED_CONTROLS:
+                return Duration.MEDIUM;
+            case REVERSED_HAND:
+                return Duration.LONG;
+            case QUICK_REVIVE:
+                return Duration.INFINITE;
             default:
-                return 150;
+                throw new UnknownError();
         }
     }
 

@@ -100,7 +100,7 @@ public class AnimationsActivity extends Activity {
         thumb1View.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                expandedImageView.setVisibility(View.GONE);
+                //expandedImageView.setVisibility(View.GONE);
                 reverseImage = reverse_of_multishot;
                 zoomImageFromThumb(thumb1View, R.drawable.multishot_collection2);
             }
