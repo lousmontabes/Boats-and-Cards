@@ -55,7 +55,6 @@ public class IslandDomain extends RoundCollider {
     @Override
     protected void onDraw(Canvas canvas){
         canvas.drawCircle(this.getRadiusPixels(), this.getRadiusPixels(), this.getRadiusPixels(), islandPaint);
-        System.out.println("ISLA DIBUJADA");
     }
 
     public void toggleInvadedStatus(boolean invaderIsLocal){

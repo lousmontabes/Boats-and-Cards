@@ -179,6 +179,7 @@ public class GameActivity extends AppCompatActivity {
      **/
     // Scores
     int localScore = 0;
+    boolean localPlayerScoring = false;
     int remoteScore = 0;
 
     // Time
@@ -296,16 +297,6 @@ public class GameActivity extends AppCompatActivity {
 
         remoteTask = new RemoteDataTask();
         remoteTask.execute();
-
-    }
-
-    private void waitForRemotePlayerReady() {
-
-        while (!remotePlayerReady){
-
-            System.out.println("Waiting for remotePlayer to be ready");
-
-        }
 
     }
 
@@ -439,8 +430,9 @@ public class GameActivity extends AppCompatActivity {
     private void initializePlayers() {
 
         localPlayer = new Player(GameActivity.this, null);
-        remotePlayer = new Player(GameActivity.this, null);
+        localPlayer.setMoving(true);
 
+        remotePlayer = new Player(GameActivity.this, null);
         remotePlayer.setMaxVelocity();
 
         //localPlayer.showHitbox();
@@ -480,17 +472,19 @@ public class GameActivity extends AppCompatActivity {
 
         if (player.canShoot()) {
 
+            float angle = player.getAngle(); // Radians
+
             float pW = player.getWidth();
             float pH = player.getHeight();
-            float oX = player.getX() + pW / 2;
-            float oY = player.getY() + pH / 2;
+            float oX = player.getX() + pW * Math.max(0.5f, (float) Math.cos(angle));
+            float oY = player.getY() + pH * Math.max(0.5f, (float) Math.sin(angle));
             int baseDamage = 20;
 
             if (isEffectActive(Card.Effect.ATTACK_UP)) {
                 baseDamage *= 2;
             }
 
-            Projectile projectile = new Projectile(GameActivity.this, player.getAngle(), oX, oY, baseDamage);
+            Projectile projectile = new Projectile(GameActivity.this, angle, oX, oY, baseDamage);
             GameActivity.this.activeProjectiles.add(projectile);
             GameActivity.this.activeColliders.add(projectile);
 
@@ -499,6 +493,7 @@ public class GameActivity extends AppCompatActivity {
             if (player == localPlayer){
                 activateEventFlag(Event.LOCAL_PLAYER_FIRED);
                 shotsFiredStats++;
+                player.restoreFireCooldown();
             }
 
             /*if (fireSound.isPlaying()) fireSound.stop();
@@ -506,11 +501,11 @@ public class GameActivity extends AppCompatActivity {
 
             if (isEffectActive(Card.Effect.TRIPLE_SHOT)) {
 
-                Projectile projectileL = new Projectile(GameActivity.this, player.getAngle() - .3f, oX, oY, baseDamage);
+                Projectile projectileL = new Projectile(GameActivity.this, angle - .3f, oX, oY, baseDamage);
                 GameActivity.this.activeProjectiles.add(projectileL);
                 GameActivity.this.activeColliders.add(projectileL);
 
-                Projectile projectileR = new Projectile(GameActivity.this, player.getAngle() + .3f, oX, oY, baseDamage);
+                Projectile projectileR = new Projectile(GameActivity.this, angle + .3f, oX, oY, baseDamage);
                 GameActivity.this.activeProjectiles.add(projectileR);
                 GameActivity.this.activeColliders.add(projectileR);
 
@@ -520,7 +515,6 @@ public class GameActivity extends AppCompatActivity {
                 if (player == localPlayer) shotsFiredStats += 2;
             }
 
-            player.restoreFireCooldown();
         }
 
     }
@@ -748,6 +742,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void advanceCounter() {
 
+        // CLOCK
         frameLog.setText(Integer.toString(currentFrame));
 
         if (currentFrame % fps == 0) {
@@ -767,6 +762,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }
 
+        // LOCAL PLAYER SCORING
         if (localPlayerInside && !remotePlayerInside) {
 
             if (--framesUntilTickLocal == 0) {
@@ -775,7 +771,6 @@ public class GameActivity extends AppCompatActivity {
 
                     localScore++;
                     framesUntilTickLocal = fps / 2;
-                    textViewCounterLocal.setText(Integer.toString(localScore) + "%");
 
                     showPlayerPopup(localPlayer, "+1", 250, true);
 
@@ -787,17 +782,20 @@ public class GameActivity extends AppCompatActivity {
                     // localPlayer reached 100% score.
                     finishGame();
                 }
-
             }
 
+            localPlayerScoring = true;
             textViewCounterLocal.setTextColor(getResources().getColor(R.color.localCounterActive));
 
         } else {
+
+            localPlayerScoring = false;
             framesUntilTickLocal = fps / 2;
             textViewCounterLocal.setTextColor(getResources().getColor(R.color.counterStopped));
+
         }
 
-        if (remotePlayerInside && !localPlayerInside) {
+        /*if (remotePlayerInside && !localPlayerInside) {
 
             if (--framesUntilTickRemote == 0) {
 
@@ -825,7 +823,11 @@ public class GameActivity extends AppCompatActivity {
         } else {
             framesUntilTickRemote = fps / 2;
             textViewCounterRemote.setTextColor(getResources().getColor(R.color.counterStopped));
-        }
+        }*/
+
+        // SCORE COUNTERS
+        textViewCounterLocal.setText(Integer.toString(localScore) + "%");
+        textViewCounterRemote.setText(Integer.toString(remoteScore) + "%");
 
     }
 
@@ -894,7 +896,7 @@ public class GameActivity extends AppCompatActivity {
                 // Move remotePlayer to the retrieved position
                 if (remotePosition != lastReadRemotePosition){
                     System.out.println("New remote position detected");
-
+                    remotePlayer.setMoving(true);
                     lastReadRemotePosition = remotePosition;
                 }
                 if (remoteAngle != lastReadRemoteAngle){
@@ -921,7 +923,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * Handle remote event prevoiusly retreived from server.
+     * Handle remote event previously retrieved from server.
      */
     private void handleRemoteEvent() {
 
@@ -947,6 +949,7 @@ public class GameActivity extends AppCompatActivity {
                     break;
 
                 case LOCAL_PLAYER_FIRED:
+                    System.out.println("Remote player fired");
                     playerShoot(remotePlayer);
                     break;
 
@@ -960,7 +963,7 @@ public class GameActivity extends AppCompatActivity {
 
             }
 
-            remoteEventIndex = lastReadRemoteEventIndex;
+            lastReadRemoteEventIndex = remoteEventIndex;
 
         }
 
@@ -1242,6 +1245,7 @@ public class GameActivity extends AppCompatActivity {
 
                 if (!remotePlayerReady){
 
+                    // Ask the server if the remote player is ready yet.
                     checkRemotePlayerReady();
 
                 }else {
@@ -1249,6 +1253,12 @@ public class GameActivity extends AppCompatActivity {
                     if ((currentFrame % connectionFrequency == 0) && (lastFrameChecked != currentFrame)) {
 
                         lastFrameChecked = currentFrame;
+
+                        // Send local scoring data
+                        sendLocalScoreData();
+
+                        // Retreive both players' scoring data
+                        retrieveScoringData();
 
                         // Send position & angle data
                         sendLocalPositionData();
@@ -1272,10 +1282,38 @@ public class GameActivity extends AppCompatActivity {
 
         }
 
+        private void sendLocalScoreData() {
+
+            getJSON("https://pis04-ub.herokuapp.com/send_local_score.php?matchId=" + matchId
+                    + "&player=" + assignedPlayer
+                    + "&score=" + localScore, 2000);
+
+        }
+
+        private void retrieveScoringData() {
+
+            //This returns a JSON object with a {"score1": int, "score2": int} pattern.
+            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_scores.php?matchId=" + matchId, 2000);
+
+            // Parse the JSON information into a ScorePair object.
+            ScorePair p = new Gson().fromJson(data, ScorePair.class);
+
+            // Set score1 and score2 variables retrieved from JSON to the localScore and
+            // remoteScore global variables.
+            if (p != null){
+                if(assignedPlayer == 1 || assignedPlayer == -1){
+                    //localScore = p.score1;
+                    remoteScore = p.score2;
+                }else{
+                    //localScore = p.score2;
+                    remoteScore = p.score1;
+                }
+            }
+        }
+
         private void notifyLocalPlayerReady(){
 
             // Set the playerX_ready column to 1 on the server database.
-
             getJSON("https://pis04-ub.herokuapp.com/send_local_ready.php?matchId=" + matchId
                     + "&player=" + assignedPlayer
                     + "&ready=" + 1, 2000);
@@ -1284,9 +1322,7 @@ public class GameActivity extends AppCompatActivity {
 
         private void checkRemotePlayerReady(){
 
-            // This returns a JSON object with a {"ready": int} pattern.
-            // This int represents a boolean status and will be either 0 or 1.
-
+            // This returns a string containing either 1 or 0, representing a boolean value.
             String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_ready.php?matchId=" + matchId
                     + "&player=" + oppositePlayer, 2000);
 
@@ -1325,8 +1361,6 @@ public class GameActivity extends AppCompatActivity {
             String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_event.php?matchId=" + matchId
                     + "&player=" + oppositePlayer, 2000);
 
-            System.out.println(currentFrame + ": REMOTE EVENT " + data);
-
             // Parse the JSON information into an EventIndexPair object.
             EventIndexPair p = new Gson().fromJson(data, EventIndexPair.class);
 
@@ -1336,7 +1370,9 @@ public class GameActivity extends AppCompatActivity {
             if (p != null){
                 if (p.eventIndex > remoteEventIndex){
 
-                    System.out.println("This event is new");
+                    System.out.println("New remote event");
+                    System.out.println("Remote event index: " + p.eventIndex);
+                    System.out.println("Remote event type: " + p.event);
 
                     remoteActiveEvent = p.event;
                     remoteEventIndex = p.eventIndex;
@@ -1449,6 +1485,11 @@ public class GameActivity extends AppCompatActivity {
         int x;
         int y;
         float angle;
+    }
+
+    private class ScorePair{
+        int score1;
+        int score2;
     }
 
 }

@@ -93,17 +93,19 @@ public class CubicBezierCurve {
      * @param b  Finishing angle in rad.
      */
     public void set(Point p0, Point p3, float a, float b){
-        this.p0 = p0;
-        //this.p1 = new Point((int) (p0.x + 40 * Math.cos(Math.toRadians(a))), (int) (p0.y + 40 * Math.sin(Math.toRadians(a))));
-        //this.p2 = new Point((int) (p3.x + 40 * Math.cos(Math.toRadians(b))), (int) (p3.y + 40 * Math.sin(Math.toRadians(b))));
-        this.p1 = new Point(p0);
-        p1.offset(100 * (int) Math.cos(a), 100 * (int) Math.sin(a));
-        this.p2 = new Point(p3);
-        p2.offset(100 * (int) Math.cos(b), 100 * (int) Math.sin(b));
-        this.p3 = p3;
+
         this.a = a + (float) Math.PI / 2;
         this.b = b + (float) Math.PI / 2;
-        System.out.println("New Bezier curve:\nP0: " + p0 + " - P1: " + p1 + " - P2: " + p2 + " - P3: " + p3 + "\nα:" + this.a + " - β:" + this.b);
+
+        this.p0 = p0;
+
+        this.p1 = new Point(p0);
+        p1.offset((int) (100 * Math.cos(a)), (int) (100 * Math.sin(a)));
+
+        this.p2 = new Point(p3);
+        p2.offset((int) (100 * Math.cos(b)), (int) (100 * Math.sin(b)));
+
+        this.p3 = p3;
     }
 
     /**

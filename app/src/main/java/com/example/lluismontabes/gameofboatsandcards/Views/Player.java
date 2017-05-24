@@ -44,8 +44,9 @@ public class Player extends RectangularCollider {
     private float y;
     private float angle;
 
-    // Parameter for curved movement
+    // Parameters for curved movement
     float p = 0;
+    boolean moving = false;
 
     /**
      * HEALTH & GAMEPLAY PARAMETERS
@@ -127,6 +128,8 @@ public class Player extends RectangularCollider {
         this.velocity = MAX_VELOCITY;
     }
 
+    public void setMoving(boolean m) { this.moving = m; }
+
     // GETTERS
     public Point getPosition(){
         return new Point((int) (this.getX()), (int) (this.getY()));
@@ -151,6 +154,8 @@ public class Player extends RectangularCollider {
     public boolean isAlive() {
         return this.alive;
     }
+
+    public boolean isMoving() { return this.moving; }
 
     // MOVEMENT METHODS
     public void moveUp() {
@@ -232,8 +237,7 @@ public class Player extends RectangularCollider {
 
             this.setX(x + velocityX);
             this.setY(y + velocityY);
-            this.setRotation((float) Math.toDegrees(a) + 90);
-            //this.rotateTo((float) Math.toDegrees(a) + 90);
+            if (moving) this.setRotation((float) Math.toDegrees(a) + 90);
 
             // Move shadow with player
             shadowImageView.setY(-45 * (float) Math.sin(a));
@@ -277,9 +281,16 @@ public class Player extends RectangularCollider {
      * @param curve CubicBezierCurve to follow.
      */
     public void moveInCurve(CubicBezierCurve curve) {
-        p += 0.025f;
-        this.setRotation(curve.getAngleAt(p % 1));
-        this.moveTo(curve.getPointAt(p % 1));
+
+        if (isMoving()){
+            this.setRotation(curve.getAngleAt(p % 1));
+            this.moveTo(curve.getPointAt(p % 1));
+            p += 0.025f;
+            if (p == 1) setMoving(false);
+        }else{
+            p = 0;
+        }
+
     }
 
     public void rotateTo(float a) {
@@ -338,8 +349,6 @@ public class Player extends RectangularCollider {
     }
 
     public void die(boolean quickRespawn) {
-
-        System.out.println("Player died");
 
         alive = false;
         this.setAlpha(0);
