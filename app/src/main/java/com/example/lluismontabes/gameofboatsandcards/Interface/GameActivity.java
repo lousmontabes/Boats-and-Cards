@@ -918,8 +918,32 @@ public class GameActivity extends AppCompatActivity {
                 // Environmental effects
                 showDripplets();
 
+                // localPlayer respawn
+                checkLocalPlayerRespawn();
+
             }
         });
+    }
+
+    /**
+     * If localPlayer is dead, check if localPlayer should respawn on this frame or decrease
+     * the counter until it respawns.
+     */
+    private void checkLocalPlayerRespawn() {
+
+        if (!localPlayer.isAlive()){
+
+            // Calculate frames left for player respawn.
+            if (localPlayer.getTimeToRespawn() == 0){
+
+                // If there are 0 frames left, respawn.
+                localPlayer.respawn();
+
+                // Activate flag to notify server of localPlayer respawn
+                activateEventFlag(Event.LOCAL_PLAYER_RESPAWNED);
+            }
+        }
+
     }
 
     /**
@@ -936,24 +960,28 @@ public class GameActivity extends AppCompatActivity {
                 // from the point of view of this method.
 
                 case REMOTE_PLAYER_DIED:
+                    // remotePlayer killed localPlayer
                     localPlayer.die(isEffectActive(Card.Effect.QUICK_REVIVE));
                     break;
 
                 case REMOTE_PLAYER_DAMAGED:
                     // TODO: Check real damage inflicted.
+                    // remotePlayer damaged localPlayer
                     localPlayer.damage(20);
                     break;
 
                 case LOCAL_PLAYER_RESPAWNED:
-                    // TODO
+                    // remotePlayer respawned
+                    remotePlayer.respawn();
                     break;
 
                 case LOCAL_PLAYER_FIRED:
-                    System.out.println("Remote player fired");
+                    // remotePlayer fired
                     playerShoot(remotePlayer);
                     break;
 
                 case LOCAL_PLAYER_USED_CARD:
+                    // remotePlayer used card
                     // TODO
                     break;
 
@@ -989,7 +1017,6 @@ public class GameActivity extends AppCompatActivity {
         } else {
             localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
             localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
-            localPlayer.respawn();
             joystick.resetCurrentAngle();
         }
 
@@ -1056,6 +1083,9 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * UNUSED
+     */
     private void showDripplets() {
 
         if (canvasCreated) {
@@ -1072,6 +1102,9 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Spawns card at random position.
+     */
     private void spawnCard() {
         if (!cardHasSpawned) {
             cardSpawned = new Card();
@@ -1106,11 +1139,18 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Keeps specified Player object inside the screen's dimensions.
+     * @param p Player to keep in bounds.
+     */
     private void keepInBounds(Player p) {
         p.setX(Math.min(Math.max(p.getX(), 0), layout.getWidth() - p.getWidth()));
         p.setY(Math.min(Math.max(p.getY(), 0), layout.getHeight() - p.getHeight()));
     }
 
+    /**
+     * Check if localPlayer is colliding with currently spawned card, therefore picking it up.
+     */
     private void checkCollisionCardSpawn() {
         if (localPlayer.isColliding(cardSpawn) && !caught && cardZone.getCardList().size() < 3) {
             drawCard(localPlayer);
@@ -1118,6 +1158,10 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Add picked up cards to the localPlayer's deck.
+     * @param player
+     */
     private void drawCard(Player player) {
         //TODO: use Deck class for card drawing
         // (int) (Math.random() * (MAX_CARD_COOLDOWN - MIN_CARD_COOLDOWN)) + MIN_CARD_COOLDOWN;
@@ -1126,6 +1170,11 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Use specified card in the Player's deck.
+     * @param player
+     * @param n
+     */
     private void useCard(Player player, int n) {
         if (player.isAlive()) {
             Card usedCard = cardZone.removeCard(n);
@@ -1302,10 +1351,8 @@ public class GameActivity extends AppCompatActivity {
             // remoteScore global variables.
             if (p != null){
                 if(assignedPlayer == 1 || assignedPlayer == -1){
-                    //localScore = p.score1;
                     remoteScore = p.score2;
                 }else{
-                    //localScore = p.score2;
                     remoteScore = p.score1;
                 }
             }

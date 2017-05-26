@@ -22,7 +22,7 @@ public class Card {
     // Possible effects of the cards
     public enum Effect {
         SPEED_UP(MEDIUM, "Speed up!"),
-        ATTACK_UP(MEDIUM, "Attack up!"),
+        ATTACK_UP(MEDIUM, "Increased damage!"),
         FULL_RESTORATION(INSTANT, ""),
         STUNNED(SHORT, "Immobilized!"),
         REVERSED_HAND(LONG, "Cards reversed!"),

@@ -309,15 +309,21 @@ public class Player extends RectangularCollider {
 
     }
 
+    public int getTimeToRespawn(){
+
+        if (respawnTimer > 0) respawnTimer--;
+        return respawnTimer;
+
+    }
+
     public void respawn() {
-        if (respawnTimer > 0) {
-            respawnTimer--;
-        } else {
-            setAlpha(1);
-            alive = true;
-            setAngle(0);
-            velocity = 0;
-        }
+
+        health = MAX_HEALTH;
+        alive = true;
+        velocity = 0;
+        setAngle(0);
+        setAlpha(1);
+
     }
 
     public void setStunned(boolean stunned) {
