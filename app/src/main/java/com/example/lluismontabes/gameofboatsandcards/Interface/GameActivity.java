@@ -937,6 +937,7 @@ public class GameActivity extends AppCompatActivity {
                 case LOCAL_PLAYER_RESPAWNED:
                     // remotePlayer respawned
                     remotePlayer.respawn();
+                    remotePlayer.setMaxVelocity();
                     break;
 
                 case LOCAL_PLAYER_FIRED:

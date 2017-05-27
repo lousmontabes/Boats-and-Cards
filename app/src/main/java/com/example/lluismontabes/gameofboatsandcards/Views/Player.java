@@ -306,7 +306,7 @@ public class Player extends RectangularCollider {
     public void moveInCurve(CubicBezierCurve curve) {
 
         if (isMoving()){
-            this.setRotation(curve.getAngleAt(p % 1));
+            //this.setRotation(curve.getAngleAt(p % 1));
             this.moveTo(curve.getPointAt(p % 1));
             p += 0.025f;
             if (p == 1) setMoving(false);
@@ -344,6 +344,7 @@ public class Player extends RectangularCollider {
     }
 
     public void respawn() {
+        System.out.println("Respawning");
         this.alive = true;
         health = MAX_HEALTH;
         velocity = 0;
