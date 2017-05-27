@@ -22,8 +22,8 @@ public class Card {
     // Possible effects of the cards
     public enum Effect {
         SPEED_UP(MEDIUM, "Speed up!"),
-        ATTACK_UP(MEDIUM, "Increased damage!"),
-        FULL_RESTORATION(INSTANT, ""),
+        ATTACK_UP(MEDIUM, "Attack up!"),
+        FULL_RESTORATION(INSTANT, "Full heal!"),
         STUNNED(SHORT, "Immobilized!"),
         REVERSED_HAND(LONG, "Cards reversed!"),
         DISCARD_ONE(INSTANT, "One card discarded!"),
@@ -100,7 +100,7 @@ public class Card {
             case FULL_RESTORATION:
             case TRIPLE_SHOT:
             case QUICK_REVIVE:
-                return SELF;
+                return Target.SELF;
             case STUNNED:
             case REVERSED_HAND:
             case REVERSED_CONTROLS:
@@ -139,7 +139,7 @@ public class Card {
             case TRIPLE_SHOT:
                 return R.drawable.multishot;
             case DISPEL:
-                return R.drawable.placeholder3;
+                return R.drawable.dispel;
             case KO:
                 return R.drawable.ko;
             case QUICK_REVIVE:
@@ -184,7 +184,7 @@ public class Card {
         }
     }
 
-    public boolean getReversed() {
+    public boolean isReversed() {
         return reversed;
     }
 
