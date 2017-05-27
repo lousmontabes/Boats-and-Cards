@@ -134,7 +134,7 @@
             android:layout_width="67dp"
             android:layout_height="90dp"
             android:id="@+id/thumb_button_12"
-            android:src="@drawable/placeholder_reversed"
+            android:src="@drawable/dispel"
             android:scaleType="fitXY"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"/>
