@@ -40,6 +40,7 @@ public class Player extends RectangularCollider {
     private float currentMinAngle;
 
     // Position
+    private Point startPosition;
     private float x;
     private float y;
     private float angle;
@@ -59,9 +60,9 @@ public class Player extends RectangularCollider {
     private final int MAX_FIRE_COOLDOWN = 10;       // 10 frames of max fire cooldown
     private int fireCooldown;
 
-    private final int RESPAWN_TIMER = 150;
-    private final int RESPAWN_TIMER_QUICK = 30;
-    private int respawnTimer;
+    private final int MAX_RESPAWN_TIME = 150;
+    private final int QUICK_REPAWN_TIME = 30;
+    private int timeToRespawn;
 
     // Effects
     private boolean alive;
@@ -70,7 +71,7 @@ public class Player extends RectangularCollider {
     private boolean speedUp;
     private boolean backwards;
 
-    public Player(Context context, AttributeSet attrs) {
+    public Player(Context context) {
         super(context, 34, 59, 40, 45);
 
         LayoutInflater.from(context).inflate(R.layout.player, this);
@@ -92,7 +93,7 @@ public class Player extends RectangularCollider {
         health = MAX_HEALTH;        // 100 units of current health
 
         fireCooldown = 0;           // 0 frames of current fire cooldown
-        respawnTimer = 0;
+        timeToRespawn = 0;
 
         stunned = false;
         speedUp = false;
@@ -103,6 +104,10 @@ public class Player extends RectangularCollider {
     }
 
     // SETTERS
+    public void setStartPosition(Point p){
+        this.startPosition = p;
+    }
+
     public void setPosition(Point p){
         this.setX(p.x);
         this.setY(p.y);
@@ -157,27 +162,6 @@ public class Player extends RectangularCollider {
 
     public boolean isMoving() { return this.moving; }
 
-    // MOVEMENT METHODS
-    public void moveUp() {
-        y = this.getY();
-        this.setY(y - velocity);
-    }
-
-    public void moveDown() {
-        y = this.getY();
-        this.setY(y + velocity);
-    }
-
-    public void moveLeft() {
-        x = this.getX();
-        this.setX(x - velocity);
-    }
-
-    public void moveRight() {
-        x = this.getX();
-        this.setX(x + velocity);
-    }
-
     public void accelerate() {
 
         float futureRotationSpeed = rotationSpeed + rotationAcceleration;
@@ -206,7 +190,7 @@ public class Player extends RectangularCollider {
     }
 
     /**
-     * Moves Player in the specified a.
+     * Moves Player in the specified angle.
      *
      * @param a         Angle in which to move the Player.
      * @param intensity Multiplier (from 0.0 to 1.0) of the velocity.
@@ -242,6 +226,45 @@ public class Player extends RectangularCollider {
             // Move shadow with player
             shadowImageView.setY(-45 * (float) Math.sin(a));
             shadowImageView.setX(45 * (float) Math.cos(a));
+        }
+    }
+
+    /**
+     * Moves Player in the specified angle, showing a static angle.
+     *
+     * @param a         Angle in which to move the Player.
+     * @param intensity Multiplier (from 0.0 to 1.0) of the velocity.
+     */
+    public void staticAngleMove(float a, float intensity) {
+
+        if (!stunned && alive) {
+
+            this.angle = a;
+
+            x = this.getX();
+            y = this.getY();
+
+            float scaleX = (float) Math.cos(a);
+            float scaleY = (float) Math.sin(a);
+
+            float modifier = 1;
+
+            if (speedUp) {
+                modifier *= 2;
+            }
+            if (backwards) {
+                modifier = -modifier;
+            }
+
+            float velocityX = scaleX * this.velocity * intensity * modifier;
+            float velocityY = scaleY * this.velocity * intensity * modifier;
+
+            this.setX(x + velocityX);
+            this.setY(y + velocityY);
+
+            // Move shadow with player
+            shadowImageView.setY(-45 * (float) Math.sin(this.getRotation()));
+            shadowImageView.setX(45 * (float) Math.cos(this.getRotation()));
         }
     }
 
@@ -293,6 +316,10 @@ public class Player extends RectangularCollider {
 
     }
 
+    public void toStartPosition(){
+        this.setPosition(startPosition);
+    }
+
     public void rotateTo(float a) {
 
         //angle = this.getRotation();
@@ -311,19 +338,18 @@ public class Player extends RectangularCollider {
 
     public int getTimeToRespawn(){
 
-        if (respawnTimer > 0) respawnTimer--;
-        return respawnTimer;
+        if ( timeToRespawn > 0)  timeToRespawn--;
+        return  timeToRespawn;
 
     }
 
     public void respawn() {
-
+        this.alive = true;
         health = MAX_HEALTH;
-        alive = true;
         velocity = 0;
         setAngle(0);
         setAlpha(1);
-
+        toStartPosition();
     }
 
     public void setStunned(boolean stunned) {
@@ -360,9 +386,9 @@ public class Player extends RectangularCollider {
         this.setAlpha(0);
 
         if (quickRespawn) {
-            respawnTimer = 30;
+             timeToRespawn = QUICK_REPAWN_TIME;
         } else {
-            respawnTimer = 150;
+             timeToRespawn = MAX_RESPAWN_TIME;
         }
 
         //removeAllEffects();
@@ -389,5 +415,4 @@ public class Player extends RectangularCollider {
     public boolean isColliding(Collider c) {
         return (alive && super.isColliding(c));
     }
-
 }

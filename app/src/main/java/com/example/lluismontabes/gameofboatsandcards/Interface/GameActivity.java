@@ -107,11 +107,12 @@ public class GameActivity extends AppCompatActivity {
         @SerializedName("7") LOCAL_PLAYER_DAMAGED,
         @SerializedName("8") REMOTE_PLAYER_DAMAGED,
         @SerializedName("9") LOCAL_PLAYER_USED_CARD,
-        @SerializedName("10") REMOTE_PLAYER_USED_CARD
+        @SerializedName("10") REMOTE_PLAYER_USED_CARD,
+        @SerializedName("11") LOCAL_PLAYER_WON
     }
     private Event localActiveEvent = Event.NONE;
     private int localEventIndex = 0;
-    private int lastReadLocalEventIndex = -1;
+    private int lastSentLocalEventIndex = -1;
 
     private Event remoteActiveEvent = Event.NONE;
     private int remoteEventIndex = 0;
@@ -142,16 +143,6 @@ public class GameActivity extends AppCompatActivity {
     boolean localPlayerInside = false;
     boolean remotePlayerInside = false;
     boolean running = false;
-
-    // Control button boolean variables
-    private boolean upPressed = false;
-    private boolean leftPressed = false;
-    private boolean rightPressed = false;
-    private boolean downPressed = false;
-
-    // Point-and-click control variables
-    private boolean moving = false;
-    private float destX, destY;
 
     /**
      * VIEWS
@@ -429,10 +420,10 @@ public class GameActivity extends AppCompatActivity {
 
     private void initializePlayers() {
 
-        localPlayer = new Player(GameActivity.this, null);
+        localPlayer = new Player(GameActivity.this);
         localPlayer.setMoving(true);
 
-        remotePlayer = new Player(GameActivity.this, null);
+        remotePlayer = new Player(GameActivity.this);
         remotePlayer.setMaxVelocity();
 
         //localPlayer.showHitbox();
@@ -566,12 +557,6 @@ public class GameActivity extends AppCompatActivity {
         this.logIndex++;
     }
 
-    private void moveObjectTo(View object, float x, float y) {
-        this.destX = x;
-        this.destY = y;
-        this.moving = true;
-    }
-
     private void showBoatTrace() {
         float oX = localPlayer.getX() + 30; // Compensem per l'espai buit de l'imatge
         float oY = localPlayer.getY() + 76; // Compensem per l'espai buit de l'imatge
@@ -654,8 +639,6 @@ public class GameActivity extends AppCompatActivity {
      */
     private void checkIslandDomainCollisions() {
 
-        // TODO: Make this method less spaghetti-y
-
         boolean localPlayerColliding = localPlayer.isColliding(islandDomain);
         boolean remotePlayerColliding = remotePlayer.isColliding(islandDomain);
 
@@ -713,6 +696,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void finishGame() {
+
         if (!gameFinished) {
 
             gameFinished = true;
@@ -727,6 +711,8 @@ public class GameActivity extends AppCompatActivity {
             }
 
             i.putExtra("gameState", currentGameState);
+            i.putExtra("localScoreStats", localScore);
+            i.putExtra("remoteScoreStats", remoteScore);
             i.putExtra("killsStats", killsStats);
             i.putExtra("deathsStats", deathsStats);
             i.putExtra("shotsFiredStats", shotsFiredStats);
@@ -756,9 +742,6 @@ public class GameActivity extends AppCompatActivity {
 
                 timer.setText(Integer.toString(m) + ":" + String.format("%02d", s));
 
-            } else {
-                // Time ran out.
-                finishGame();
             }
         }
 
@@ -778,10 +761,8 @@ public class GameActivity extends AppCompatActivity {
                         pointSound.start();
                     }
 
-                } else {
-                    // localPlayer reached 100% score.
-                    finishGame();
                 }
+
             }
 
             localPlayerScoring = true;
@@ -794,36 +775,6 @@ public class GameActivity extends AppCompatActivity {
             textViewCounterLocal.setTextColor(getResources().getColor(R.color.counterStopped));
 
         }
-
-        /*if (remotePlayerInside && !localPlayerInside) {
-
-            if (--framesUntilTickRemote == 0) {
-
-                if (remoteScore < 100) {
-
-                    remoteScore++;
-                    framesUntilTickRemote = fps / 2;
-                    textViewCounterRemote.setText(Integer.toString(remoteScore) + "%");
-
-                    showPlayerPopup(remotePlayer, "+1", 250, true);
-
-                    if (running) {
-                        pointSound.start();
-                    }
-
-                } else {
-                    // remotePlayer reached 100% score.
-                    finishGame();
-                }
-
-            }
-
-            textViewCounterRemote.setTextColor(getResources().getColor(R.color.remoteCounterActive));
-
-        } else {
-            framesUntilTickRemote = fps / 2;
-            textViewCounterRemote.setTextColor(getResources().getColor(R.color.counterStopped));
-        }*/
 
         // SCORE COUNTERS
         textViewCounterLocal.setText(Integer.toString(localScore) + "%");
@@ -841,12 +792,6 @@ public class GameActivity extends AppCompatActivity {
 
                 // Garbage collector
                 destroyExcessiveViews();
-
-                // Control buttons (currently unused)
-                if (upPressed) localPlayer.moveUp();
-                if (leftPressed) localPlayer.moveLeft();
-                if (rightPressed) localPlayer.moveRight();
-                if (downPressed) localPlayer.moveDown();
 
                 // Starting position
                 if (currentFrame <= 10) setStartPositions();
@@ -866,6 +811,9 @@ public class GameActivity extends AppCompatActivity {
 
                 // Death check
                 checkPlayerHealth();
+
+                // localPlayer respawn check
+                checkLocalPlayerRespawn();
 
                 // Decrease cooldown to shoot again
                 localPlayer.decreaseFireCooldown();
@@ -915,14 +863,24 @@ public class GameActivity extends AppCompatActivity {
                 // Process remote events
                 if (remoteActiveEvent != null) handleRemoteEvent();
 
-                // Environmental effects
-                showDripplets();
-
-                // localPlayer respawn
-                checkLocalPlayerRespawn();
+                // Check game finish conditions
+                checkGameFinish();
 
             }
         });
+    }
+
+    private void checkGameFinish() {
+
+        if (secondsLeft <= 0) finishGame(); // Time ran out
+        else if (localScore >= 100){
+            activateEventFlag(Event.LOCAL_PLAYER_WON);
+            finishGame(); // localPlayer reached 100%
+        }
+        else if (remoteScore >= 100){
+            finishGame(); // remotePlayer reached 100%
+        }
+
     }
 
     /**
@@ -933,6 +891,8 @@ public class GameActivity extends AppCompatActivity {
 
         if (!localPlayer.isAlive()){
 
+            System.out.println("localPlayer is dead");
+
             // Calculate frames left for player respawn.
             if (localPlayer.getTimeToRespawn() == 0){
 
@@ -942,6 +902,7 @@ public class GameActivity extends AppCompatActivity {
                 // Activate flag to notify server of localPlayer respawn
                 activateEventFlag(Event.LOCAL_PLAYER_RESPAWNED);
             }
+
         }
 
     }
@@ -953,6 +914,8 @@ public class GameActivity extends AppCompatActivity {
 
         if (remoteEventIndex > lastReadRemoteEventIndex){
 
+            log("Remote event: (" + remoteEventIndex + ") " + remoteActiveEvent);
+
             switch(remoteActiveEvent){
 
                 // NOTICE: These Events are retrieved from the server, sent by the other player.
@@ -962,6 +925,7 @@ public class GameActivity extends AppCompatActivity {
                 case REMOTE_PLAYER_DIED:
                     // remotePlayer killed localPlayer
                     localPlayer.die(isEffectActive(Card.Effect.QUICK_REVIVE));
+                    deathsStats++;
                     break;
 
                 case REMOTE_PLAYER_DAMAGED:
@@ -983,6 +947,11 @@ public class GameActivity extends AppCompatActivity {
                 case LOCAL_PLAYER_USED_CARD:
                     // remotePlayer used card
                     // TODO
+                    break;
+
+                case LOCAL_PLAYER_WON:
+                    // remotePlayer won the game
+                    finishGame();
                     break;
 
                 case NONE:
@@ -1027,29 +996,36 @@ public class GameActivity extends AppCompatActivity {
      */
     private void checkPlayerHealth() {
 
-        if (localPlayer.getHealth() <= 0) {
+        /*if (localPlayer.isAlive()){
+            if (localPlayer.getHealth() <= 0) {
 
-            localPlayer.die(isEffectActive(QUICK_REVIVE));
-            activateEventFlag(Event.LOCAL_PLAYER_DIED);
+                localPlayer.die(isEffectActive(QUICK_REVIVE));
+                activateEventFlag(Event.LOCAL_PLAYER_DIED);
 
-            deathsStats++;
-        }
+                deathsStats++;
+            }
+        }*/
 
-        if (remotePlayer.getHealth() <= 0) {
+        if (remotePlayer.isAlive()){
+            if (remotePlayer.getHealth() <= 0) {
 
-            remotePlayer.die(isEffectActive(QUICK_REVIVE));
-            activateEventFlag(Event.REMOTE_PLAYER_DIED);
+                remotePlayer.die(isEffectActive(QUICK_REVIVE));
+                activateEventFlag(Event.REMOTE_PLAYER_DIED);
 
-            killsStats++;
+                killsStats++;
+            }
         }
 
     }
 
+    /**
+     * Activate an event flag and increase the event index.
+     * @param event Event to activate.
+     */
     private void activateEventFlag(Event event) {
-
         localActiveEvent = event;
         localEventIndex++;
-
+        log ("Activated event flag: (" + localEventIndex + ")" + localActiveEvent);
     }
 
     /**
@@ -1062,22 +1038,22 @@ public class GameActivity extends AppCompatActivity {
         if (assignedPlayer == 1 || assignedPlayer == -1) {
 
             // Spawn local player at bottom position
-            localPlayer.setX(centerX);
-            localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
+            localPlayer.setStartPosition(new Point(centerX, layout.getHeight() - localPlayer.getHeight()));
+            localPlayer.toStartPosition();
 
             // Spawn remote player at top position
-            remotePlayer.setX(centerX);
-            remotePlayer.setY(0);
+            remotePlayer.setStartPosition(new Point(centerX, 0));
+            remotePlayer.toStartPosition();
 
         } else if (assignedPlayer == 2) {
 
             // Spawn local player at bottom position
-            remotePlayer.setX(centerX);
-            remotePlayer.setY(layout.getHeight() - localPlayer.getHeight());
+            remotePlayer.setStartPosition(new Point(centerX, layout.getHeight() - localPlayer.getHeight()));
+            remotePlayer.toStartPosition();
 
             // Spawn remote player at top position
-            localPlayer.setX(centerX);
-            localPlayer.setY(0);
+            localPlayer.setStartPosition(new Point(centerX, 0));
+            localPlayer.toStartPosition();
 
         }
 
@@ -1172,7 +1148,7 @@ public class GameActivity extends AppCompatActivity {
 
     /**
      * Use specified card in the Player's deck.
-     * @param player
+     * @param player Player whose deck to add to.
      * @param n
      */
     private void useCard(Player player, int n) {
@@ -1386,7 +1362,7 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalEventData() {
 
-            if (localEventIndex > lastReadLocalEventIndex){
+            if (localEventIndex > lastSentLocalEventIndex){
 
                 int eventNumber = localActiveEvent.ordinal();
 
@@ -1396,7 +1372,7 @@ public class GameActivity extends AppCompatActivity {
                         + "&eventIndex=" + localEventIndex,
                         2000);
 
-                lastReadLocalEventIndex = localEventIndex;
+                lastSentLocalEventIndex = localEventIndex;
 
             }
 
@@ -1416,10 +1392,6 @@ public class GameActivity extends AppCompatActivity {
             // These variables will be used to process events locally on the next frame.
             if (p != null){
                 if (p.eventIndex > remoteEventIndex){
-
-                    System.out.println("New remote event");
-                    System.out.println("Remote event index: " + p.eventIndex);
-                    System.out.println("Remote event type: " + p.event);
 
                     remoteActiveEvent = p.event;
                     remoteEventIndex = p.eventIndex;

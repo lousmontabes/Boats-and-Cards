@@ -16,7 +16,7 @@ public class Card {
 
     // Target of the effect of the card
     public enum Target {
-        SELF, OPPONENT, ALL
+        SELF, OPPONENT, ALL, NONE
     }
 
     // Possible effects of the cards
@@ -32,7 +32,8 @@ public class Card {
         DISPEL(INSTANT, "All effects removed!"),
         KO(INSTANT, "YOU DIED"),
         QUICK_REVIVE(INFINITE, "Quick revive!"),
-        RANDOM_WARP(INSTANT, "Random warp!");
+        RANDOM_WARP(INSTANT, "Random warp!"),
+        NONE(INSTANT, "");
 
         private short duration;
         private String name;
@@ -105,13 +106,13 @@ public class Card {
             case REVERSED_HAND:
             case REVERSED_CONTROLS:
             case DISCARD_ONE:
-                return Target.OPPONENT;
+                return OPPONENT;
             case DISPEL:
             case KO:
             case RANDOM_WARP:
-                return Target.ALL;
+                return ALL;
             default:
-                throw new UnknownError();
+                return NONE;
         }
     }
 
@@ -149,7 +150,7 @@ public class Card {
             case RANDOM_WARP:
                 return R.drawable.rand_warp;
             default:
-                throw new UnknownError();
+                return R.drawable.carta;
         }
     }
 
@@ -180,7 +181,7 @@ public class Card {
             case 12:
                 return Effect.RANDOM_WARP;
             default:
-                throw new UnknownError();
+                return Effect.NONE;
         }
     }
 

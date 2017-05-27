@@ -38,6 +38,8 @@ public class GameEndActivity extends AppCompatActivity {
         Intent intent = getIntent();
         GameActivity.GameState finishState = (GameActivity.GameState) intent.getSerializableExtra("gameState");
 
+        int localScoreStats = intent.getIntExtra("localScoreStats", 0);
+        int remoteScoreStats = intent.getIntExtra("remoteScoreStats", 0);
         int killsStats = intent.getIntExtra("killsStats", 0);
         int deathsStats = intent.getIntExtra("deathsStats", 0);
         int shotsFiredStats = intent.getIntExtra("shotsFiredStats", 0);
@@ -63,6 +65,8 @@ public class GameEndActivity extends AppCompatActivity {
                 break;
         }
 
+        localScoreTextView.setText(Integer.toString(localScoreStats) + "%");
+        remoteScoreTextView.setText(Integer.toString(remoteScoreStats) + "%");
         killsTextView.setText(Integer.toString(killsStats));
         deathsTextView.setText(Integer.toString(deathsStats));
         shotsFiredTextView.setText(Integer.toString(shotsFiredStats));
