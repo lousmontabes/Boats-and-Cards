@@ -844,16 +844,16 @@ public class GameActivity extends AppCompatActivity {
                 // Move remotePlayer to the retrieved position
                 if (remotePosition != lastReadRemotePosition){
                     System.out.println("New remote position detected");
-                    remotePlayer.setMoving(true);
                     lastReadRemotePosition = remotePosition;
                 }
                 if (remoteAngle != lastReadRemoteAngle){
                     System.out.println("New remote angle detected");
-
+                    remotePlayer.restoreMovement();
+                    remotePlayer.setMoving(true);
                     lastReadRemoteAngle = remoteAngle;
                 }
                 //remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
-                remotePlayer.moveInCurve(remoteCurve);
+                if(remotePlayer.isMoving()) remotePlayer.moveInCurve(remoteCurve);
 
                 //remotePlayer.moveTo(remotePosition);
 

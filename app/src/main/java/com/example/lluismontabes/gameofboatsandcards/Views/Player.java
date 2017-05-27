@@ -299,20 +299,25 @@ public class Player extends RectangularCollider {
 
     }
 
+    public void restoreMovement(){
+        this.p = 0;
+    }
+
     /**
      * Moves the player following a specified CubicBezierCurve.
      * @param curve CubicBezierCurve to follow.
      */
     public void moveInCurve(CubicBezierCurve curve) {
 
-        if (isMoving()){
-            //this.setRotation(curve.getAngleAt(p % 1));
-            this.moveTo(curve.getPointAt(p % 1));
-            p += 0.025f;
-            if (p == 1) setMoving(false);
+        //this.setRotation(curve.getAngleAt(p % 1));
+        if (p >= 1){
+            setMoving(false);
         }else{
-            p = 0;
+            this.moveTo(curve.getPointAt(p % 1));
         }
+        p += 0.025f;
+
+        System.out.println("p: " + p);
 
     }
 
