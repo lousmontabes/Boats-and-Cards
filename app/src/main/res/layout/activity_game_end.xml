@@ -19,15 +19,17 @@
             android:layout_height="match_parent"
             android:layout_marginTop="-100dp"
             android:gravity="center_vertical|center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:weightSum="1">
 
             <ImageView
                 android:id="@+id/imageView2"
-                android:layout_width="197dp"
-                android:layout_height="52dp"
+                android:layout_width="168dp"
+                android:layout_height="31dp"
                 android:layout_above="@+id/newGameButton"
                 android:layout_alignEnd="@+id/newGameButton"
-                app:srcCompat="@drawable/operationresult" />
+                app:srcCompat="@drawable/operationresult"
+                android:layout_weight="0.00" />
 
             <TextView
                 android:id="@+id/resultsText"

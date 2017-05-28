@@ -247,7 +247,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        goFullscreen();
+        requestFullscreen();
         setContentView(R.layout.activity_game);
 
         running = true;
@@ -353,7 +353,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void goFullscreen() {
+    private void requestFullscreen() {
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
