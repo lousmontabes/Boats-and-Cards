@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_gameEnd"
     android:layout_width="match_parent"
@@ -9,181 +10,196 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/background_blueprint"
+        android:elevation="1dp">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginTop="-100dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="197dp"
+                android:layout_height="52dp"
+                android:layout_above="@+id/newGameButton"
+                android:layout_alignEnd="@+id/newGameButton"
+                app:srcCompat="@drawable/operationresult" />
 
             <TextView
-                android:text="@string/win"
+                android:id="@+id/resultsText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/resultsText"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="68dp"
-                android:textStyle="normal|bold"
+                android:text="@string/victory"
                 android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                 android:textColor="@color/localCounterActive"
-                android:textAllCaps="true" />
+                android:textStyle="normal|bold" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:text="100%"
+                    android:id="@+id/localScoreTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/localScoreTextView"
                     android:layout_weight="1"
                     android:padding="5dp"
+                    android:text="100%"
                     android:textAlignment="textEnd"
                     android:textSize="24sp"
                     android:textStyle="normal|bold|italic" />
 
                 <TextView
-                    android:text="0%"
+                    android:id="@+id/remoteScoreTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/remoteScoreTextView"
                     android:layout_weight="1"
                     android:padding="5dp"
+                    android:text="0%"
                     android:textSize="24sp"
                     android:textStyle="normal|italic" />
             </LinearLayout>
 
             <TextView
-                android:text="Match overview:"
+                android:id="@+id/textView7"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView7"
-                android:textAlignment="center"
-                android:textStyle="normal|bold"
-                android:textAllCaps="false"
                 android:paddingBottom="10dp"
-                android:paddingTop="30dp" />
+                android:paddingTop="30dp"
+                android:text="Match overview:"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textStyle="normal|bold" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:text="Kills:"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/textView11"
-                    android:layout_weight="1"
-                    android:textAlignment="textEnd"
-                    android:padding="5dp" />
-
-                <TextView
-                    android:text="0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:text="Kills:"
+                    android:textAlignment="textEnd" />
+
+                <TextView
                     android:id="@+id/killsTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="5dp"
+                    android:text="0"
                     android:textStyle="normal|bold|italic" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:text="Deaths:"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/textView9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="5dp"
+                    android:text="Deaths:"
                     android:textAlignment="textEnd" />
 
                 <TextView
-                    android:text="0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/deathsTextView"
-                    android:layout_weight="1"
-                    android:padding="5dp"
-                    android:textStyle="normal|bold|italic" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:text="Shots fired:"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textView6"
                     android:layout_weight="1"
-                    android:textAlignment="textEnd"
-                    android:padding="5dp" />
-
-                <TextView
+                    android:padding="5dp"
                     android:text="0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/shotsFiredTextView"
-                    android:layout_weight="1"
-                    android:padding="5dp"
                     android:textStyle="normal|bold|italic" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:text="Cards used:"
+                    android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textView13"
                     android:layout_weight="1"
                     android:padding="5dp"
+                    android:text="Shots fired:"
                     android:textAlignment="textEnd" />
 
                 <TextView
-                    android:text="0"
+                    android:id="@+id/shotsFiredTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/cardsUsedTextView"
                     android:layout_weight="1"
                     android:padding="5dp"
+                    android:text="0"
+                    android:textStyle="normal|bold|italic" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView13"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:text="Cards used:"
+                    android:textAlignment="textEnd" />
+
+                <TextView
+                    android:id="@+id/cardsUsedTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:text="0"
                     android:textStyle="normal|bold|italic" />
             </LinearLayout>
 
         </LinearLayout>
 
         <Button
-            android:text="@string/returnToMenu"
+            android:id="@+id/mainMenuButton"
             android:layout_width="100pt"
             android:layout_height="25pt"
-            android:textSize="11pt"
-            android:layout_marginBottom="34dp"
-            android:id="@+id/mainMenuButton"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="34dp"
+            android:background="@android:color/transparent"
+            android:text="@string/returnToMenu"
+            android:textAllCaps="false"
+            android:textSize="14sp" />
 
         <Button
-            android:text="@string/next"
+            android:id="@+id/newGameButton"
             android:layout_width="100pt"
             android:layout_height="25pt"
-            android:textSize="11pt"
-            android:id="@+id/newGameButton"
             android:layout_above="@+id/mainMenuButton"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
+            android:text="@string/newGame"
+            android:textSize="11pt"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 

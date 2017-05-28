@@ -527,14 +527,14 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(GameActivity.this)
-                .setTitle("Exit Game")
-                .setMessage("Are you sure you want to quit the match? This will result in a loss.")
-                .setNegativeButton("No, continue playing", new DialogInterface.OnClickListener() {
+                .setTitle(getString(R.string.exitGameDialogTitle))
+                .setMessage(getString(R.string.exitGameWarning))
+                .setNegativeButton(getString(R.string.exitGameNegativeButton), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
                     }
                 })
-                .setPositiveButton("Yes, quit", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.exitGamePositiveButton), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         gameFinished = true;
                         finish();

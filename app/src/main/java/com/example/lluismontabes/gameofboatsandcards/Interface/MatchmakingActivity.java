@@ -181,7 +181,7 @@ public class MatchmakingActivity extends AppCompatActivity {
             default:
 
                 // There was a problem creating or looking for a request.
-                changeConnectionMessage("There was a problem finding a match. Please try again later.");
+                changeConnectionMessage(getString(R.string.problemFindingMatchMessage));
 
                 break;
 
@@ -191,7 +191,7 @@ public class MatchmakingActivity extends AppCompatActivity {
 
     private void waitForRequestResponse(int requestId){
 
-        changeConnectionMessage("In queue");
+        changeConnectionMessage(getString(R.string.searchingForOpponentMessage));
 
         // Wait for someone to answer the user's match request.
         while (assignedMatch == -1 || requestStatus == null){
@@ -238,7 +238,7 @@ public class MatchmakingActivity extends AppCompatActivity {
         // TODO: Add comprovation that the user is still active.
         // Only join the match if both users are active.
 
-        changeConnectionMessage("Joining match with ID: " + matchId);
+        changeConnectionMessage(getString(R.string.joiningMatchMessage) + matchId);
 
         // Start GameActivity
         Intent i = new Intent(MatchmakingActivity.this, GameActivity.class);

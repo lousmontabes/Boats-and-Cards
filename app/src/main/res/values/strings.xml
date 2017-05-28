@@ -1,14 +1,19 @@
 <resources>
-    <string name="app_name">GameOfBoatsAndCards</string>
-    <string name="title_activity_main_menu">MainMenuActivity</string>
+    <string name="app_name">Boats and Cards</string>
+    <string name="title_activity_main_menu">Boats and Cards</string>
 
-    <string name="gameTitle">Rule the\nTreasure Island!</string>
+    <string name="gameTitle">Boats and Cards</string>
 
     <string name="playButtonText">Play</string>
     <string name="multiplayerButtonText">Online Match</string>
     <string name="settingsButtonText">Settings</string>
     <string name="creditsButtonText">Credits</string>
     <string name="exitButtonText">Exit</string>
+
+    <string name="connectingToServerMessage">Connecting to the server&#8230;</string>
+    <string name="searchingForOpponentMessage">Searching for an opponent&#8230;</string>
+    <string name="problemFindingMatchMessage">There was a problem finding a match. Please try again later.</string>
+    <string name="joiningMatchMessage">Joining match with ID: </string>
 
     <string name="copyrightDisclaimer">Projecte Integrat de Software\nUniversitat de Barcelona</string>
     <string name="comingSoon">Soon™</string>
@@ -17,11 +22,16 @@
     
     <string name="counterInitValue">100</string>
 
-    <string name="win">Victory!</string>
-    <string name="lose">Defeat</string>
+    <string name="exitGameDialogTitle">Exit Game</string>
+    <string name="exitGameWarning">Are you sure you want to quit the match? This will result in a loss.</string>
+    <string name="exitGameNegativeButton">No, continue playing</string>
+    <string name="exitGamePositiveButton">Yes, quit</string>
+
+    <string name="victory">Victory!</string>
+    <string name="defeat">Defeat</string>
     <string name="draw">Draw</string>
-    <string name="next">New Game</string>
-    <string name="returnToMenu">Main Menu</string>
+    <string name="newGame">New Game</string>
+    <string name="returnToMenu">Back to menu</string>
 
     <string name="attackUp">Power shot!</string>
 
