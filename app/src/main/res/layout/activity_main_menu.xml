@@ -11,66 +11,52 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/sea">
+        android:background="@drawable/background">
 
         <ImageView
+            android:id="@+id/imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/logo"
-            android:id="@+id/imageView"
+            android:layout_above="@+id/playButton"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginBottom="50dp"
-            android:layout_alignParentEnd="true"
-            android:layout_above="@+id/playButton"
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
-            android:layout_alignParentStart="true" />
+            app:srcCompat="@drawable/logo" />
 
         <TextView
-            android:text="@string/copyrightDisclaimer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/textView2"
-            android:gravity="center"
-            android:layout_marginBottom="15dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true" />
-
-        <Button
-            android:id="@+id/button3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/imageView"
+            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:text="This is a button that bypasses the online functionality that won't be here on the final version of this app" />
+            android:layout_marginBottom="15dp"
+            android:gravity="center"
+            android:text="@string/copyrightDisclaimer" />
 
         <Button
-            android:text="@string/playButtonText"
-            android:textSize="11pt"
+            android:id="@+id/playButton"
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="100pt"
             android:layout_height="25pt"
-            android:id="@+id/playButton"
-            android:layout_marginBottom="80dp"
-            android:layout_above="@+id/textView2"
-            android:layout_centerHorizontal="true" />
+            android:layout_above="@+id/settingsTextView"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
+            android:text="@string/playButtonText"
+            android:textSize="11pt"
+            android:textStyle="bold" />
 
         <TextView
-            android:text="@string/settingsButtonText"
+            android:id="@+id/settingsTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/settingsTextView"
             android:padding="10dp"
+            android:text="@string/settingsButtonText"
+            android:layout_marginBottom="30dp"
             android:layout_above="@+id/textView2"
             android:layout_centerHorizontal="true" />
-
-        <Button
-            android:text="Collection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="38dp"
-            android:layout_above="@+id/textView2"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/collectionButton"/>
 
     </RelativeLayout>
 

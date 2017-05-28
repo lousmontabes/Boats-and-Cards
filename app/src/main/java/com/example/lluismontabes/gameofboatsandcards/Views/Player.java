@@ -313,7 +313,7 @@ public class Player extends RectangularCollider {
         if (p >= 1){
             setMoving(false);
         }else{
-            this.moveTo(curve.getPointAt(p % 1));
+            this.moveTo(curve.getPointAt(1));
         }
         p += 0.025f;
 

@@ -247,7 +247,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setFullscreen();
+        goFullscreen();
         setContentView(R.layout.activity_game);
 
         running = true;
@@ -353,7 +353,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void setFullscreen() {
+    private void goFullscreen() {
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
@@ -952,6 +952,7 @@ public class GameActivity extends AppCompatActivity {
 
                 case LOCAL_PLAYER_WON:
                     // remotePlayer won the game
+                    remoteScore = 100;
                     finishGame();
                     break;
 
