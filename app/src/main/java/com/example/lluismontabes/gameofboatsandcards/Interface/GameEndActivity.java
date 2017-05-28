@@ -109,7 +109,7 @@ public class GameEndActivity extends AppCompatActivity {
                 Animation.RELATIVE_TO_SELF, 0.5f, // Pivot point of X scaling
                 Animation.RELATIVE_TO_SELF, 0.5f); // Pivot point of Y scaling
         anim.setFillAfter(true); // Needed to keep the result of the animation
-        anim.setDuration(500);
+        anim.setDuration(400);
         resultTextView.startAnimation(anim);
 
     }

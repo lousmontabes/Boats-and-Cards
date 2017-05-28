@@ -175,13 +175,14 @@ public class GameActivity extends AppCompatActivity {
 
     // Time
     int currentFrame = 0;
-    int seconds = 0;
+    int secondsElapsed = 0;
     int secondsLeft = 120;
     boolean gameFinished;
 
     // Counters
-    byte framesUntilTickLocal = fps / 2;
-    byte framesUntilTickRemote = fps / 2;
+    static byte MAX_FRAMES_UNTIL_TICK = fps / 2;
+    byte framesUntilTickLocal = MAX_FRAMES_UNTIL_TICK;
+    byte framesUntilTickRemote = MAX_FRAMES_UNTIL_TICK;
 
     // Misc
     int killsStats = 0;
@@ -732,7 +733,7 @@ public class GameActivity extends AppCompatActivity {
         frameLog.setText(Integer.toString(currentFrame));
 
         if (currentFrame % fps == 0) {
-            seconds++;
+            secondsElapsed++;
 
             if (secondsLeft > 0) {
                 secondsLeft--;
@@ -753,7 +754,7 @@ public class GameActivity extends AppCompatActivity {
                 if (localScore < 100) {
 
                     localScore++;
-                    framesUntilTickLocal = fps / 2;
+                    framesUntilTickLocal = MAX_FRAMES_UNTIL_TICK;
 
                     showPlayerPopup(localPlayer, "+1", 250, true);
 
@@ -771,7 +772,7 @@ public class GameActivity extends AppCompatActivity {
         } else {
 
             localPlayerScoring = false;
-            framesUntilTickLocal = fps / 2;
+            framesUntilTickLocal = MAX_FRAMES_UNTIL_TICK;
             textViewCounterLocal.setTextColor(getResources().getColor(R.color.counterStopped));
 
         }
