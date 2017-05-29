@@ -6,7 +6,7 @@
 
     <string name="playButtonText">Play</string>
     <string name="multiplayerButtonText">Online Match</string>
-    <string name="settingsButtonText">Settings</string>
+    <string name="collectionText">Collection</string>
     <string name="creditsButtonText">Credits</string>
     <string name="exitButtonText">Exit</string>
 
