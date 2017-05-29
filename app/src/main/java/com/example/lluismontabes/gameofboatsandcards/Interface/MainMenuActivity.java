@@ -90,7 +90,8 @@ public class MainMenuActivity extends AppCompatActivity {
                 if(soundActive ^= true) {
                     mp.start();
                 } else {
-                    mp.stop();
+                    mp.seekTo(0);
+                    mp.pause();
                 }
             }
         });
