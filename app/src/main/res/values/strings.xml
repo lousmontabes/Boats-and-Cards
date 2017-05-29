@@ -33,7 +33,31 @@
     <string name="newGame">New Game</string>
     <string name="returnToMenu">Back to menu</string>
 
-    <string name="attackUp">Power shot!</string>
+    <string name="cardQuoteAttackUp">Let\'s play our lives away!</string>
+    <string name="cardQuoteBackwards">Who turned the wheel upside down?</string>
+    <string name="cardQuoteDiscardOne">You won\'t be needing that.</string>
+    <string name="cardQuoteDispel">A fresh start.</string>
+    <string name="cardQuoteFullHeal">You\'re not getting rid of me that easily!</string>
+    <string name="cardQuoteKo">You\'re going down with me!</string>
+    <string name="cardQuoteMultishot">I\'ll kill you three times before you land.</string>
+    <string name="cardQuoteQuickRevive">Not today.</string>
+    <string name="cardQuoteRandomWarp">You might know where you\'re going, but not where you are.</string>
+    <string name="cardQuoteReversedHand">This is the traditional way of inflicting temporary amnesia.</string>
+    <string name="cardQuoteSpeedUp">Full sail!</string>
+    <string name="cardQuoteStunned">Whoa there!</string>
+
+    <string name="cardDescAttackUp">Doubles your attack power.</string>
+    <string name="cardDescBackwards">Makes the opponent move backwards.</string>
+    <string name="cardDescDiscardOne">Discards a random card from the opponent.</string>
+    <string name="cardDescDispel">Removes all effects you and your opponent have active.</string>
+    <string name="cardDescFullHeal">Fully restores your health.</string>
+    <string name="cardDescKo">Both you and your opponent die.</string>
+    <string name="cardDescMultishot">Shoot three projectiles at once.</string>
+    <string name="cardDescQuickRevive">Next time you die, you respawn way faster.</string>
+    <string name="cardDescRandomWarp">Both boats get teleported to a random location of the map.</string>
+    <string name="cardDescReversedHand">Make the opponent unable to see his cards.</string>
+    <string name="cardDescSpeedUp">Increase your movement speed.</string>
+    <string name="cardDescStunned">Immobilize your opponent for a short time.</string>
 
 
     <!-- Strings related to Settings -->
