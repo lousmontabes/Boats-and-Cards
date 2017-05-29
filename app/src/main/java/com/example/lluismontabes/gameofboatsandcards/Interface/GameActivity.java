@@ -1400,41 +1400,16 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalEventData() {
 
-            // Make a copy of the local event data to make sure it doesn't get changed by the
-            // main thread while this method is executing.
+            if(!unhandledEvents.isEmpty()){
 
-            /*
-            int currentLocalEventIndex = localEventIndex;
-            Event currentLocalActiveEvent = localActiveEvent;
+                EventIndexPair eventIndexPair = unhandledEvents.get(0);
 
-            System.out.println("ACTIVE EVENT Nº: " + currentLocalEventIndex + " TYPE: " + currentLocalActiveEvent);
-            System.out.println("LAST SENT EVENT Nº: " + lastSentLocalEventIndex);
-
-            if (currentLocalEventIndex > lastSentLocalEventIndex){
-
-                System.out.println("** THIS EVENT IS NEW **");
-
-                int eventNumber = currentLocalActiveEvent.ordinal();
-
-                getJSON("https://pis04-ub.herokuapp.com/send_local_event.php?matchId=" + matchId
-                        + "&player=" + assignedPlayer
-                        + "&event=" + eventNumber
-                        + "&eventIndex=" + currentLocalActiveEvent,
-                        2000);
-
-                lastSentLocalEventIndex = currentLocalEventIndex;
-
-            }
-            */
-
-            Iterator<EventIndexPair> eventIterator = unhandledEvents.iterator();
-
-            while(eventIterator.hasNext()){
-
-                Event event = eventIterator.next().event;
-                int eventIndex = eventIterator.next().eventIndex;
-
+                Event event = eventIndexPair.event;
+                int eventIndex = eventIndexPair.eventIndex;
                 int eventNumber = event.ordinal();
+
+                System.out.println("EVENT: " + event);
+                System.out.println("INDEX: " + eventIndex);
 
                 getJSON("https://pis04-ub.herokuapp.com/send_local_event.php?matchId=" + matchId
                                 + "&player=" + assignedPlayer
@@ -1443,7 +1418,7 @@ public class GameActivity extends AppCompatActivity {
                         2000);
 
                 lastSentLocalEventIndex = eventIndex;
-                eventIterator.remove();
+                unhandledEvents.remove(0);
 
             }
 
