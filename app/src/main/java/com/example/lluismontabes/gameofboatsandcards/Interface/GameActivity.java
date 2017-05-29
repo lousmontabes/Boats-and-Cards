@@ -46,6 +46,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -113,6 +114,7 @@ public class GameActivity extends AppCompatActivity {
     private Event localActiveEvent = Event.NONE;
     private int localEventIndex = 0;
     private int lastSentLocalEventIndex = -1;
+    private ArrayList<EventIndexPair> unhandledEvents = new ArrayList<>();
 
     private Event remoteActiveEvent = Event.NONE;
     private int remoteEventIndex = 0;
@@ -1056,6 +1058,10 @@ public class GameActivity extends AppCompatActivity {
     private void activateEventFlag(Event event) {
         localActiveEvent = event;
         localEventIndex++;
+
+        EventIndexPair eventIndexPair = new EventIndexPair(localActiveEvent, localEventIndex);
+        unhandledEvents.add(eventIndexPair);
+
         log ("Activated event flag: (" + localEventIndex + ")" + localActiveEvent);
     }
 
@@ -1396,6 +1402,8 @@ public class GameActivity extends AppCompatActivity {
 
             // Make a copy of the local event data to make sure it doesn't get changed by the
             // main thread while this method is executing.
+
+            /*
             int currentLocalEventIndex = localEventIndex;
             Event currentLocalActiveEvent = localActiveEvent;
 
@@ -1415,6 +1423,27 @@ public class GameActivity extends AppCompatActivity {
                         2000);
 
                 lastSentLocalEventIndex = currentLocalEventIndex;
+
+            }
+            */
+
+            Iterator<EventIndexPair> eventIterator = unhandledEvents.iterator();
+
+            while(eventIterator.hasNext()){
+
+                Event event = eventIterator.next().event;
+                int eventIndex = eventIterator.next().eventIndex;
+
+                int eventNumber = event.ordinal();
+
+                getJSON("https://pis04-ub.herokuapp.com/send_local_event.php?matchId=" + matchId
+                                + "&player=" + assignedPlayer
+                                + "&event=" + eventNumber
+                                + "&eventIndex=" + eventIndex,
+                        2000);
+
+                lastSentLocalEventIndex = eventIndex;
+                eventIterator.remove();
 
             }
 
@@ -1556,6 +1585,12 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private class EventIndexPair{
+
+        public EventIndexPair(Event e, int i){
+            this.event = e;
+            this.eventIndex = i;
+        }
+
         int eventIndex;
         Event event;
     }
