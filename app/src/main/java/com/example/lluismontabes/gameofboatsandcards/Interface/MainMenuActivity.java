@@ -1,7 +1,6 @@
 package com.example.lluismontabes.gameofboatsandcards.Interface;
 
 import android.content.Intent;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -72,8 +71,8 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                // Start AnimationsActivity (Collection)
-                Intent i = new Intent(MainMenuActivity.this, AnimationsActivity.class);
+                // Start CollectionActivity (Collection)
+                Intent i = new Intent(MainMenuActivity.this, CollectionActivity.class);
                 startActivity(i);
 
             }
