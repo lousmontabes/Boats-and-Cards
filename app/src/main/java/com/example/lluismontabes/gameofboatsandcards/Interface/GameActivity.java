@@ -1394,17 +1394,27 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalEventData() {
 
-            if (localEventIndex > lastSentLocalEventIndex){
+            // Make a copy of the local event data to make sure it doesn't get changed by the
+            // main thread while this method is executing.
+            int currentLocalEventIndex = localEventIndex;
+            Event currentLocalActiveEvent = localActiveEvent;
 
-                int eventNumber = localActiveEvent.ordinal();
+            System.out.println("ACTIVE EVENT Nº: " + currentLocalEventIndex + " TYPE: " + currentLocalActiveEvent);
+            System.out.println("LAST SENT EVENT Nº: " + lastSentLocalEventIndex);
+
+            if (currentLocalEventIndex > lastSentLocalEventIndex){
+
+                System.out.println("** THIS EVENT IS NEW **");
+
+                int eventNumber = currentLocalActiveEvent.ordinal();
 
                 getJSON("https://pis04-ub.herokuapp.com/send_local_event.php?matchId=" + matchId
                         + "&player=" + assignedPlayer
                         + "&event=" + eventNumber
-                        + "&eventIndex=" + localEventIndex,
+                        + "&eventIndex=" + currentLocalActiveEvent,
                         2000);
 
-                lastSentLocalEventIndex = localEventIndex;
+                lastSentLocalEventIndex = currentLocalEventIndex;
 
             }
 
