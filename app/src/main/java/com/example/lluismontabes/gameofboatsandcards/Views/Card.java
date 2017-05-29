@@ -156,29 +156,29 @@ public class Card {
 
     public static Effect getEffect(byte id) {
         switch (id) {
-            case 1:
+            case 0:
                 return Effect.ATTACK_UP;
-            case 2:
+            case 1:
                 return Effect.STUNNED;
-            case 3:
+            case 2:
                 return Effect.SPEED_UP;
-            case 4:
+            case 3:
                 return Effect.REVERSED_HAND;
-            case 5:
+            case 4:
                 return Effect.DISCARD_ONE;
-            case 6:
+            case 5:
                 return Effect.REVERSED_CONTROLS;
-            case 7:
+            case 6:
                 return Effect.TRIPLE_SHOT;
-            case 8:
+            case 7:
                 return Effect.DISPEL;
-            case 9:
+            case 8:
                 return Effect.KO;
-            case 10:
+            case 9:
                 return Effect.QUICK_REVIVE;
-            case 11:
+            case 10:
                 return Effect.FULL_RESTORATION;
-            case 12:
+            case 11:
                 return Effect.RANDOM_WARP;
             default:
                 return Effect.NONE;

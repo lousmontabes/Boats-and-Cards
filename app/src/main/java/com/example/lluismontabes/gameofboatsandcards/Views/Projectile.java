@@ -18,8 +18,9 @@ public class Projectile extends RoundCollider {
     Paint projectilePaint;
     private int damage;
     private float velocity, angle, originX, originY;
+    private boolean firedByLocal;
 
-    public Projectile(Context context, float angle, float originX, float originY, int damage) {
+    public Projectile(Context context, boolean firedByLocal, float angle, float originX, float originY, int damage) {
         super(context, 20);
 
         setWillNotDraw(false);
@@ -29,6 +30,8 @@ public class Projectile extends RoundCollider {
         this.angle = angle;
         this.setX(originX - Graphics.toPixels(getContext(), 10));
         this.setY(originY - Graphics.toPixels(getContext(), 10));
+
+        this.firedByLocal = firedByLocal;
 
         int pixels = (int) Graphics.toPixels(getContext(), 20);
 
@@ -78,6 +81,10 @@ public class Projectile extends RoundCollider {
 
     public int getDamage() {
         return damage;
+    }
+
+    public boolean isFiredByLocal() {
+        return firedByLocal;
     }
 
 }

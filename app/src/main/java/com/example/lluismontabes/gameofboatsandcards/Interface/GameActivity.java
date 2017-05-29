@@ -214,6 +214,7 @@ public class GameActivity extends AppCompatActivity {
     ImageView containerCard1;
     ImageView containerCard2;
     ImageView containerCard3;
+
     CardSpawn cardSpawn;
     Card cardSpawned;
     boolean caught = true;
@@ -221,9 +222,12 @@ public class GameActivity extends AppCompatActivity {
     int cardSpawnCooldown;
     int cardVisibilityTimer;
     boolean cardHasSpawned = true;
+
     private static final int MAX_CARD_COOLDOWN = 500;
     private static final int MIN_CARD_COOLDOWN = 100;
     private static final int CARD_VISIBLE_TIME = 300;
+
+    private Card.Effect effectToSend;
 
     /**
      * SOUND
@@ -471,18 +475,19 @@ public class GameActivity extends AppCompatActivity {
             float oX = player.getX() + pW * Math.max(0.5f, (float) Math.cos(angle));
             float oY = player.getY() + pH * Math.max(0.5f, (float) Math.sin(angle));
             int baseDamage = 20;
+            boolean firedByLocal = player == localPlayer;
 
             if (isEffectActive(Card.Effect.ATTACK_UP)) {
                 baseDamage *= 2;
             }
 
-            Projectile projectile = new Projectile(GameActivity.this, angle, oX, oY, baseDamage);
+            Projectile projectile = new Projectile(GameActivity.this, firedByLocal, angle, oX, oY, baseDamage);
             GameActivity.this.activeProjectiles.add(projectile);
             GameActivity.this.activeColliders.add(projectile);
 
             layout.addView(projectile);
 
-            if (player == localPlayer){
+            if (firedByLocal){
                 activateEventFlag(Event.LOCAL_PLAYER_FIRED);
                 shotsFiredStats++;
                 player.restoreFireCooldown();
@@ -493,11 +498,11 @@ public class GameActivity extends AppCompatActivity {
 
             if (isEffectActive(Card.Effect.TRIPLE_SHOT)) {
 
-                Projectile projectileL = new Projectile(GameActivity.this, angle - .3f, oX, oY, baseDamage);
+                Projectile projectileL = new Projectile(GameActivity.this, firedByLocal, angle - .3f, oX, oY, baseDamage);
                 GameActivity.this.activeProjectiles.add(projectileL);
                 GameActivity.this.activeColliders.add(projectileL);
 
-                Projectile projectileR = new Projectile(GameActivity.this, angle + .3f, oX, oY, baseDamage);
+                Projectile projectileR = new Projectile(GameActivity.this, firedByLocal, angle + .3f, oX, oY, baseDamage);
                 GameActivity.this.activeProjectiles.add(projectileR);
                 GameActivity.this.activeColliders.add(projectileR);
 
@@ -617,11 +622,17 @@ public class GameActivity extends AppCompatActivity {
         while (projectileIterator.hasNext()) {
 
             Projectile p = projectileIterator.next();
+            Player playerToCheck;
+            if (p.isFiredByLocal()) {
+                playerToCheck = remotePlayer;
+            } else {
+                playerToCheck = localPlayer;
+            }
 
-            if (p.isColliding(remotePlayer)) {
+            if (p.isColliding(playerToCheck)) {
 
-                remotePlayer.boatImageView.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
-                remotePlayer.damage(p.getDamage());
+                playerToCheck.boatImageView.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
+                playerToCheck.damage(p.getDamage());
                 showPlayerPopup(remotePlayer, "-" + p.getDamage() + " ♡", 300, true);
 
                 layout.removeView(p);
@@ -630,7 +641,7 @@ public class GameActivity extends AppCompatActivity {
                 if (hitSound.isPlaying()) hitSound.stop();
                 hitSound.start();
 
-            } else remotePlayer.boatImageView.setColorFilter(null);
+            } else playerToCheck.boatImageView.setColorFilter(null);
 
         }
     }
@@ -645,27 +656,39 @@ public class GameActivity extends AppCompatActivity {
 
         if (localPlayerColliding && remotePlayerColliding) {
 
-            // Do nothing - preference is for the player who invaded first.
+            islandDomain.setInvadedBy(Invader.NONE);
+
+            if (!localPlayerInside) {
+                // localPlayer was not inside before the current state.
+                localPlayerInside = true;
+            }
+
+            if (!remotePlayerInside) {
+                // remotePlayer was not inside before the current state.
+                remotePlayerInside = true;
+            }
 
         } else if (localPlayerColliding) {
 
             // localPlayer is colliding with islandDomain.
-            if (!localPlayerInside) {
+            //if (!localPlayerInside) {
 
                 // localPlayer was not inside before this collision.
                 islandDomain.setInvadedBy(Invader.LOCAL_PLAYER);
                 localPlayerInside = true;
-            }
+            remotePlayerInside = false;
+            //}
 
         } else if (remotePlayerColliding) {
 
             // remotePlayer is colliding with islandDomain.
-            if (!remotePlayerInside) {
+            //if (!remotePlayerInside) {
 
                 // remotePlayer was not inside before this collision.
                 islandDomain.setInvadedBy(Invader.REMOTE_PLAYER);
                 remotePlayerInside = true;
-            }
+            localPlayerInside = false;
+            //}
 
         } else {
 
@@ -823,7 +846,11 @@ public class GameActivity extends AppCompatActivity {
                 checkIslandDomainCollisions();
 
                 // Card usage
-                if (cardUsed != 0) useCard(localPlayer, cardUsed);
+                if (cardUsed == 0) {
+                    effectToSend = NONE;
+                } else {
+                    useCard(localPlayer, cardUsed);
+                }
 
                 //Card spawning
                 spawnCard();
@@ -840,7 +867,7 @@ public class GameActivity extends AppCompatActivity {
                 localPosition.set((int) localPlayer.getX(), (int) localPlayer.getY());
                 localAngle = (float) Math.toDegrees(localPlayer.getAngle());
 
-                if (currentFrame % 10 == 9) remoteCurve.set(lastReadRemotePosition, remotePosition, lastReadRemoteAngle, remoteAngle);
+                if (currentFrame % 6 == 5) remoteCurve.set(lastReadRemotePosition, remotePosition, lastReadRemoteAngle, remoteAngle);
 
                 // Move remotePlayer to the retrieved position
                 if (remotePosition != lastReadRemotePosition){
@@ -854,7 +881,8 @@ public class GameActivity extends AppCompatActivity {
                     lastReadRemoteAngle = remoteAngle;
                 }
                 //remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
-                if(remotePlayer.isMoving()) remotePlayer.moveInCurve(remoteCurve);
+                if(remotePlayer.isMoving())
+                    remotePlayer.moveInCurve(remoteCurve);
 
                 //remotePlayer.moveTo(remotePosition);
 
@@ -1166,17 +1194,16 @@ public class GameActivity extends AppCompatActivity {
                     addEffect(effect);
                     break;
 
-                case OPPONENT:
-                    addEffect(effect);
-                    break;
-
                 case ALL:
                     addEffect(effect);
+
+                case OPPONENT:
+                    effectToSend = effect;
                     break;
 
             }
 
-            if (usedCard.getEffect() != FULL_RESTORATION) { // Case handled separately
+            if (usedCard.getEffect() != FULL_RESTORATION) { // Case handled separately in handleEffects()
                 showPlayerPopup(localPlayer, usedCard.getEffect().getName(), 1000, false);
             }
 
@@ -1223,7 +1250,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void addEffect(Card.Effect effect) {
-        cardEffects[effect.ordinal()] = effect.getDuration();
+        if (effect != NONE) {
+            cardEffects[effect.ordinal()] = effect.getDuration();
+        }
     }
 
     private void removeEffect(Card.Effect effect) {
@@ -1285,7 +1314,7 @@ public class GameActivity extends AppCompatActivity {
                         // Send local scoring data
                         sendLocalScoreData();
 
-                        // Retreive both players' scoring data
+                        // Retrieve both players' scoring data
                         retrieveScoringData();
 
                         // Send position & angle data
@@ -1441,6 +1470,24 @@ public class GameActivity extends AppCompatActivity {
             } else {
                 lastCheckSuccessful = false;
             }
+
+        }
+
+        private void sendEffectData() {
+
+            getJSON("https://pis04-ub.herokuapp.com/send_effect.php?matchId=" + matchId
+                    + "&player=" + assignedPlayer
+                    + "&effect=" + effectToSend.ordinal(), 2000);
+
+        }
+
+        private void retrieveEffectData() {
+
+            //somehow get the effect
+
+            Card.Effect effect = NONE;
+
+            addEffect(effect);
 
         }
 

@@ -60,7 +60,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
 
             }
-        });
+        });*
 
         collectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
