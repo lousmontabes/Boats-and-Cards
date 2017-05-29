@@ -16,7 +16,7 @@ import com.example.lluismontabes.gameofboatsandcards.R;
 
 public class MainMenuActivity extends AppCompatActivity {
 
-    private static boolean soundActive = true;
+    public static boolean soundActive = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,10 +88,11 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(soundActive ^= true) {
                     mp.start();
-                    soundButton.setImageResource();
+                    soundButton.setImageResource(android.R.drawable.ic_lock_silent_mode_off);
                 } else {
-                    mp.seekTo(0);
                     mp.pause();
+                    mp.seekTo(0);
+                    soundButton.setImageResource(android.R.drawable.ic_lock_silent_mode);
                 }
             }
         });

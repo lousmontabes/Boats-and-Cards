@@ -53,6 +53,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.*;
+import static com.example.lluismontabes.gameofboatsandcards.Interface.MainMenuActivity.soundActive;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -266,7 +267,7 @@ public class GameActivity extends AppCompatActivity {
         initializeOnlineParameters();
         initializeLayoutViews();
         initializeCards();
-        initializeAudio();
+        if (soundActive) initializeAudio();
         initializePlayers();
         initializeIslandDomain(100);
         initializeListeners();
@@ -461,7 +462,6 @@ public class GameActivity extends AppCompatActivity {
         backgroundMusic = MediaPlayer.create(getApplicationContext(), R.raw.background_music);
 
         // Start background music
-        // TODO: Add condition in case the user has turned off sound in the settings.
         backgroundMusic.start();
 
     }
@@ -521,14 +521,14 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         running = false;
-        backgroundMusic.pause();
+        if (soundActive) backgroundMusic.pause();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         running = true;
-        backgroundMusic.start();
+        if (soundActive) backgroundMusic.start();
         super.onResume();
     }
 
@@ -639,10 +639,10 @@ public class GameActivity extends AppCompatActivity {
 
                 layout.removeView(p);
                 projectileIterator.remove();
-
-                if (hitSound.isPlaying()) hitSound.stop();
-                hitSound.start();
-
+                if (soundActive) {
+                    if (hitSound.isPlaying()) hitSound.stop();
+                    hitSound.start();
+                }
             } else playerToCheck.boatImageView.setColorFilter(null);
 
         }
@@ -784,7 +784,7 @@ public class GameActivity extends AppCompatActivity {
                     showPlayerPopup(localPlayer, "+1", 250, true);
 
                     if (running) {
-                        pointSound.start();
+                        if (soundActive) pointSound.start();
                     }
 
                 }

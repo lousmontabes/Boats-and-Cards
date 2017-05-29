@@ -70,14 +70,6 @@
             android:background="@android:color/transparent"
             app:srcCompat="@android:drawable/ic_lock_silent_mode_off" />
 
-        <ImageButton
-            android:id="@+id/noSoundButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            app:srcCompat="@android:drawable/ic_lock_silent_mode" />
-
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

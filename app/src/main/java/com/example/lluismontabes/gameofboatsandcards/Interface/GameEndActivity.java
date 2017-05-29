@@ -20,6 +20,8 @@ import com.example.lluismontabes.gameofboatsandcards.R;
 
 import org.w3c.dom.Text;
 
+import static com.example.lluismontabes.gameofboatsandcards.Interface.MainMenuActivity.soundActive;
+
 public class GameEndActivity extends AppCompatActivity {
 
     @Override
@@ -55,7 +57,7 @@ public class GameEndActivity extends AppCompatActivity {
         int shotsHitStats = intent.getIntExtra("shotsHitStats", 0);
         int cardsUsedStats = intent.getIntExtra("cardsUsedStats", 0);
 
-        MediaPlayer mp = new MediaPlayer();
+        MediaPlayer mp;
 
         switch (finishState) {
             case LOCAL_WON:
@@ -63,8 +65,10 @@ public class GameEndActivity extends AppCompatActivity {
                 resultTextView.setTextColor(getResources().getColor(R.color.localCounterActive));
                 localScoreTextView.setTextColor(getResources().getColor(R.color.localCounterActive));
 
-                mp = MediaPlayer.create(getApplicationContext(), R.raw.victory);
-                mp.start();
+                if (soundActive) {
+                    mp = MediaPlayer.create(getApplicationContext(), R.raw.victory);
+                    mp.start();
+                }
 
                 break;
 
@@ -87,7 +91,7 @@ public class GameEndActivity extends AppCompatActivity {
         shotsFiredTextView.setText(Integer.toString(shotsFiredStats));
         cardsUsedTextView.setText(Integer.toString(cardsUsedStats));
 
-        newGameButton.setOnClickListener(new View.OnClickListener(){
+        newGameButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Start MatchmakingActivity
                 Intent i = new Intent(GameEndActivity.this, MatchmakingActivity.class);
@@ -95,7 +99,7 @@ public class GameEndActivity extends AppCompatActivity {
             }
         });
 
-        mainMenuButton.setOnClickListener(new View.OnClickListener(){
+        mainMenuButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.paper_turn);
                 mp.start();
