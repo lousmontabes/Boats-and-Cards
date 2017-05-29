@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_blueprint"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/thumb_button_1"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:contentDescription="@string/description_image_1"
+            android:scaleType="fitXY"
+            android:src="@drawable/multishot" />
+
+        <ImageView
+            android:id="@+id/thumb_button_2"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/reversed_hand" />
+
+        <ImageView
+            android:id="@+id/thumb_button_3"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/attack_up" />
+
+        <ImageView
+            android:id="@+id/thumb_button_4"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/rand_warp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="140dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/thumb_button_5"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/backwards" />
+
+        <ImageView
+            android:id="@+id/thumb_button_6"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/discard_one" />
+
+        <ImageView
+            android:id="@+id/thumb_button_7"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/speed_up" />
+
+        <ImageView
+            android:id="@+id/thumb_button_8"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/stunned" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="260dp"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/thumb_button_9"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ko" />
+
+        <ImageView
+            android:id="@+id/thumb_button_10"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/quick_revive" />
+
+        <ImageView
+            android:id="@+id/thumb_button_11"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/full_heal" />
+
+        <ImageView
+            android:id="@+id/thumb_button_12"
+            android:layout_width="67dp"
+            android:layout_height="90dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/dispel" />
+
+    </LinearLayout>
+
+
+    <!-- This initially-hidden ImageView will hold the expanded/zoomed version of
+         the images above. Without transformations applied, it takes up the entire
+         screen. To achieve the "zoom" animation, this view's bounds are animated
+         from the bounds of the thumbnail button above, to its final laid-out
+         bounds.
+         -->
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/container2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/notelist"
+            layout="@layout/first_view" />
+
+        <include
+            android:id="@+id/notelist"
+            layout="@layout/second_view" />
+
+        <include
+            android:id="@+id/notelist2"
+            layout="@layout/reversed_hand_first_view" />
+
+        <include
+            android:id="@+id/notelist2"
+            layout="@layout/reversed_hand_second_view" />
+
+        <include
+            android:id="@+id/notelist3"
+            layout="@layout/attack_up_first_view" />
+
+        <include
+            android:id="@+id/notelist3"
+            layout="@layout/attack_up_second_view" />
+
+        <include
+            android:id="@+id/notelist4"
+            layout="@layout/rand_warp_first_view" />
+
+        <include
+            android:id="@+id/notelist4"
+            layout="@layout/rand_warp_second_view" />
+
+        <include
+            android:id="@+id/notelist5"
+            layout="@layout/backwards_first_view" />
+
+        <include
+            android:id="@+id/notelist5"
+            layout="@layout/backwards_second_view" />
+
+        <include
+            android:id="@+id/notelist6"
+            layout="@layout/discard_one_first_view" />
+
+        <include
+            android:id="@+id/notelist6"
+            layout="@layout/discard_one_second_view" />
+
+        <include
+            android:id="@+id/notelist7"
+            layout="@layout/speed_up_first_view" />
+
+        <include
+            android:id="@+id/notelist7"
+            layout="@layout/speed_up_second_view" />
+
+        <include
+            android:id="@+id/notelist8"
+            layout="@layout/stunned_first_view" />
+
+        <include
+            android:id="@+id/notelist8"
+            layout="@layout/stunned_second_view" />
+
+        <include
+            android:id="@+id/notelist9"
+            layout="@layout/full_restoration_first_view" />
+
+        <include
+            android:id="@+id/notelist9"
+            layout="@layout/full_restoration_second_view" />
+
+        <include
+            android:id="@+id/notelist10"
+            layout="@layout/dispel_first_view" />
+
+        <include
+            android:id="@+id/notelist10"
+            layout="@layout/dispel_second_view" />
+
+        <include
+            android:id="@+id/notelist11"
+            layout="@layout/ko_first_view" />
+
+        <include
+            android:id="@+id/notelist11"
+            layout="@layout/ko_second_view" />
+
+        <include
+            android:id="@+id/notelist12"
+            layout="@layout/quick_revive_first_view" />
+
+        <include
+            android:id="@+id/notelist12"
+            layout="@layout/quick_revive_second_view" />
+
+    </FrameLayout>
+
+</FrameLayout>

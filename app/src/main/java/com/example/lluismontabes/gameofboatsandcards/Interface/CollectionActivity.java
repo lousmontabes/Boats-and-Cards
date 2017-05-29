@@ -10,6 +10,8 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
@@ -21,8 +23,7 @@ import com.example.lluismontabes.gameofboatsandcards.R;
  * Created by JorgeTB on 15/04/2017.
  */
 
-public class AnimationsActivity extends Activity {
-
+public class CollectionActivity extends Activity {
 
     // Hold a reference to the current animator,
     // so that it can be canceled mid-way.
@@ -32,7 +33,6 @@ public class AnimationsActivity extends Activity {
     // duration is ideal for subtle animations or animations that occur
     // very frequently.
     private int mShortAnimationDuration;
-
 
     //num clicks
     private int clicks = 0;
@@ -53,7 +53,11 @@ public class AnimationsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_zoom);
+
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        setContentView(R.layout.activity_collection);
 
         final ImageView reverse_of_multishot = (ImageView) findViewById(R.id.reverse_of_multishot);
         reverse_of_multishot.setVisibility(View.GONE);
