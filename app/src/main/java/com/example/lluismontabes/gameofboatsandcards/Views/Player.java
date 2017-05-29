@@ -315,7 +315,7 @@ public class Player extends RectangularCollider {
         }else{
             this.moveTo(curve.getPointAt(1));
         }
-        p += 0.025f;
+        p += 1/6f;
 
         System.out.println("p: " + p);
 

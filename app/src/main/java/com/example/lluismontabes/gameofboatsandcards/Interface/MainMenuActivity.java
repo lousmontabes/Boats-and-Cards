@@ -32,7 +32,7 @@ public class MainMenuActivity extends AppCompatActivity {
         //TextView settingsTextView = (TextView) findViewById(R.id.collectionTextView);
         //Button debugButton = (Button) findViewById(R.id.button3);
         TextView collectionTextView = (TextView) findViewById(R.id.collectionTextView);
-        ImageButton soundButton = (ImageButton) findViewById(R.id.soundButton);
+        final ImageButton soundButton = (ImageButton) findViewById(R.id.soundButton);
 
         playButton.setOnClickListener(new View.OnClickListener()
         {
@@ -89,6 +89,7 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(soundActive ^= true) {
                     mp.start();
+                    soundButton.setImageResource();
                 } else {
                     mp.seekTo(0);
                     mp.pause();
