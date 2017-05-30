@@ -113,7 +113,7 @@
                 android:id="@+id/skullImageView"
                 android:layout_width="27dp"
                 android:layout_height="32dp"
-                app:srcCompat="@drawable/skull" />
+                app:srcCompat="@drawable/skull"/>
         </LinearLayout>
 
     </RelativeLayout>

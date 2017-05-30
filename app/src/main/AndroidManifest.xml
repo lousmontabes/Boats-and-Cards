@@ -60,8 +60,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Interface.CollectionActivity" />
-
     </application>
 
 </manifest>
