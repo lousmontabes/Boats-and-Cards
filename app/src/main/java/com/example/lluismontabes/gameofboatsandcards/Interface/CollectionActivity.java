@@ -86,7 +86,7 @@ public class CollectionActivity extends Activity {
 
         int height_pixels = (int) (40 * getResources().getDisplayMetrics().density);
 
-        int left_cita = width/4 +20;
+        int left_cita = 100;
         int top_cita = (int) (height*0.65);
         int right_cita = 100;
         int bottom_cita = 0;

@@ -14,6 +14,7 @@
     <string name="searchingForOpponentMessage">Searching for an opponent&#8230;</string>
     <string name="problemFindingMatchMessage">There was a problem finding a match. Please try again later.</string>
     <string name="joiningMatchMessage">Joining match with ID: </string>
+    <string name="opponentFoundMessage">Opponent found!</string>
 
     <string name="copyrightDisclaimer">Projecte Integrat de Software\nUniversitat de Barcelona</string>
     <string name="comingSoon">Soon™</string>
