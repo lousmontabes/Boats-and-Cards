@@ -44,29 +44,6 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         });
 
-        /*settingsTextView.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v) {
-
-                // Start SettingsActivity
-                Intent i = new Intent(MainMenuActivity.this, SettingsActivity.class);
-                startActivity(i);
-
-            }
-        });
-
-        debugButton.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v) {
-
-                // Start GameActivity
-                Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
-                startActivity(i);
-
-
-            }
-        });*/
-
         collectionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

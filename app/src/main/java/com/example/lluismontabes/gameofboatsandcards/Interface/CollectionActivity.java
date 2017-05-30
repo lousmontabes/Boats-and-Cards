@@ -96,7 +96,7 @@ public class CollectionActivity extends Activity {
         layoutParams.setMargins(left_cita,top_cita,right_cita,bottom_cita);
         cita_attack_up.setVisibility(View.INVISIBLE);
         cita_attack_up.setLayoutParams(layoutParams);
-        cita_attack_up.setText("  'More damage, more power, but \n for a pirate there is never enough'");
+        cita_attack_up.setText(R.string.cardQuoteAttackUp);
         cita_attack_up.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_attack_up.setTextColor(Color.WHITE);
         activityZ.addView(cita_attack_up);
@@ -106,7 +106,7 @@ public class CollectionActivity extends Activity {
         //layoutParams.setMargins(left_cita,top_cita,right_cita,bottom_cita);
         cita_backwards.setVisibility(View.INVISIBLE);
         cita_backwards.setLayoutParams(layoutParams);
-        cita_backwards.setText("'Who has set the rudder upside down?'");
+        cita_backwards.setText(R.string.cardQuoteBackwards);
         cita_backwards.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_backwards.setTextColor(Color.WHITE);
         activityZ.addView(cita_backwards);
@@ -116,7 +116,7 @@ public class CollectionActivity extends Activity {
         //layoutParams2.setMargins(left_cita,top_cita,right_cita,bottom_cita);
         cita_discard_one.setVisibility(View.INVISIBLE);
         cita_discard_one.setLayoutParams(layoutParams);
-        cita_discard_one.setText("  'Freshwater sailor, \n a good one escaped from you!'");
+        cita_discard_one.setText(R.string.cardQuoteDiscardOne);
         cita_discard_one.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_discard_one.setTextColor(Color.WHITE);
         activityZ.addView(cita_discard_one);
@@ -126,7 +126,7 @@ public class CollectionActivity extends Activity {
         //layoutParams3.setMargins(left_cita,top_cita,right_cita,bottom_cita);
         cita_multishot.setVisibility(View.INVISIBLE);
         cita_multishot.setLayoutParams(layoutParams);
-        cita_multishot.setText("     'Too much rum? \nMaybe you start seeing triple?'");
+        cita_multishot.setText(R.string.cardQuoteMultishot);
         cita_multishot.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_multishot.setTextColor(Color.WHITE);
         activityZ.addView(cita_multishot);
@@ -136,7 +136,7 @@ public class CollectionActivity extends Activity {
         //layoutParams4.setMargins(left_cita,top_cita,right_cita,bottom_cita);
         cita_rand_warp.setVisibility(View.INVISIBLE);
         cita_rand_warp.setLayoutParams(layoutParams);
-        cita_rand_warp.setText("  'The sea is very unpredictable,\n maybe too much ARRRRG'");
+        cita_rand_warp.setText(R.string.cardQuoteRandomWarp);
         cita_rand_warp.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_rand_warp.setTextColor(Color.WHITE);
         activityZ.addView(cita_rand_warp);
@@ -144,7 +144,7 @@ public class CollectionActivity extends Activity {
         final TextView cita_reversed_hand = new TextView(this);
         cita_reversed_hand.setVisibility(View.INVISIBLE);
         cita_reversed_hand.setLayoutParams(layoutParams);
-        cita_reversed_hand.setText("  'You can not cheat if \n you do not see the cards'");
+        cita_reversed_hand.setText(R.string.cardQuoteReversedHand);
         cita_reversed_hand.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_reversed_hand.setTextColor(Color.WHITE);
         activityZ.addView(cita_reversed_hand);
@@ -152,7 +152,7 @@ public class CollectionActivity extends Activity {
         final TextView cita_speed_up = new TextView(this);
         cita_speed_up.setVisibility(View.INVISIBLE);
         cita_speed_up.setLayoutParams(layoutParams);
-        cita_speed_up.setText("             'Stern wind!'");
+        cita_speed_up.setText(R.string.cardQuoteSpeedUp);
         cita_speed_up.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_speed_up.setTextColor(Color.WHITE);
         activityZ.addView(cita_speed_up);
@@ -160,7 +160,7 @@ public class CollectionActivity extends Activity {
         final TextView cita_stunned = new TextView(this);
         cita_stunned.setVisibility(View.INVISIBLE);
         cita_stunned.setLayoutParams(layoutParams);
-        cita_stunned.setText("  'This looks like a whirlpool \nof water ... good luck, you'll need it'");
+        cita_stunned.setText(R.string.cardQuoteStunned);
         cita_stunned.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_stunned.setTextColor(Color.WHITE);
         activityZ.addView(cita_stunned);
@@ -168,7 +168,7 @@ public class CollectionActivity extends Activity {
         final TextView cita_full_heal = new TextView(this);
         cita_full_heal.setVisibility(View.INVISIBLE);
         cita_full_heal.setLayoutParams(layoutParams);
-        cita_full_heal.setText("      'Take an orange! there is\n nothing better against scurvy'");
+        cita_full_heal.setText(R.string.cardQuoteFullHeal);
         cita_full_heal.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_full_heal.setTextColor(Color.WHITE);
         activityZ.addView(cita_full_heal);
@@ -176,7 +176,7 @@ public class CollectionActivity extends Activity {
         final TextView cita_ko = new TextView(this);
         cita_ko.setVisibility(View.INVISIBLE);
         cita_ko.setLayoutParams(layoutParams);
-        cita_ko.setText("'You will come down with me!'");
+        cita_ko.setText(R.string.cardQuoteKo);
         cita_ko.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_ko.setTextColor(Color.WHITE);
         activityZ.addView(cita_ko);
@@ -184,7 +184,7 @@ public class CollectionActivity extends Activity {
         final TextView cita_quick_revive = new TextView(this);
         cita_quick_revive.setVisibility(View.INVISIBLE);
         cita_quick_revive.setLayoutParams(layoutParams);
-        cita_quick_revive.setText("  'Son of the sea,\n you have another chance'");
+        cita_quick_revive.setText(R.string.cardQuoteQuickRevive);
         cita_quick_revive.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_quick_revive.setTextColor(Color.WHITE);
         activityZ.addView(cita_quick_revive);
@@ -192,7 +192,7 @@ public class CollectionActivity extends Activity {
         final TextView cita_dispel = new TextView(this);
         cita_dispel.setVisibility(View.INVISIBLE);
         cita_dispel.setLayoutParams(layoutParams);
-        cita_dispel.setText("       'Have a drink of rum!'");
+        cita_dispel.setText(R.string.cardQuoteDispel);
         cita_dispel.setTypeface(null, Typeface.BOLD_ITALIC);
         cita_dispel.setTextColor(Color.WHITE);
         activityZ.addView(cita_dispel);
