@@ -123,7 +123,8 @@ public class GameActivity extends AppCompatActivity {
         @SerializedName("18") LOCAL_PLAYER_USED_KO,
         @SerializedName("19") LOCAL_PLAYER_USED_QUICK_REVIVE,
         @SerializedName("20") LOCAL_PLAYER_USED_RANDOM_WARP,
-        @SerializedName("21") LOCAL_PLAYER_WON
+        @SerializedName("21") LOCAL_PLAYER_WON,
+        @SerializedName("22") LOCAL_PLAYER_LEFT
     }
     private Event localActiveEvent = Event.NONE;
     private int localEventIndex = 0;
@@ -139,6 +140,7 @@ public class GameActivity extends AppCompatActivity {
     // Online invasion and winning statuses
     public enum Invader {NONE, LOCAL_PLAYER, REMOTE_PLAYER}
     public enum GameState {UNFINISHED, TIME_OUT, LOCAL_WON, REMOTE_WON, DRAW}
+    public enum FinishCondition {TIME_OUT, LOCAL_MAX_SCORE, REMOTE_MAX_SCORE, REMOTE_PLAYER_LEFT}
     private GameState currentGameState = GameState.UNFINISHED;
 
     /**
@@ -310,6 +312,12 @@ public class GameActivity extends AppCompatActivity {
 
         localPlayerReady = true;
 
+    }
+
+    protected void onStop() {
+        super.onStop();
+        connectionActive = false;
+        running = false;
     }
 
     private void startRemoteTask() {
@@ -550,16 +558,14 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        running = false;
-        if (soundActive) backgroundMusic.pause();
         super.onPause();
+        if (soundActive) backgroundMusic.pause();
     }
 
     @Override
     protected void onResume() {
-        running = true;
-        if (soundActive) backgroundMusic.start();
         super.onResume();
+        if (soundActive) backgroundMusic.start();
     }
 
     @Override
@@ -574,14 +580,13 @@ public class GameActivity extends AppCompatActivity {
                 })
                 .setPositiveButton(getString(R.string.exitGamePositiveButton), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        activateEventFlag(Event.LOCAL_PLAYER_LEFT);
                         gameFinished = true;
                         finish();
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
-
-        // TODO: Notify server that the local player has left the match.
     }
 
     private void startRefreshTimer() {
@@ -781,14 +786,14 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void finishGame() {
+    private void finishGame(FinishCondition condition) {
 
         if (!gameFinished) {
 
             gameFinished = true;
             Intent i = new Intent(GameActivity.this, GameEndActivity.class);
 
-            if (localScore > remoteScore) {
+            if ((localScore > remoteScore) || condition == FinishCondition.REMOTE_PLAYER_LEFT) {
                 currentGameState = GameState.LOCAL_WON;
             } else if (localScore < remoteScore) {
                 currentGameState = GameState.REMOTE_WON;
@@ -796,6 +801,7 @@ public class GameActivity extends AppCompatActivity {
                 currentGameState = GameState.DRAW;
             }
 
+            i.putExtra("finishCondition", condition);
             i.putExtra("gameState", currentGameState);
             i.putExtra("localScoreStats", localScore);
             i.putExtra("remoteScoreStats", remoteScore);
@@ -874,7 +880,7 @@ public class GameActivity extends AppCompatActivity {
                     remoteScore++;
                     framesUntilTickLocal = MAX_FRAMES_UNTIL_TICK;
 
-                    finishGame();
+                    finishGame(FinishCondition.REMOTE_MAX_SCORE);
 
                 }
 
@@ -892,6 +898,9 @@ public class GameActivity extends AppCompatActivity {
     private void refresh() {
         runOnUiThread(new Runnable() {
             public void run() {
+
+                remotePlayer.bringToFront();
+                localPlayer.bringToFront();
 
                 // Advance current frame
                 currentFrame++;
@@ -976,22 +985,19 @@ public class GameActivity extends AppCompatActivity {
                 // Check game finish conditions
                 checkGameFinish();
 
-                remotePlayer.bringToFront();
-                localPlayer.bringToFront();
-
             }
         });
     }
 
     private void checkGameFinish() {
 
-        if (secondsLeft <= 0) finishGame(); // Time ran out
+        if (secondsLeft <= 0) finishGame(FinishCondition.TIME_OUT); // Time ran out
         else if (localScore >= 100){
             activateEventFlag(Event.LOCAL_PLAYER_WON);
-            finishGame(); // localPlayer reached 100%
+            finishGame(FinishCondition.LOCAL_MAX_SCORE); // localPlayer reached 100%
         }
         else if (remoteScore >= 100){
-            finishGame(); // remotePlayer reached 100%
+            finishGame(FinishCondition.REMOTE_MAX_SCORE); // remotePlayer reached 100%
         }
 
     }
@@ -1005,6 +1011,8 @@ public class GameActivity extends AppCompatActivity {
         if (!localPlayer.isAlive()){
 
             System.out.println("localPlayer is dead");
+
+            deathPromptLayout.bringToFront();
 
             int timeToRespawn = localPlayer.getTimeToRespawn();
             respawnTimerTextView.setText(Integer.toString(timeToRespawn / fps + 1));
@@ -1065,7 +1073,7 @@ public class GameActivity extends AppCompatActivity {
                 case LOCAL_PLAYER_WON:
                     // remotePlayer won the game
                     remoteScore = 100;
-                    finishGame();
+                    finishGame(FinishCondition.REMOTE_MAX_SCORE);
                     break;
 
                 case LOCAL_PLAYER_USED_SPEED_UP:
@@ -1121,6 +1129,9 @@ public class GameActivity extends AppCompatActivity {
                     showPlayerPopup(localPlayer, Card.Effect.RANDOM_WARP.getName(), 1000, false);
                     addEffect(RANDOM_WARP);
                     break;
+
+                case LOCAL_PLAYER_LEFT:
+                    finishGame(FinishCondition.REMOTE_PLAYER_LEFT);
 
                 default:
                     break;
@@ -1470,7 +1481,7 @@ public class GameActivity extends AppCompatActivity {
     public class RefreshTask extends TimerTask {
         @Override
         public void run() {
-            if (localPlayerReady && remotePlayerReady){
+            if (localPlayerReady && remotePlayerReady && running){
 
                 // Start the game loop only once both players have posted their
                 // ready signals to the server and these signals have been retrieved.

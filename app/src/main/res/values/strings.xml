@@ -33,6 +33,11 @@
     <string name="newGame">New Game</string>
     <string name="returnToMenu">Back to menu</string>
 
+    <string name="timeRanOut">Time ran out</string>
+    <string name="localReachedMaxScore">You reached the maximum score</string>
+    <string name="remoteReachedMaxScore">The opponent reached the maximum score</string>
+    <string name="remoteLeftMatch">The opponent has left the match</string>
+
     <string name="cardQuoteAttackUp">Let\'s play our lives away!</string>
     <string name="cardQuoteBackwards">Who turned the wheel upside down?</string>
     <string name="cardQuoteDiscardOne">You won\'t be needing that.</string>

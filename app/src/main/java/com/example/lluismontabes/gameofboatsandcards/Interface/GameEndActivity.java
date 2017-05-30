@@ -38,6 +38,8 @@ public class GameEndActivity extends AppCompatActivity {
         TextView localScoreTextView = (TextView) findViewById(R.id.localScoreTextView);
         TextView remoteScoreTextView = (TextView) findViewById(R.id.remoteScoreTextView);
 
+        TextView finishConditionTextView = (TextView) findViewById(R.id.finishConditionTextView);
+
         TextView killsTextView = (TextView) findViewById(R.id.killsTextView);
         TextView deathsTextView = (TextView) findViewById(R.id.deathsTextView);
         TextView shotsFiredTextView = (TextView) findViewById(R.id.shotsFiredTextView);
@@ -47,6 +49,7 @@ public class GameEndActivity extends AppCompatActivity {
         Button mainMenuButton = (Button) findViewById(R.id.mainMenuButton);
 
         Intent intent = getIntent();
+        GameActivity.FinishCondition finishCondition = (GameActivity.FinishCondition) intent.getSerializableExtra("finishCondition");
         GameActivity.GameState finishState = (GameActivity.GameState) intent.getSerializableExtra("gameState");
 
         int localScoreStats = intent.getIntExtra("localScoreStats", 0);
@@ -90,6 +93,26 @@ public class GameEndActivity extends AppCompatActivity {
                 break;
         }
 
+        switch (finishCondition){
+
+            case TIME_OUT:
+                finishConditionTextView.setText(R.string.timeRanOut);
+                break;
+
+            case LOCAL_MAX_SCORE:
+                finishConditionTextView.setText(R.string.localReachedMaxScore);
+                break;
+
+            case REMOTE_MAX_SCORE:
+                finishConditionTextView.setText(R.string.remoteReachedMaxScore);
+                break;
+
+            case REMOTE_PLAYER_LEFT:
+                finishConditionTextView.setText(R.string.remoteLeftMatch);
+                break;
+
+        }
+
         localScoreTextView.setText(Integer.toString(localScoreStats) + "%");
         remoteScoreTextView.setText(Integer.toString(remoteScoreStats) + "%");
         killsTextView.setText(Integer.toString(killsStats));
@@ -107,9 +130,9 @@ public class GameEndActivity extends AppCompatActivity {
 
         mainMenuButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.paper_turn);
-                mp.start();
-                onBackPressed();
+                // Start MainMenuActivity
+                Intent i = new Intent(GameEndActivity.this, MainMenuActivity.class);
+                startActivity(i);
             }
         });
 
