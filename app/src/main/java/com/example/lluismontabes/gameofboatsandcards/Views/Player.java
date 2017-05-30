@@ -2,10 +2,10 @@ package com.example.lluismontabes.gameofboatsandcards.Views;
 
 import android.content.Context;
 import android.graphics.Point;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 
+import com.example.lluismontabes.gameofboatsandcards.Interface.GameActivity;
 import com.example.lluismontabes.gameofboatsandcards.Model.Collider;
 import com.example.lluismontabes.gameofboatsandcards.Model.CubicBezierCurve;
 import com.example.lluismontabes.gameofboatsandcards.Model.RectangularCollider;
@@ -20,6 +20,11 @@ import com.example.lluismontabes.gameofboatsandcards.R;
 public class Player extends RectangularCollider {
 
     /**
+     * ONLINE PARAMETERS
+     */
+    private boolean local;
+
+    /**
      * VIEWS
      */
     public ImageView boatImageView;
@@ -30,6 +35,7 @@ public class Player extends RectangularCollider {
      */
     // Velocity
     private final float MAX_VELOCITY = 40;
+    private final float REMOTE_VELOCITY = MAX_VELOCITY;
     private final float MAX_ROTATION_SPEED = 45;
     private float velocity, idleVelocity;
     private float acceleration;
@@ -53,16 +59,20 @@ public class Player extends RectangularCollider {
      * HEALTH & GAMEPLAY PARAMETERS
      */
     // Health
-    public static final int MAX_HEALTH = 100;
-    private int health;
+    public static final int MAX_HEALTH = 100;       // MAX HEALTH: 100 units of health
+    private int health;                             // Current health
 
     // Cooldowns
-    private final int MAX_FIRE_COOLDOWN = 10;       // 10 frames of max fire cooldown
-    private int fireCooldown;
+    private final int MAX_FIRE_COOLDOWN = 10;       // MAX FIRE COOLDOWN: 10 frames
+    private int fireCooldown;                       // Countdown until Player can fire again
 
-    private final int MAX_RESPAWN_TIME = 150;
-    private final int QUICK_REPAWN_TIME = 30;
-    private int timeToRespawn;
+    private final int MAX_RESPAWN_TIME = 150;       // MAX RESPAWN TIME: 10 frames
+    private final int QUICK_REPAWN_TIME = 30;       // QUICK RESPAWN TIME: 30 frames
+    private int timeToRespawn;                      // Countdown until respawn
+
+    // Damage
+    private final int BASE_DAMAGE = 20;             // BASE DAMAGE: 20 units of health per shot
+    private int damage;                             // Current damage inflicted per shot
 
     // Effects
     private boolean alive;
@@ -71,8 +81,10 @@ public class Player extends RectangularCollider {
     private boolean speedUp;
     private boolean backwards;
 
-    public Player(Context context) {
+    public Player(Context context, boolean local) {
         super(context, 34, 59, 40, 45);
+
+        this.local = local;
 
         LayoutInflater.from(context).inflate(R.layout.player, this);
 
@@ -133,6 +145,10 @@ public class Player extends RectangularCollider {
         this.velocity = MAX_VELOCITY;
     }
 
+    public void setRemoteVelocity(){
+        this.velocity = REMOTE_VELOCITY;
+    }
+
     public void setMoving(boolean m) { this.moving = m; }
 
     // GETTERS
@@ -161,6 +177,15 @@ public class Player extends RectangularCollider {
     }
 
     public boolean isMoving() { return this.moving; }
+
+    public boolean isLocal() { return this.local; }
+
+    public int getDamage(boolean attackUpActive){
+        if (attackUpActive) return 40;
+        else return 20;
+    }
+
+    // MOVEMENT
 
     public void accelerate() {
 
@@ -312,10 +337,16 @@ public class Player extends RectangularCollider {
         //this.setRotation(curve.getAngleAt(p % 1));
         if (p >= 1){
             setMoving(false);
+            float a = curve.getAngleAt(1) + 90;
+            setAngle(a);
+            setRotation(a);
         }else{
             this.moveTo(curve.getPointAt(1));
         }
-        p += 1/6f;
+
+        //float dist = (float) Math.hypot(curve.getPointAt(1).x - getX(), curve.getPointAt(1).y - getY());
+
+        p += 0.015f;
 
         System.out.println("p: " + p);
 
@@ -339,23 +370,6 @@ public class Player extends RectangularCollider {
         currentMaxAngle = a2 + rotationSpeed;
         currentMinAngle = a2 - rotationSpeed;
 
-    }
-
-    public int getTimeToRespawn(){
-
-        if ( timeToRespawn > 0)  timeToRespawn--;
-        return  timeToRespawn;
-
-    }
-
-    public void respawn() {
-        System.out.println("Respawning");
-        this.alive = true;
-        health = MAX_HEALTH;
-        velocity = 0;
-        setAngle(0);
-        setAlpha(1);
-        toStartPosition();
     }
 
     public void setStunned(boolean stunned) {
@@ -397,8 +411,26 @@ public class Player extends RectangularCollider {
              timeToRespawn = MAX_RESPAWN_TIME;
         }
 
+        if (isLocal()) GameActivity.deathPromptVisible(true);
         //removeAllEffects();
+    }
 
+    public int getTimeToRespawn(){
+
+        if ( timeToRespawn > 0)  timeToRespawn--;
+        return  timeToRespawn;
+
+    }
+
+    public void respawn() {
+        System.out.println("Respawning");
+        this.alive = true;
+        health = MAX_HEALTH;
+        velocity = 0;
+        setAngle(0);
+        setAlpha(1);
+        toStartPosition();
+        if (isLocal()) GameActivity.deathPromptVisible(false);
     }
 
     // COOLDOWNS

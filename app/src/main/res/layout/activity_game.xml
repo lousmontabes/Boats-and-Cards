@@ -89,6 +89,33 @@
             android:layout_width="70dp"
             android:layout_height="70dp" />
 
+        <LinearLayout
+            android:id="@+id/deathPromptLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:alpha="0"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/respawnTimerTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/red"
+                android:textSize="36sp"
+                android:textStyle="bold|italic" />
+
+            <ImageView
+                android:id="@+id/skullImageView"
+                android:layout_width="27dp"
+                android:layout_height="32dp"
+                app:srcCompat="@drawable/skull" />
+        </LinearLayout>
+
     </RelativeLayout>
 
     <com.example.lluismontabes.gameofboatsandcards.Views.Joystick

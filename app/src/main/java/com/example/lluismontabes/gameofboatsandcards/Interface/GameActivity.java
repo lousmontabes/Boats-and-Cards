@@ -20,6 +20,10 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.ScaleAnimation;
 import android.widget.*;
 
 import com.example.lluismontabes.gameofboatsandcards.Model.CubicBezierCurve;
@@ -46,7 +50,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -108,18 +111,30 @@ public class GameActivity extends AppCompatActivity {
         @SerializedName("6") REMOTE_PLAYER_FIRED,
         @SerializedName("7") LOCAL_PLAYER_DAMAGED,
         @SerializedName("8") REMOTE_PLAYER_DAMAGED,
-        @SerializedName("9") LOCAL_PLAYER_USED_CARD,
-        @SerializedName("10") REMOTE_PLAYER_USED_CARD,
-        @SerializedName("11") LOCAL_PLAYER_WON
+        @SerializedName("9") LOCAL_PLAYER_USED_SPEED_UP,
+        @SerializedName("10") LOCAL_PLAYER_USED_ATTACK_UP,
+        @SerializedName("11") LOCAL_PLAYER_USED_FULL_RESTORATION,
+        @SerializedName("12")LOCAL_PLAYER_USED_STUNNED,
+        @SerializedName("13") LOCAL_PLAYER_USED_REVERSED_HAND,
+        @SerializedName("14") LOCAL_PLAYER_USED_DISCARD_ONE,
+        @SerializedName("15") LOCAL_PLAYER_USED_REVERSED_CONTROLS,
+        @SerializedName("16") LOCAL_PLAYER_USED_TRIPLE_SHOT,
+        @SerializedName("17") LOCAL_PLAYER_USED_DISPEL,
+        @SerializedName("18") LOCAL_PLAYER_USED_KO,
+        @SerializedName("19") LOCAL_PLAYER_USED_QUICK_REVIVE,
+        @SerializedName("20") LOCAL_PLAYER_USED_RANDOM_WARP,
+        @SerializedName("21") LOCAL_PLAYER_WON
     }
     private Event localActiveEvent = Event.NONE;
     private int localEventIndex = 0;
     private int lastSentLocalEventIndex = -1;
-    private ArrayList<EventIndexPair> unhandledEvents = new ArrayList<>();
 
     private Event remoteActiveEvent = Event.NONE;
     private int remoteEventIndex = 0;
     private int lastReadRemoteEventIndex = 0;
+
+    private ArrayList<EventIndexPair> localUnsentEvents = new ArrayList<>();
+    private ArrayList<EventIndexPair> remoteUnhandledEvents = new ArrayList<>();
 
     // Online invasion and winning statuses
     public enum Invader {NONE, LOCAL_PLAYER, REMOTE_PLAYER}
@@ -167,6 +182,11 @@ public class GameActivity extends AppCompatActivity {
 
     // Images
     ImageView treasureImageView;
+
+    // Death prompt
+    static LinearLayout deathPromptLayout;
+    TextView respawnTimerTextView;
+    static boolean deathPromptActive = false;
 
     /**
      * STATISTICS
@@ -267,7 +287,7 @@ public class GameActivity extends AppCompatActivity {
         initializeOnlineParameters();
         initializeLayoutViews();
         initializeCards();
-        if (soundActive) initializeAudio();
+        initializeAudio();
         initializePlayers();
         initializeIslandDomain(100);
         initializeListeners();
@@ -309,7 +329,7 @@ public class GameActivity extends AppCompatActivity {
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (cardUsed == 0) playerShoot(localPlayer);
+                if (cardUsed == 0) spawnProjectile(localPlayer);
                 // UNIMPLEMENTED: Point-and-click movement
                 //moveObjectTo(localPlayer, event.getX(), event.getY());
                 return false;
@@ -343,6 +363,10 @@ public class GameActivity extends AppCompatActivity {
         // Layout
         layout = (RelativeLayout) findViewById(R.id.gameLayout);
         cardLayout = (LinearLayout) findViewById(R.id.cardLayout);
+
+        // Death prompt
+        deathPromptLayout = (LinearLayout) findViewById(R.id.deathPromptLayout);
+        respawnTimerTextView = (TextView) findViewById(R.id.respawnTimerTextView);
 
         // Debugging logs
         log = (TextView) findViewById(R.id.log);
@@ -428,11 +452,14 @@ public class GameActivity extends AppCompatActivity {
 
     private void initializePlayers() {
 
-        localPlayer = new Player(GameActivity.this);
+        localPlayer = new Player(GameActivity.this, true);
         localPlayer.setMoving(true);
 
-        remotePlayer = new Player(GameActivity.this);
-        remotePlayer.setMaxVelocity();
+        remotePlayer = new Player(GameActivity.this, false);
+        remotePlayer.setRemoteVelocity();
+
+        remotePlayer.bringToFront();
+        localPlayer.bringToFront();
 
         //localPlayer.showHitbox();
 
@@ -453,31 +480,37 @@ public class GameActivity extends AppCompatActivity {
 
     private void initializeAudio() {
 
-        // Initialize sound effects
-        pointSound = MediaPlayer.create(getApplicationContext(), R.raw.point);
-        fireSound = MediaPlayer.create(getApplicationContext(), R.raw.fire);
-        hitSound = MediaPlayer.create(getApplicationContext(), R.raw.hit);
+        if (soundActive) {
+            // Initialize sound effects
+            pointSound = MediaPlayer.create(getApplicationContext(), R.raw.point);
+            fireSound = MediaPlayer.create(getApplicationContext(), R.raw.fire);
+            hitSound = MediaPlayer.create(getApplicationContext(), R.raw.hit);
 
-        // Initialize background music
-        backgroundMusic = MediaPlayer.create(getApplicationContext(), R.raw.background_music);
+            // Initialize background music
+            backgroundMusic = MediaPlayer.create(getApplicationContext(), R.raw.background_music);
 
-        // Start background music
-        backgroundMusic.start();
+            // Start background music
+            backgroundMusic.start();
+        }
 
     }
 
-    private void playerShoot(Player player) {
+    /**
+     * Makes a new Projectile appear at the coordinates and angle of the specified Player.
+     * @param player Player to appear next to.
+     */
+    private void spawnProjectile(Player player) {
 
         if (player.canShoot()) {
 
-            float angle = player.getAngle(); // Radians
+            float angle = (float) Math.toRadians(player.getRotation() - 90); // Radians
 
             float pW = player.getWidth();
             float pH = player.getHeight();
             float oX = player.getX() + pW * Math.max(0.5f, (float) Math.cos(angle));
             float oY = player.getY() + pH * Math.max(0.5f, (float) Math.sin(angle));
             int baseDamage = 20;
-            boolean firedByLocal = player == localPlayer;
+            boolean firedByLocal = player.isLocal();
 
             if (isEffectActive(Card.Effect.ATTACK_UP)) {
                 baseDamage *= 2;
@@ -494,9 +527,6 @@ public class GameActivity extends AppCompatActivity {
                 shotsFiredStats++;
                 player.restoreFireCooldown();
             }
-
-            /*if (fireSound.isPlaying()) fireSound.stop();
-            fireSound.start();*/
 
             if (isEffectActive(Card.Effect.TRIPLE_SHOT)) {
 
@@ -579,8 +609,6 @@ public class GameActivity extends AppCompatActivity {
             layout.removeView(activeTraces.get(0));
             activeTraces.remove(0);
         }
-
-        localPlayer.bringToFront();
     }
 
     /**
@@ -615,6 +643,58 @@ public class GameActivity extends AppCompatActivity {
 
         layout.addView(popup);
         popup.animate().setStartDelay(time).alpha(0).y(oY - 100).setDuration(1000);
+
+    }
+
+    public static void deathPromptVisible(boolean visible) {
+
+        if (visible){
+
+            deathPromptLayout.bringToFront();
+            deathPromptLayout.setAlpha(1);
+
+            AnimationSet animSet = new AnimationSet(true);
+
+            Animation scaleAnim = new ScaleAnimation(
+                    1.5f, 1f, // Start and end values for the X axis scaling
+                    1.5f, 1f, // Start and end values for the Y axis scaling
+                    Animation.RELATIVE_TO_SELF, 0.5f, // Pivot point of X scaling
+                    Animation.RELATIVE_TO_SELF, 0.5f); // Pivot point of Y scaling
+            scaleAnim.setDuration(200);
+
+            Animation alphaAnim = new AlphaAnimation(0, 1);
+            alphaAnim.setDuration(200);
+
+            animSet.addAnimation(scaleAnim);
+            animSet.addAnimation(alphaAnim);
+            animSet.setFillAfter(true);
+
+            deathPromptLayout.startAnimation(animSet);
+
+            //deathPromptLayout.animate().alpha(1).setDuration(100);
+        }else{
+
+            AnimationSet animSet = new AnimationSet(true);
+
+            Animation scaleAnim = new ScaleAnimation(
+                    1f, 0.5f, // Start and end values for the X axis scaling
+                    1f, 0.5f, // Start and end values for the Y axis scaling
+                    Animation.RELATIVE_TO_SELF, 0.5f, // Pivot point of X scaling
+                    Animation.RELATIVE_TO_SELF, 0.5f); // Pivot point of Y scaling
+            scaleAnim.setDuration(200);
+            scaleAnim.setFillAfter(false);
+
+            Animation alphaAnim = new AlphaAnimation(1, 0);
+            alphaAnim.setDuration(200);
+            alphaAnim.setFillAfter(true);
+
+            animSet.addAnimation(scaleAnim);
+            animSet.addAnimation(alphaAnim);
+            animSet.setFillAfter(true);
+
+            deathPromptLayout.startAnimation(animSet);
+
+        }
 
     }
 
@@ -658,39 +738,19 @@ public class GameActivity extends AppCompatActivity {
 
         if (localPlayerColliding && remotePlayerColliding) {
 
-            islandDomain.setInvadedBy(Invader.NONE);
-
-            if (!localPlayerInside) {
-                // localPlayer was not inside before the current state.
-                localPlayerInside = true;
-            }
-
-            if (!remotePlayerInside) {
-                // remotePlayer was not inside before the current state.
-                remotePlayerInside = true;
-            }
+            // Do nothing - preference is for whoever came in first.
 
         } else if (localPlayerColliding) {
 
-            // localPlayer is colliding with islandDomain.
-            //if (!localPlayerInside) {
-
-                // localPlayer was not inside before this collision.
-                islandDomain.setInvadedBy(Invader.LOCAL_PLAYER);
-                localPlayerInside = true;
+            islandDomain.setInvadedBy(Invader.LOCAL_PLAYER);
+            localPlayerInside = true;
             remotePlayerInside = false;
-            //}
 
         } else if (remotePlayerColliding) {
 
-            // remotePlayer is colliding with islandDomain.
-            //if (!remotePlayerInside) {
-
-                // remotePlayer was not inside before this collision.
-                islandDomain.setInvadedBy(Invader.REMOTE_PLAYER);
-                remotePlayerInside = true;
+            islandDomain.setInvadedBy(Invader.REMOTE_PLAYER);
+            remotePlayerInside = true;
             localPlayerInside = false;
-            //}
 
         } else {
 
@@ -802,6 +862,26 @@ public class GameActivity extends AppCompatActivity {
 
         }
 
+        if (remotePlayerInside && !localPlayerInside){
+
+            if (--framesUntilTickRemote == 0) {
+
+                if (remoteScore == 99) {
+
+                    // This comprovation is meant in case the remote game fails to send
+                    // the remote score to the server in time before closing the activity.
+
+                    remoteScore++;
+                    framesUntilTickLocal = MAX_FRAMES_UNTIL_TICK;
+
+                    finishGame();
+
+                }
+
+            }
+
+        }
+
         // SCORE COUNTERS
         textViewCounterLocal.setText(Integer.toString(localScore) + "%");
         textViewCounterRemote.setText(Integer.toString(remoteScore) + "%");
@@ -883,8 +963,7 @@ public class GameActivity extends AppCompatActivity {
                     lastReadRemoteAngle = remoteAngle;
                 }
                 //remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
-                if(remotePlayer.isMoving())
-                    remotePlayer.moveInCurve(remoteCurve);
+                if(remotePlayer.isMoving()) remotePlayer.moveInCurve(remoteCurve);
 
                 //remotePlayer.moveTo(remotePosition);
 
@@ -896,6 +975,9 @@ public class GameActivity extends AppCompatActivity {
 
                 // Check game finish conditions
                 checkGameFinish();
+
+                remotePlayer.bringToFront();
+                localPlayer.bringToFront();
 
             }
         });
@@ -924,8 +1006,11 @@ public class GameActivity extends AppCompatActivity {
 
             System.out.println("localPlayer is dead");
 
+            int timeToRespawn = localPlayer.getTimeToRespawn();
+            respawnTimerTextView.setText(Integer.toString(timeToRespawn / fps + 1));
+
             // Calculate frames left for player respawn.
-            if (localPlayer.getTimeToRespawn() == 0){
+            if (timeToRespawn == 0){
 
                 // If there are 0 frames left, respawn.
                 localPlayer.respawn();
@@ -962,6 +1047,7 @@ public class GameActivity extends AppCompatActivity {
                 case REMOTE_PLAYER_DAMAGED:
                     // TODO: Check real damage inflicted.
                     // remotePlayer damaged localPlayer
+                    //localPlayer.damage(remotePlayer.getDamage(isEffectActive(ATTACK_UP)));
                     localPlayer.damage(20);
                     break;
 
@@ -973,12 +1059,7 @@ public class GameActivity extends AppCompatActivity {
 
                 case LOCAL_PLAYER_FIRED:
                     // remotePlayer fired
-                    playerShoot(remotePlayer);
-                    break;
-
-                case LOCAL_PLAYER_USED_CARD:
-                    // remotePlayer used card
-                    // TODO
+                    spawnProjectile(remotePlayer);
                     break;
 
                 case LOCAL_PLAYER_WON:
@@ -987,7 +1068,60 @@ public class GameActivity extends AppCompatActivity {
                     finishGame();
                     break;
 
-                case NONE:
+                case LOCAL_PLAYER_USED_SPEED_UP:
+                    // Does not apply.
+                    break;
+
+                case LOCAL_PLAYER_USED_ATTACK_UP:
+                    // TODO
+                    break;
+
+                case LOCAL_PLAYER_USED_FULL_RESTORATION:
+                    // Does not apply
+                    break;
+
+                case LOCAL_PLAYER_USED_STUNNED:
+                    showPlayerPopup(localPlayer, Card.Effect.STUNNED.getName(), 1000, false);
+                    addEffect(STUNNED);
+                    break;
+
+                case LOCAL_PLAYER_USED_REVERSED_HAND:
+                    showPlayerPopup(localPlayer, Card.Effect.REVERSED_HAND.getName(), 1000, false);
+                    addEffect(REVERSED_HAND);
+                    break;
+
+                case LOCAL_PLAYER_USED_DISCARD_ONE:
+                    showPlayerPopup(localPlayer, Card.Effect.DISCARD_ONE.getName(), 1000, false);
+                    addEffect(DISCARD_ONE);
+                    break;
+
+                case LOCAL_PLAYER_USED_REVERSED_CONTROLS:
+                    showPlayerPopup(localPlayer, Card.Effect.REVERSED_CONTROLS.getName(), 1000, false);
+                    addEffect(REVERSED_CONTROLS);
+                    break;
+
+                case LOCAL_PLAYER_USED_TRIPLE_SHOT:
+                    // TODO
+                    break;
+
+                case LOCAL_PLAYER_USED_DISPEL:
+                    // Does not apply
+                    break;
+
+                case LOCAL_PLAYER_USED_KO:
+                    showPlayerPopup(localPlayer, Card.Effect.KO.getName(), 1000, false);
+                    addEffect(KO);
+                    break;
+
+                case LOCAL_PLAYER_USED_QUICK_REVIVE:
+                    // Does not apply
+                    break;
+
+                case LOCAL_PLAYER_USED_RANDOM_WARP:
+                    showPlayerPopup(localPlayer, Card.Effect.RANDOM_WARP.getName(), 1000, false);
+                    addEffect(RANDOM_WARP);
+                    break;
+
                 default:
                     break;
 
@@ -1060,7 +1194,7 @@ public class GameActivity extends AppCompatActivity {
         localEventIndex++;
 
         EventIndexPair eventIndexPair = new EventIndexPair(localActiveEvent, localEventIndex);
-        unhandledEvents.add(eventIndexPair);
+        localUnsentEvents.add(eventIndexPair);
 
         log ("Activated event flag: (" + localEventIndex + ")" + localActiveEvent);
     }
@@ -1204,7 +1338,63 @@ public class GameActivity extends AppCompatActivity {
                     addEffect(effect);
 
                 case OPPONENT:
-                    effectToSend = effect;
+
+                    switch(effect){
+
+                        case SPEED_UP:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_SPEED_UP);
+                            break;
+
+                        case ATTACK_UP:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_ATTACK_UP);
+                            break;
+
+                        case FULL_RESTORATION:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_FULL_RESTORATION);
+                            break;
+
+                        case STUNNED:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_STUNNED);
+                            break;
+
+                        case REVERSED_HAND:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_REVERSED_HAND);
+                            break;
+
+                        case DISCARD_ONE:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_DISCARD_ONE);
+                            break;
+
+                        case REVERSED_CONTROLS:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_REVERSED_CONTROLS);
+                            break;
+
+                        case TRIPLE_SHOT:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_TRIPLE_SHOT);
+                            break;
+
+                        case DISPEL:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_DISPEL);
+                            break;
+
+                        case KO:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_KO);
+                            break;
+
+                        case QUICK_REVIVE:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_QUICK_REVIVE);
+                            break;
+
+                        case RANDOM_WARP:
+                            activateEventFlag(Event.LOCAL_PLAYER_USED_RANDOM_WARP);
+                            break;
+
+                        case NONE:
+                        default:
+                            break;
+
+                    }
+
                     break;
 
             }
@@ -1225,9 +1415,9 @@ public class GameActivity extends AppCompatActivity {
         cardZone.reverseCards(isEffectActive(REVERSED_HAND));
         if (isEffectActive(DISCARD_ONE)) cardZone.discardOne();
         if (isEffectActive(KO)) {
-            localPlayer.die(isEffectActive(QUICK_REVIVE));
-            removeEffect(QUICK_REVIVE);
-            activateEventFlag(Event.LOCAL_PLAYER_DIED);
+            remotePlayer.die(isEffectActive(QUICK_REVIVE));
+            activateEventFlag(Event.REMOTE_PLAYER_DIED);
+            killsStats++;
         }
         if (isEffectActive(FULL_RESTORATION)) {
             showPlayerPopup(localPlayer, "+" + (Player.MAX_HEALTH - localPlayer.getHealth()) + " ♡", 500, false);
@@ -1321,7 +1511,7 @@ public class GameActivity extends AppCompatActivity {
                         sendLocalScoreData();
 
                         // Retrieve both players' scoring data
-                        retrieveScoringData();
+                        retrieveScoreData();
 
                         // Send position & angle data
                         sendLocalPositionData();
@@ -1353,7 +1543,7 @@ public class GameActivity extends AppCompatActivity {
 
         }
 
-        private void retrieveScoringData() {
+        private void retrieveScoreData() {
 
             //This returns a JSON object with a {"score1": int, "score2": int} pattern.
             String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_scores.php?matchId=" + matchId, 2000);
@@ -1400,9 +1590,9 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalEventData() {
 
-            if(!unhandledEvents.isEmpty()){
+            if(!localUnsentEvents.isEmpty()){
 
-                EventIndexPair eventIndexPair = unhandledEvents.get(0);
+                EventIndexPair eventIndexPair = localUnsentEvents.get(0);
 
                 Event event = eventIndexPair.event;
                 int eventIndex = eventIndexPair.eventIndex;
@@ -1418,7 +1608,7 @@ public class GameActivity extends AppCompatActivity {
                         2000);
 
                 lastSentLocalEventIndex = eventIndex;
-                unhandledEvents.remove(0);
+                localUnsentEvents.remove(0);
 
             }
 
@@ -1484,24 +1674,6 @@ public class GameActivity extends AppCompatActivity {
             } else {
                 lastCheckSuccessful = false;
             }
-
-        }
-
-        private void sendEffectData() {
-
-            getJSON("https://pis04-ub.herokuapp.com/send_effect.php?matchId=" + matchId
-                    + "&player=" + assignedPlayer
-                    + "&effect=" + effectToSend.ordinal(), 2000);
-
-        }
-
-        private void retrieveEffectData() {
-
-            //somehow get the effect
-
-            Card.Effect effect = NONE;
-
-            addEffect(effect);
 
         }
 

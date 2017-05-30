@@ -76,6 +76,12 @@ public class GameEndActivity extends AppCompatActivity {
                 resultTextView.setText(R.string.defeat);
                 resultTextView.setTextColor(getResources().getColor(R.color.remoteCounterActive));
                 remoteScoreTextView.setTextColor(getResources().getColor(R.color.remoteCounterActive));
+
+                if (soundActive) {
+                    mp = MediaPlayer.create(getApplicationContext(), R.raw.defeat);
+                    mp.start();
+                }
+
                 break;
 
             case DRAW:
