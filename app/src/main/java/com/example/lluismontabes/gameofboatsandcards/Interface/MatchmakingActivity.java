@@ -238,7 +238,7 @@ public class MatchmakingActivity extends AppCompatActivity {
         // TODO: Add comprovation that the user is still active.
         // Only join the match if both users are active.
 
-        changeConnectionMessage(getString(R.string.joiningMatchMessage) + matchId);
+        changeConnectionMessage(getString(R.string.opponentFoundMessage));
 
         // Start GameActivity
         Intent i = new Intent(MatchmakingActivity.this, GameActivity.class);
