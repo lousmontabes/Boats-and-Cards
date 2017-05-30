@@ -294,6 +294,7 @@ public class GameActivity extends AppCompatActivity {
         initializeIslandDomain(100);
         initializeListeners();
         initializeCardEffects();
+        initializeReleaseConfig();
 
     }
 
@@ -325,6 +326,11 @@ public class GameActivity extends AppCompatActivity {
         remoteTask = new RemoteDataTask();
         remoteTask.execute();
 
+    }
+
+    private void initializeReleaseConfig() {
+        this.log.setAlpha(0);
+        this.frameLog.setAlpha(0);
     }
 
     private void initializeCardEffects() {
