@@ -716,24 +716,24 @@ public class GameActivity extends AppCompatActivity {
 
             Projectile p = projectileIterator.next();
             Player playerToCheck;
-            if (p.isFiredByLocal()) {
-                playerToCheck = remotePlayer;
-            } else {
-                playerToCheck = localPlayer;
-            }
+
+            if (p.isFiredByLocal()) playerToCheck = remotePlayer;
+            else playerToCheck = localPlayer;
 
             if (p.isColliding(playerToCheck)) {
 
                 playerToCheck.boatImageView.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
                 playerToCheck.damage(p.getDamage());
-                showPlayerPopup(remotePlayer, "-" + p.getDamage() + " ♡", 300, true);
+                showPlayerPopup(playerToCheck, "-" + p.getDamage() + " ♡", 300, true);
 
                 layout.removeView(p);
                 projectileIterator.remove();
+
                 if (soundActive) {
                     if (hitSound.isPlaying()) hitSound.stop();
                     hitSound.start();
                 }
+
             } else playerToCheck.boatImageView.setColorFilter(null);
 
         }
