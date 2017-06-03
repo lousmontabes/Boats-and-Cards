@@ -961,26 +961,13 @@ public class GameActivity extends AppCompatActivity {
                 advanceCounter();
 
                 // Prepare local data to send to server
-                localPosition.set((int) localPlayer.getX(), (int) localPlayer.getY());
+                float localPlayerDpX = Graphics.toDp(GameActivity.this, localPlayer.getX());
+                float localPlayerDpY = Graphics.toDp(GameActivity.this, localPlayer.getY());
+                localPosition.set((int) localPlayerDpX * 1000, (int) localPlayerDpY * 1000);
                 localAngle = (float) Math.toDegrees(localPlayer.getAngle());
 
-                if (currentFrame % 6 == 5) remoteCurve.set(lastReadRemotePosition, remotePosition, lastReadRemoteAngle, remoteAngle);
-
-                // Move remotePlayer to the retrieved position
-                if (remotePosition != lastReadRemotePosition){
-                    System.out.println("New remote position detected");
-                    lastReadRemotePosition = remotePosition;
-                }
-                if (remoteAngle != lastReadRemoteAngle){
-                    System.out.println("New remote angle detected");
-                    remotePlayer.restoreMovement();
-                    remotePlayer.setMoving(true);
-                    lastReadRemoteAngle = remoteAngle;
-                }
-                //remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
-                if(remotePlayer.isMoving()) remotePlayer.moveInCurve(remoteCurve);
-
-                //remotePlayer.moveTo(remotePosition);
+                // Move remote player
+                moveRemotePlayer();
 
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
@@ -993,6 +980,27 @@ public class GameActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void moveRemotePlayer() {
+
+        if (currentFrame % 6 == 5) remoteCurve.set(lastReadRemotePosition, remotePosition, lastReadRemoteAngle, remoteAngle);
+
+        // If remotePlayer is in a range of 10px from the destination, consider it reached
+        boolean reached = (Math.abs(remotePosition.x - remotePlayer.getPosition().x) < 10
+                && Math.abs(remotePosition.y - remotePlayer.getPosition().y) < 10);
+
+        if (!reached){
+            remotePlayer.restoreMovement();
+            remotePlayer.setMoving(true);
+        }else{
+            remotePlayer.setMoving(false);
+            remotePlayer.restoreMovement();
+        }
+
+        //remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
+        if(remotePlayer.isMoving()) remotePlayer.moveInCurve(remoteCurve);
+
     }
 
     private void checkGameFinish() {
@@ -1656,6 +1664,8 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalPositionData() {
 
+            // Local coordinates get sent as DP and multiplied by 1000 to keep decimal data.
+
             getJSON("https://pis04-ub.herokuapp.com/send_local_position.php?matchId=" + matchId
                     + "&player=" + assignedPlayer
                     + "&x=" + localPosition.x
@@ -1669,20 +1679,24 @@ public class GameActivity extends AppCompatActivity {
 
         private void retrieveRemotePositionData() {
 
+            // Remote coordinates are received as DP and must be converted to px.
+            // They're also received multiplied by 1000 to keep decimal data, so they
+            // must be divided by 1000.
+
             //This returns a JSON object with a {"x": int,"y": int} pattern.
             String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_position.php?matchId=" + matchId
                     + "&player=" + oppositePlayer, 2000);
 
             System.out.println(currentFrame + ": " + data);
 
-            // Parse the JSON information into a Point object.
+            // Parse the JSON information into a PointAnglePair object.
             PointAnglePair p = new Gson().fromJson(data, PointAnglePair.class);
 
             // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
             // variables. These variables will be used to position remotePlayer on the next frame.
             if (p != null) {
 
-                remotePosition.set(p.x, p.y);
+                remotePosition.set((int) Graphics.toPixels(GameActivity.this, p.x / 1000), (int) Graphics.toPixels(GameActivity.this, p.y / 1000));
                 remoteAngle = p.angle;
 
                 lastCheckSuccessful = true;
