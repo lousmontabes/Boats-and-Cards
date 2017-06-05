@@ -984,7 +984,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void moveRemotePlayer() {
 
-        if (currentFrame % 6 == 5) remoteCurve.set(lastReadRemotePosition, remotePosition, lastReadRemoteAngle, remoteAngle);
+        remoteCurve.set(remotePlayer.getPosition(), remotePosition, remotePlayer.getRotation(), remoteAngle);
 
         // If remotePlayer is in a range of 10px from the destination, consider it reached
         boolean reached = (Math.abs(remotePosition.x - remotePlayer.getPosition().x) < 10

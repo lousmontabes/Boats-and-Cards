@@ -12,15 +12,15 @@
         android:layout_alignStart="@+id/boatImageView"
         android:layout_alignTop="@+id/boatImageView"
         android:padding="11dp"
-        app:srcCompat="@drawable/basicboat" />
+        app:srcCompat="@drawable/basicboat2" />
 
     <ImageView
         android:id="@+id/boatImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        app:srcCompat="@drawable/basicboat"
+        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:padding="10dp"
+        app:srcCompat="@drawable/basicboat2" />
 
 </RelativeLayout>

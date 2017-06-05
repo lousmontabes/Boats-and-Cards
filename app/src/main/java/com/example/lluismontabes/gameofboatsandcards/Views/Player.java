@@ -2,6 +2,7 @@ package com.example.lluismontabes.gameofboatsandcards.Views;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 
@@ -63,7 +64,7 @@ public class Player extends RectangularCollider {
     private int health;                             // Current health
 
     // Cooldowns
-    private final int MAX_FIRE_COOLDOWN = 10;       // MAX FIRE COOLDOWN: 10 frames
+    private final int MAX_FIRE_COOLDOWN = 6;       // MAX FIRE COOLDOWN: 6 frames
     private int fireCooldown;                       // Countdown until Player can fire again
 
     private final int MAX_RESPAWN_TIME = 150;       // MAX RESPAWN TIME: 10 frames
@@ -90,6 +91,8 @@ public class Player extends RectangularCollider {
 
         boatImageView = (ImageView) findViewById(R.id.boatImageView);
         shadowImageView = (ImageView) findViewById(R.id.shadowImageView);
+
+        if (!local) boatImageView.setImageResource(R.drawable.basicboat_enemy);
         shadowImageView.setColorFilter(getResources().getColor(R.color.shadow), android.graphics.PorterDuff.Mode.MULTIPLY);
 
         velocity = 0;               // 10 pixels per frame
@@ -251,6 +254,7 @@ public class Player extends RectangularCollider {
             // Move shadow with player
             shadowImageView.setY(-45 * (float) Math.sin(a));
             shadowImageView.setX(45 * (float) Math.cos(a));
+
         }
     }
 
@@ -341,7 +345,7 @@ public class Player extends RectangularCollider {
             setAngle(a);
             setRotation(a);
         }else{
-            this.moveTo(curve.getPointAt(1));
+            this.moveTo(curve.getPointAt(1 ));
         }
 
         //float dist = (float) Math.hypot(curve.getPointAt(1).x - getX(), curve.getPointAt(1).y - getY());
