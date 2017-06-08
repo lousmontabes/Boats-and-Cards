@@ -11,7 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_blueprint"
+        android:background="@drawable/sea"
         android:elevation="1dp">
 
         <LinearLayout
@@ -28,8 +28,8 @@
                 android:layout_height="31dp"
                 android:layout_above="@+id/newGameButton"
                 android:layout_alignEnd="@+id/newGameButton"
-                app:srcCompat="@drawable/operationresult"
-                android:layout_weight="0.00" />
+                android:layout_weight="0.00"
+                app:srcCompat="@drawable/operationresult" />
 
             <TextView
                 android:id="@+id/resultsText"

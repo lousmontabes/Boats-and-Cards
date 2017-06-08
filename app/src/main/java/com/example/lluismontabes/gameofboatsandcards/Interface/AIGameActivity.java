@@ -24,20 +24,23 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
-import android.widget.*;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.example.lluismontabes.gameofboatsandcards.Model.Collider;
 import com.example.lluismontabes.gameofboatsandcards.Model.CubicBezierCurve;
+import com.example.lluismontabes.gameofboatsandcards.Model.Data;
+import com.example.lluismontabes.gameofboatsandcards.Model.Graphics;
+import com.example.lluismontabes.gameofboatsandcards.R;
 import com.example.lluismontabes.gameofboatsandcards.Views.Card;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardSpawn;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardZone;
-import com.example.lluismontabes.gameofboatsandcards.Model.Collider;
-import com.example.lluismontabes.gameofboatsandcards.Model.Data;
-import com.example.lluismontabes.gameofboatsandcards.Model.Graphics;
 import com.example.lluismontabes.gameofboatsandcards.Views.IslandDomain;
 import com.example.lluismontabes.gameofboatsandcards.Views.Joystick;
 import com.example.lluismontabes.gameofboatsandcards.Views.Player;
 import com.example.lluismontabes.gameofboatsandcards.Views.Projectile;
-import com.example.lluismontabes.gameofboatsandcards.R;
 import com.example.lluismontabes.gameofboatsandcards.Views.Trace;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -55,10 +58,20 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.*;
 import static com.example.lluismontabes.gameofboatsandcards.Interface.MainMenuActivity.soundActive;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.DISCARD_ONE;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.DISPEL;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.FULL_RESTORATION;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.KO;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.NONE;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.QUICK_REVIVE;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.RANDOM_WARP;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.REVERSED_CONTROLS;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.REVERSED_HAND;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.SPEED_UP;
+import static com.example.lluismontabes.gameofboatsandcards.Views.Card.Effect.STUNNED;
 
-public class GameActivity extends AppCompatActivity {
+public class AIGameActivity extends AppCompatActivity {
 
     /**
      * GAME LOOP
@@ -71,7 +84,7 @@ public class GameActivity extends AppCompatActivity {
      * ONLINE
      **/
     // Connection
-    RemoteDataTask remoteTask;
+    AITask remoteTask;
     boolean connectionActive = true;
     int connectionFrequency = 1;
     int lastFrameChecked = 0;
@@ -169,7 +182,6 @@ public class GameActivity extends AppCompatActivity {
      **/
     // Controls
     Joystick joystick;
-    Joystick joystick2;
 
     // Players
     Player localPlayer;
@@ -324,7 +336,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void startRemoteTask() {
 
-        remoteTask = new RemoteDataTask();
+        remoteTask = new AITask();
         remoteTask.execute();
 
     }
@@ -344,7 +356,7 @@ public class GameActivity extends AppCompatActivity {
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                //if (cardUsed == 0) spawnProjectile(localPlayer);
+                if (cardUsed == 0) spawnProjectile(localPlayer);
                 // UNIMPLEMENTED: Point-and-click movement
                 //moveObjectTo(localPlayer, event.getX(), event.getY());
                 return false;
@@ -389,7 +401,6 @@ public class GameActivity extends AppCompatActivity {
 
         // Joystick
         joystick = (Joystick) findViewById(R.id.joystick);
-        joystick2 = (Joystick) findViewById(R.id.joystick2);
 
         // Timer and scoreboard
         timer = (TextView) findViewById(R.id.timer);
@@ -468,10 +479,10 @@ public class GameActivity extends AppCompatActivity {
 
     private void initializePlayers() {
 
-        localPlayer = new Player(GameActivity.this, true);
+        localPlayer = new Player(AIGameActivity.this, true);
         localPlayer.setMoving(true);
 
-        remotePlayer = new Player(GameActivity.this, false);
+        remotePlayer = new Player(AIGameActivity.this, false);
         remotePlayer.setRemoteVelocity();
 
         remotePlayer.bringToFront();
@@ -515,11 +526,11 @@ public class GameActivity extends AppCompatActivity {
      * Makes a new Projectile appear at the coordinates and angle of the specified Player.
      * @param player Player to appear next to.
      */
-    private void spawnProjectile(Player player, float angle) {
+    private void spawnProjectile(Player player) {
 
         if (player.canShoot()) {
 
-            //float angle = (float) Math.toRadians(player.getRotation() - 90); // Radians
+            float angle = (float) Math.toRadians(player.getRotation() - 90); // Radians
 
             float pW = player.getWidth();
             float pH = player.getHeight();
@@ -532,9 +543,9 @@ public class GameActivity extends AppCompatActivity {
                 baseDamage *= 2;
             }
 
-            Projectile projectile = new Projectile(GameActivity.this, firedByLocal, angle, oX, oY, baseDamage);
-            GameActivity.this.activeProjectiles.add(projectile);
-            GameActivity.this.activeColliders.add(projectile);
+            Projectile projectile = new Projectile(AIGameActivity.this, firedByLocal, angle, oX, oY, baseDamage);
+            AIGameActivity.this.activeProjectiles.add(projectile);
+            AIGameActivity.this.activeColliders.add(projectile);
 
             layout.addView(projectile);
 
@@ -546,13 +557,13 @@ public class GameActivity extends AppCompatActivity {
 
             if (isEffectActive(Card.Effect.TRIPLE_SHOT)) {
 
-                Projectile projectileL = new Projectile(GameActivity.this, firedByLocal, angle - .3f, oX, oY, baseDamage);
-                GameActivity.this.activeProjectiles.add(projectileL);
-                GameActivity.this.activeColliders.add(projectileL);
+                Projectile projectileL = new Projectile(AIGameActivity.this, firedByLocal, angle - .3f, oX, oY, baseDamage);
+                AIGameActivity.this.activeProjectiles.add(projectileL);
+                AIGameActivity.this.activeColliders.add(projectileL);
 
-                Projectile projectileR = new Projectile(GameActivity.this, firedByLocal, angle + .3f, oX, oY, baseDamage);
-                GameActivity.this.activeProjectiles.add(projectileR);
-                GameActivity.this.activeColliders.add(projectileR);
+                Projectile projectileR = new Projectile(AIGameActivity.this, firedByLocal, angle + .3f, oX, oY, baseDamage);
+                AIGameActivity.this.activeProjectiles.add(projectileR);
+                AIGameActivity.this.activeColliders.add(projectileR);
 
                 layout.addView(projectileL);
                 layout.addView(projectileR);
@@ -578,7 +589,7 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(GameActivity.this)
+        new AlertDialog.Builder(AIGameActivity.this)
                 .setTitle(getString(R.string.exitGameDialogTitle))
                 .setMessage(getString(R.string.exitGameWarning))
                 .setNegativeButton(getString(R.string.exitGameNegativeButton), new DialogInterface.OnClickListener() {
@@ -614,7 +625,7 @@ public class GameActivity extends AppCompatActivity {
 
         float angle = (float) Math.toDegrees(joystick.getCurrentAngle()) + 90;
 
-        Trace trace = new Trace(GameActivity.this, oX, oY, angle);
+        Trace trace = new Trace(AIGameActivity.this, oX, oY, angle);
         activeTraces.add(trace);
         layout.addView(trace);
 
@@ -755,20 +766,20 @@ public class GameActivity extends AppCompatActivity {
 
         } else if (localPlayerColliding) {
 
-            islandDomain.setInvadedBy(Invader.LOCAL_PLAYER);
+            islandDomain.setInvadedBy(GameActivity.Invader.LOCAL_PLAYER);
             localPlayerInside = true;
             remotePlayerInside = false;
 
         } else if (remotePlayerColliding) {
 
-            islandDomain.setInvadedBy(Invader.REMOTE_PLAYER);
+            islandDomain.setInvadedBy(GameActivity.Invader.REMOTE_PLAYER);
             remotePlayerInside = true;
             localPlayerInside = false;
 
         } else {
 
             // No one is colliding with islandDomain.
-            islandDomain.setInvadedBy(Invader.NONE);
+            islandDomain.setInvadedBy(GameActivity.Invader.NONE);
 
             if (localPlayerInside) {
                 // localPlayer was inside before the current state.
@@ -799,7 +810,7 @@ public class GameActivity extends AppCompatActivity {
         if (!gameFinished) {
 
             gameFinished = true;
-            Intent i = new Intent(GameActivity.this, GameEndActivity.class);
+            Intent i = new Intent(AIGameActivity.this, GameEndActivity.class);
 
             if ((localScore > remoteScore) || condition == FinishCondition.REMOTE_PLAYER_LEFT) {
                 currentGameState = GameState.LOCAL_WON;
@@ -923,8 +934,6 @@ public class GameActivity extends AppCompatActivity {
                 // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
                 else moveLocalPlayer();
 
-                fireLocalPlayer();
-
                 // Projectile movement
                 for (Projectile p : activeProjectiles) p.move();
 
@@ -965,8 +974,8 @@ public class GameActivity extends AppCompatActivity {
                 advanceCounter();
 
                 // Prepare local data to send to server
-                float localPlayerDpX = Graphics.toDp(GameActivity.this, localPlayer.getX());
-                float localPlayerDpY = Graphics.toDp(GameActivity.this, localPlayer.getY());
+                float localPlayerDpX = Graphics.toDp(AIGameActivity.this, localPlayer.getX());
+                float localPlayerDpY = Graphics.toDp(AIGameActivity.this, localPlayer.getY());
                 localPosition.set((int) localPlayerDpX * 1000, (int) localPlayerDpY * 1000);
                 localAngle = (float) Math.toDegrees(localPlayer.getAngle());
 
@@ -984,14 +993,6 @@ public class GameActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    private void fireLocalPlayer() {
-
-        if (joystick2.getCurrentIntensity() >= 0.25) {
-            spawnProjectile(localPlayer, joystick2.getCurrentAngle());
-        }
-
     }
 
     private void moveRemotePlayer() {
@@ -1093,7 +1094,7 @@ public class GameActivity extends AppCompatActivity {
 
                 case LOCAL_PLAYER_FIRED:
                     // remotePlayer fired
-                    //spawnProjectile(remotePlayer);
+                    spawnProjectile(remotePlayer);
                     break;
 
                 case LOCAL_PLAYER_WON:
@@ -1518,8 +1519,8 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    // Asynchronous task that retrieves the remote player's actions
-    public class RemoteDataTask extends AsyncTask<String, String, Void> {
+    // Asynchronous task that handles the AI
+    public class AITask extends AsyncTask<String, String, Void> {
 
         private boolean running = true;
 
@@ -1708,7 +1709,7 @@ public class GameActivity extends AppCompatActivity {
             // variables. These variables will be used to position remotePlayer on the next frame.
             if (p != null) {
 
-                remotePosition.set((int) Graphics.toPixels(GameActivity.this, p.x / 1000), (int) Graphics.toPixels(GameActivity.this, p.y / 1000));
+                remotePosition.set((int) Graphics.toPixels(AIGameActivity.this, p.x / 1000), (int) Graphics.toPixels(AIGameActivity.this, p.y / 1000));
                 remoteAngle = p.angle;
 
                 lastCheckSuccessful = true;

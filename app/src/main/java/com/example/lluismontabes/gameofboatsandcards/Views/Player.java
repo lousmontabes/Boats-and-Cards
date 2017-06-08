@@ -64,7 +64,7 @@ public class Player extends RectangularCollider {
     private int health;                             // Current health
 
     // Cooldowns
-    private final int MAX_FIRE_COOLDOWN = 6;       // MAX FIRE COOLDOWN: 6 frames
+    private final int MAX_FIRE_COOLDOWN = 10;       // MAX FIRE COOLDOWN: 6 frames
     private int fireCooldown;                       // Countdown until Player can fire again
 
     private final int MAX_RESPAWN_TIME = 150;       // MAX RESPAWN TIME: 10 frames

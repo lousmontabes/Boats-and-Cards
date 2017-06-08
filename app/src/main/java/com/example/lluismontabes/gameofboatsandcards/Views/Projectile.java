@@ -21,11 +21,11 @@ public class Projectile extends RoundCollider {
     private boolean firedByLocal;
 
     public Projectile(Context context, boolean firedByLocal, float angle, float originX, float originY, int damage) {
-        super(context, 20);
+        super(context, 10);
 
         setWillNotDraw(false);
 
-        this.velocity = 50;
+        this.velocity = 25;
         this.damage = damage;
         this.angle = angle;
         this.setX(originX - Graphics.toPixels(getContext(), 10));
