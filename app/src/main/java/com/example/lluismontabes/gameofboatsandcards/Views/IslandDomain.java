@@ -18,6 +18,7 @@ public class IslandDomain extends RoundCollider {
 
     private Paint islandPaint;
     private boolean isInvaded;
+    private GameActivity.Invader invader;
 
     public IslandDomain(Context context, float radius) {
 
@@ -25,6 +26,8 @@ public class IslandDomain extends RoundCollider {
 
         this.isInvaded = false; // It is not being invaded
         setVisibility(VISIBLE);
+
+        invader = GameActivity.Invader.NONE;
 
         setWillNotDraw(false);
 
@@ -91,6 +94,8 @@ public class IslandDomain extends RoundCollider {
          * 2: remotePlayer
          */
 
+        this.invader = invader;
+
         switch (invader) {
 
             case NONE:
@@ -109,6 +114,14 @@ public class IslandDomain extends RoundCollider {
 
         this.invalidate();
 
+    }
+
+    public boolean isInvaded(){
+        return isInvaded;
+    }
+
+    public GameActivity.Invader getInvader() {
+        return invader;
     }
 
 }

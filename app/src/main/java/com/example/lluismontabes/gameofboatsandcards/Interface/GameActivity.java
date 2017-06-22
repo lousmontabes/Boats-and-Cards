@@ -27,6 +27,7 @@ import android.view.animation.ScaleAnimation;
 import android.widget.*;
 
 import com.example.lluismontabes.gameofboatsandcards.Model.CubicBezierCurve;
+import com.example.lluismontabes.gameofboatsandcards.Model.ServerMessage;
 import com.example.lluismontabes.gameofboatsandcards.Views.Card;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardSpawn;
 import com.example.lluismontabes.gameofboatsandcards.Views.CardZone;
@@ -45,9 +46,13 @@ import com.google.gson.annotations.SerializedName;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Timer;
@@ -77,6 +82,10 @@ public class GameActivity extends AppCompatActivity {
     int lastFrameChecked = 0;
     float latency;
     boolean lastCheckSuccessful = false;
+
+    // IP and port
+    private static final String AWS_EC2_IP = "52.56.131.67";
+    private static final int AWS_EC2_PORT = 9801;
 
     // Synchronization
     boolean localPlayerReady = false;
@@ -295,7 +304,7 @@ public class GameActivity extends AppCompatActivity {
         initializeIslandDomain(100);
         initializeListeners();
         initializeCardEffects();
-        initializeReleaseConfig();
+        //initializeReleaseConfig();
 
     }
 
@@ -982,6 +991,8 @@ public class GameActivity extends AppCompatActivity {
                 // Check game finish conditions
                 checkGameFinish();
 
+                log("PNG:" + latency);
+
             }
         });
     }
@@ -1010,7 +1021,7 @@ public class GameActivity extends AppCompatActivity {
             remotePlayer.restoreMovement();
         }
 
-        //remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
+        //nextAICurve.set(remotePlayer.getPosition(), nextAIPosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
         if(remotePlayer.isMoving()) remotePlayer.moveInCurve(remoteCurve);
 
     }
@@ -1523,8 +1534,24 @@ public class GameActivity extends AppCompatActivity {
 
         private boolean running = true;
 
+        // IP Address & socket
+        DatagramSocket clientSocket;
+        InetAddress IPAddress;
+
+        // Data packets
+        byte[] sendData = new byte[1024];
+        byte[] receiveData = new byte[1024];
+
         protected void onPreExecute() {
             super.onPreExecute();
+
+            try{
+                clientSocket = new DatagramSocket();
+                IPAddress = InetAddress.getByName(AWS_EC2_IP);
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+
         }
 
         protected Void doInBackground(String... params) {
@@ -1574,29 +1601,39 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalScoreData() {
 
-            getJSON("https://pis04-ub.herokuapp.com/send_local_score.php?matchId=" + matchId
-                    + "&player=" + assignedPlayer
-                    + "&score=" + localScore, 2000);
+            byte param1, param2;
+
+            if (assignedPlayer == 1) {
+                param1 = (byte) localScore;
+                param2 = (byte) remoteScore;
+            }else{
+                param1 = (byte) remoteScore;
+                param2 = (byte) localScore;
+            }
+
+            sendData[0] = ServerMessage.MESSAGE_SENDING_SCORE;
+            sendData[1] = param1;
+            sendData[2] = param2;
+
+            sendDataPacket();
 
         }
 
         private void retrieveScoreData() {
 
-            //This returns a JSON object with a {"score1": int, "score2": int} pattern.
-            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_scores.php?matchId=" + matchId, 2000);
+            sendData[0] = ServerMessage.MESSAGE_REQUESTING_SCORE;
+            receiveData = sendDataPacket();
 
-            // Parse the JSON information into a ScorePair object.
-            ScorePair p = new Gson().fromJson(data, ScorePair.class);
+            System.out.println(receiveData[1] + ", " + receiveData[2]);
 
-            // Set score1 and score2 variables retrieved from JSON to the localScore and
-            // remoteScore global variables.
-            if (p != null){
-                if(assignedPlayer == 1 || assignedPlayer == -1){
-                    remoteScore = p.score2;
-                }else{
-                    remoteScore = p.score1;
-                }
+            if (assignedPlayer == 1) {
+                localScore = receiveData[1];
+                remoteScore = receiveData[2];
+            }else{
+                remoteScore = receiveData[1];
+                localScore = receiveData[2];
             }
+
         }
 
         private void notifyLocalPlayerReady(){
@@ -1676,47 +1713,71 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalPositionData() {
 
-            // Local coordinates get sent as DP and multiplied by 1000 to keep decimal data.
+            byte[] bytesX = ByteBuffer.allocate(4).putInt(localPosition.x).array();
+            byte[] bytesY = ByteBuffer.allocate(4).putInt(localPosition.y).array();
 
-            getJSON("https://pis04-ub.herokuapp.com/send_local_position.php?matchId=" + matchId
-                    + "&player=" + assignedPlayer
-                    + "&x=" + localPosition.x
-                    + "&y=" + localPosition.y
-                    + "&angle=" + localAngle,
-                    2000);
+            if (assignedPlayer == 1) sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER1POS;
+            else sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER2POS;
 
-            System.out.println(localAngle);
+            sendData[1] = bytesX[0];
+            sendData[2] = bytesX[1];
+            sendData[3] = bytesX[2];
+            sendData[4] = bytesX[3];
+
+            sendData[5] = bytesY[0];
+            sendData[6] = bytesY[1];
+            sendData[7] = bytesY[2];
+            sendData[8] = bytesY[3];
+
+            receiveData = sendDataPacket();
 
         }
 
         private void retrieveRemotePositionData() {
 
-            // Remote coordinates are received as DP and must be converted to px.
-            // They're also received multiplied by 1000 to keep decimal data, so they
-            // must be divided by 1000.
-
-            //This returns a JSON object with a {"x": int,"y": int} pattern.
-            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_position.php?matchId=" + matchId
-                    + "&player=" + oppositePlayer, 2000);
-
-            System.out.println(currentFrame + ": " + data);
-
-            // Parse the JSON information into a PointAnglePair object.
-            PointAnglePair p = new Gson().fromJson(data, PointAnglePair.class);
-
-            // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
-            // variables. These variables will be used to position remotePlayer on the next frame.
-            if (p != null) {
-
-                remotePosition.set((int) Graphics.toPixels(GameActivity.this, p.x / 1000), (int) Graphics.toPixels(GameActivity.this, p.y / 1000));
-                remoteAngle = p.angle;
-
-                lastCheckSuccessful = true;
-                latency = (currentFrame - lastFrameChecked) / 30;
-
+            if (assignedPlayer == 1) {
+                sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER2POS;
             } else {
-                lastCheckSuccessful = false;
+                sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER1POS;
             }
+
+            receiveData = sendDataPacket();
+
+            byte[] bytesX = {receiveData[1], receiveData[2], receiveData[3], receiveData[4]};
+            byte[] bytesY = {receiveData[5], receiveData[6], receiveData[7], receiveData[8]};
+
+            int x = java.nio.ByteBuffer.wrap(bytesX).getInt();
+            int y = java.nio.ByteBuffer.wrap(bytesY).getInt();
+
+            System.out.println("(" + x + ", " + y + ")");
+            remotePosition.set(x, y);
+
+        }
+
+        private byte[] sendDataPacket() {
+
+            long startTime = System.currentTimeMillis();
+
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, AWS_EC2_PORT);
+            try{
+                clientSocket.send(sendPacket);
+            } catch(IOException e){
+                System.out.println(e.getMessage());
+            }
+
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            try{
+                clientSocket.receive(receivePacket);
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+
+            byte[] response = receivePacket.getData();
+
+            long finishTime = System.currentTimeMillis();
+            latency = finishTime - startTime;
+
+            return response;
 
         }
 

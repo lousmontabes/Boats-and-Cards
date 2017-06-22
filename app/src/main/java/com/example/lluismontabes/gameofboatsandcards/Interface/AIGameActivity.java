@@ -95,16 +95,24 @@ public class AIGameActivity extends AppCompatActivity {
     boolean localPlayerReady = false;
     boolean remotePlayerReady = false;
 
-    // Online player positioning
-    Point lastReadRemotePosition = new Point(0, 0);
-    Point remotePosition = new Point(0, 0);
-    Point localPosition = new Point(0, 0);
-    float lastReadRemoteAngle = 0;
-    float remoteAngle = 0;
-    float localAngle = 0;
+    // AI player positioning
+    Point nextAIPosition = new Point(0, 0);
+    private int aiReactionTime = 10; // 10 frames of reaction time
 
     // Remote player curve path
-    CubicBezierCurve remoteCurve = new CubicBezierCurve();
+    CubicBezierCurve nextAICurve = new CubicBezierCurve();
+
+    // AI Actions
+    private enum AIAction {
+        NONE,
+        MOVE,
+        ATTACK_LOCAL_PLAYER,
+        FLEE
+    }
+
+    private AIAction nextAIAction = AIAction.NONE;
+    private int aiActionIndex = 0;
+    private int lastHandledAiActionIndex = 0;
 
     // Online player and match IDs
     int matchId;
@@ -141,7 +149,7 @@ public class AIGameActivity extends AppCompatActivity {
     }
     private Event localActiveEvent = Event.NONE;
     private int localEventIndex = 0;
-    private int lastSentLocalEventIndex = -1;
+    private int lastHandledLocalEventIndex = -1;
 
     private Event remoteActiveEvent = Event.NONE;
     private int remoteEventIndex = 0;
@@ -357,6 +365,7 @@ public class AIGameActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (cardUsed == 0) spawnProjectile(localPlayer);
+                activateEventFlag(Event.LOCAL_PLAYER_FIRED);
                 // UNIMPLEMENTED: Point-and-click movement
                 //moveObjectTo(localPlayer, event.getX(), event.getY());
                 return false;
@@ -973,15 +982,6 @@ public class AIGameActivity extends AppCompatActivity {
                 // Scoreboard and timer counter
                 advanceCounter();
 
-                // Prepare local data to send to server
-                float localPlayerDpX = Graphics.toDp(AIGameActivity.this, localPlayer.getX());
-                float localPlayerDpY = Graphics.toDp(AIGameActivity.this, localPlayer.getY());
-                localPosition.set((int) localPlayerDpX * 1000, (int) localPlayerDpY * 1000);
-                localAngle = (float) Math.toDegrees(localPlayer.getAngle());
-
-                // Move remote player
-                moveRemotePlayer();
-
                 //test CardZone
                 improveVisibilityCardZone(180, 140, 90);
 
@@ -991,17 +991,48 @@ public class AIGameActivity extends AppCompatActivity {
                 // Check game finish conditions
                 checkGameFinish();
 
+                // AI
+                handleAIAction();
+
             }
         });
     }
 
+    private void handleAIAction() {
+
+        System.out.println(nextAIAction);
+
+        switch (nextAIAction){
+
+            case NONE:
+                break;
+
+            case MOVE:
+                if (aiActionIndex == lastHandledAiActionIndex) {
+                    moveRemotePlayer();
+                }
+                break;
+
+            case ATTACK_LOCAL_PLAYER:
+                attackLocalPlayer();
+                break;
+
+            default:
+                break;
+
+        }
+
+        lastHandledAiActionIndex = aiActionIndex;
+
+    }
+
     private void moveRemotePlayer() {
 
-        remoteCurve.set(remotePlayer.getPosition(), remotePosition, remotePlayer.getRotation(), remoteAngle);
+        nextAICurve.set(remotePlayer.getPosition(), nextAIPosition, remotePlayer.getRotation(), remotePlayer.getAngle());
 
         // If remotePlayer is in a range of 10px from the destination, consider it reached
-        boolean reached = (Math.abs(remotePosition.x - remotePlayer.getPosition().x) < 10
-                && Math.abs(remotePosition.y - remotePlayer.getPosition().y) < 10);
+        boolean reached = (Math.abs(nextAIPosition.x - remotePlayer.getPosition().x) < 10
+                && Math.abs(nextAIPosition.y - remotePlayer.getPosition().y) < 10);
 
         if (!reached){
             remotePlayer.restoreMovement();
@@ -1011,8 +1042,8 @@ public class AIGameActivity extends AppCompatActivity {
             remotePlayer.restoreMovement();
         }
 
-        //remoteCurve.set(remotePlayer.getPosition(), remotePosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
-        if(remotePlayer.isMoving()) remotePlayer.moveInCurve(remoteCurve);
+        //nextAICurve.set(remotePlayer.getPosition(), nextAIPosition, (float) Math.toDegrees(remotePlayer.getRotation()), remoteAngle);
+        if(remotePlayer.isMoving()) remotePlayer.moveInCurve(nextAICurve);
 
     }
 
@@ -1501,6 +1532,19 @@ public class AIGameActivity extends AppCompatActivity {
         cardZone.improveVisibility(localPlayer, maxDistance, minDistance, minAlpha);
     }
 
+
+    /**
+     * AI MOVEMENT
+     */
+
+    private void attackLocalPlayer() {
+
+        remotePlayer.setRotation((float) Math.toDegrees(Math.atan2(remotePlayer.getDistanceVector(localPlayer).x, remotePlayer.getDistanceVector(localPlayer).y)));
+        remotePlayer.moveTo(localPlayer.getCenter());
+        spawnProjectile(remotePlayer);
+
+    }
+
     /**
      * BACKGROUND TASKS
      **/
@@ -1530,8 +1574,6 @@ public class AIGameActivity extends AppCompatActivity {
 
         protected Void doInBackground(String... params) {
 
-            notifyLocalPlayerReady();
-
             while (connectionActive) {
 
                 if (!remotePlayerReady){
@@ -1545,23 +1587,7 @@ public class AIGameActivity extends AppCompatActivity {
 
                         lastFrameChecked = currentFrame;
 
-                        // Send local scoring data
-                        sendLocalScoreData();
-
-                        // Retrieve both players' scoring data
-                        retrieveScoreData();
-
-                        // Send position & angle data
-                        sendLocalPositionData();
-
-                        // Retrieve position & angle data
-                        retrieveRemotePositionData();
-
-                        // Send event flag data
-                        sendLocalEventData();
-
-                        // Retrieve event flag data
-                        retrieveRemoteEventData();
+                        calculateNextAIAction();
 
                     }
 
@@ -1573,86 +1599,13 @@ public class AIGameActivity extends AppCompatActivity {
 
         }
 
-        private void sendLocalScoreData() {
-
-            getJSON("https://pis04-ub.herokuapp.com/send_local_score.php?matchId=" + matchId
-                    + "&player=" + assignedPlayer
-                    + "&score=" + localScore, 2000);
-
-        }
-
-        private void retrieveScoreData() {
-
-            //This returns a JSON object with a {"score1": int, "score2": int} pattern.
-            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_scores.php?matchId=" + matchId, 2000);
-
-            // Parse the JSON information into a ScorePair object.
-            ScorePair p = new Gson().fromJson(data, ScorePair.class);
-
-            // Set score1 and score2 variables retrieved from JSON to the localScore and
-            // remoteScore global variables.
-            if (p != null){
-                if(assignedPlayer == 1 || assignedPlayer == -1){
-                    remoteScore = p.score2;
-                }else{
-                    remoteScore = p.score1;
-                }
-            }
-        }
-
-        private void notifyLocalPlayerReady(){
-
-            // Set the playerX_ready column to 1 on the server database.
-            getJSON("https://pis04-ub.herokuapp.com/send_local_ready.php?matchId=" + matchId
-                    + "&player=" + assignedPlayer
-                    + "&ready=" + 1, 2000);
-
-        }
-
         private void checkRemotePlayerReady(){
 
-            // This returns a string containing either 1 or 0, representing a boolean value.
-            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_ready.php?matchId=" + matchId
-                    + "&player=" + oppositePlayer, 2000);
-
-            System.out.println("Ready: " + data);
-
-            // Get first character, as, for some reason, it returns one extra character.
-            int ready = Integer.parseInt(data.substring(0, 1));
-
-            if (ready == 1){
-                remotePlayerReady = true;
-            }
+            remotePlayerReady = true;
 
         }
 
-        private void sendLocalEventData() {
-
-            if(!localUnsentEvents.isEmpty()){
-
-                EventIndexPair eventIndexPair = localUnsentEvents.get(0);
-
-                Event event = eventIndexPair.event;
-                int eventIndex = eventIndexPair.eventIndex;
-                int eventNumber = event.ordinal();
-
-                System.out.println("EVENT: " + event);
-                System.out.println("INDEX: " + eventIndex);
-
-                getJSON("https://pis04-ub.herokuapp.com/send_local_event.php?matchId=" + matchId
-                                + "&player=" + assignedPlayer
-                                + "&event=" + eventNumber
-                                + "&eventIndex=" + eventIndex,
-                        2000);
-
-                lastSentLocalEventIndex = eventIndex;
-                localUnsentEvents.remove(0);
-
-            }
-
-        }
-
-        private void retrieveRemoteEventData(){
+        private void retrieveAIEventData(){
 
             //This returns a JSON object with a {"eventIndex": int, "event": int} pattern.
             String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_event.php?matchId=" + matchId
@@ -1675,48 +1628,46 @@ public class AIGameActivity extends AppCompatActivity {
 
         }
 
-        private void sendLocalPositionData() {
-
-            // Local coordinates get sent as DP and multiplied by 1000 to keep decimal data.
-
-            getJSON("https://pis04-ub.herokuapp.com/send_local_position.php?matchId=" + matchId
-                    + "&player=" + assignedPlayer
-                    + "&x=" + localPosition.x
-                    + "&y=" + localPosition.y
-                    + "&angle=" + localAngle,
-                    2000);
-
-            System.out.println(localAngle);
-
+        private void setNextAIPosition(Point p){
+            nextAIPosition = p;
         }
 
-        private void retrieveRemotePositionData() {
+        private void setNextAIAction(AIAction action){
+            nextAIAction = action;
+            aiActionIndex++;
+        }
 
-            // Remote coordinates are received as DP and must be converted to px.
-            // They're also received multiplied by 1000 to keep decimal data, so they
-            // must be divided by 1000.
+        private void calculateNextAIAction(){
 
-            //This returns a JSON object with a {"x": int,"y": int} pattern.
-            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_position.php?matchId=" + matchId
-                    + "&player=" + oppositePlayer, 2000);
+            /*
+             * ISLAND DOMINATION
+             */
+            if (islandDomain.isColliding(localPlayer)){
 
-            System.out.println(currentFrame + ": " + data);
+                // If islandDomain is being invaded by the player, attack it
+                setNextAIAction(AIAction.ATTACK_LOCAL_PLAYER);
 
-            // Parse the JSON information into a PointAnglePair object.
-            PointAnglePair p = new Gson().fromJson(data, PointAnglePair.class);
+            }else{
 
-            // Set X and Y coordinates retrieved from JSON to the remotePosition.x and remotePosition.y global
-            // variables. These variables will be used to position remotePlayer on the next frame.
-            if (p != null) {
+                // If islandDomain is not being invaded by the player, move AI to islandDomain
+                setNextAIPosition(islandDomain.getCenter());
+                setNextAIAction(AIAction.MOVE);
 
-                remotePosition.set((int) Graphics.toPixels(AIGameActivity.this, p.x / 1000), (int) Graphics.toPixels(AIGameActivity.this, p.y / 1000));
-                remoteAngle = p.angle;
+            }
 
-                lastCheckSuccessful = true;
-                latency = (currentFrame - lastFrameChecked) / 30;
+            /*
+             * COMBAT
+             */
+            if (localActiveEvent == Event.LOCAL_PLAYER_FIRED && localEventIndex > lastHandledLocalEventIndex){
 
-            } else {
-                lastCheckSuccessful = false;
+                // Flee from combat
+                int fleeX = (int) (Math.random() * layout.getWidth());
+                int fleeY = (int) (Math.random() * layout.getHeight());
+                setNextAIPosition(new Point(fleeX, fleeY));
+                setNextAIAction(AIAction.MOVE);
+
+                lastHandledLocalEventIndex = localEventIndex;
+
             }
 
         }

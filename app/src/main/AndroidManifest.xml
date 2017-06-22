@@ -24,6 +24,16 @@
         </activity>
 
         <activity
+            android:name=".Interface.AIGameActivity"
+            android:screenOrientation="portrait"
+            android:resizeableActivity="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".Interface.MatchmakingActivity"
             android:screenOrientation="portrait"
             android:noHistory="true">
