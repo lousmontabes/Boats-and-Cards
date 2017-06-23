@@ -53,7 +53,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Timer;
@@ -95,13 +94,15 @@ public class GameActivity extends AppCompatActivity {
     // Online player positioning
     Point lastReadRemotePosition = new Point(0, 0);
     Point remotePosition = new Point(0, 0);
+    Point nextLocalPosition = new Point(0, 0);
     Point localPosition = new Point(0, 0);
     float lastReadRemoteAngle = 0;
     float remoteAngle = 0;
     float localAngle = 0;
 
-    // Remote player curve path
+    // Player curve path
     CubicBezierCurve remoteCurve = new CubicBezierCurve();
+    CubicBezierCurve localCurve = new CubicBezierCurve();
 
     // Online player and match IDs
     int matchId;
@@ -160,6 +161,8 @@ public class GameActivity extends AppCompatActivity {
     int logIndex = 0;
     TextView log;
     TextView frameLog;
+
+    TextView pointerView;
 
     /**
      * GAME DATA
@@ -342,6 +345,7 @@ public class GameActivity extends AppCompatActivity {
     private void initializeReleaseConfig() {
         this.log.setAlpha(0);
         this.frameLog.setAlpha(0);
+        this.pointerView.setAlpha(0);
     }
 
     private void initializeCardEffects() {
@@ -393,9 +397,10 @@ public class GameActivity extends AppCompatActivity {
         deathPromptLayout = (LinearLayout) findViewById(R.id.deathPromptLayout);
         respawnTimerTextView = (TextView) findViewById(R.id.respawnTimerTextView);
 
-        // Debugging logs
+        // Debugging views
         log = (TextView) findViewById(R.id.log);
         frameLog = (TextView) findViewById(R.id.frameLog);
+        pointerView = (TextView) findViewById(R.id.pointerView);
 
         // Joystick
         joystick = (Joystick) findViewById(R.id.joystick);
@@ -616,6 +621,18 @@ public class GameActivity extends AppCompatActivity {
     private void log(String message) {
         this.log.setText(Float.toString(this.logIndex) + ": " + message);
         this.logIndex++;
+    }
+
+    // Places the pointer view at a specified position
+    private void placePointer(Point p){
+        pointerView.setX(p.x);
+        pointerView.setY(p.y);
+    }
+
+    // Places the pointer view at a specified position
+    private void placePointer(int x, int y){
+        pointerView.setX(x);
+        pointerView.setY(y);
     }
 
     private void showBoatTrace() {
@@ -926,13 +943,6 @@ public class GameActivity extends AppCompatActivity {
                 // Garbage collector
                 destroyExcessiveViews();
 
-                // Starting position
-                if (currentFrame <= 10) setStartPositions();
-
-                // Joystick controls
-                // IMPORTANT: Block joystick on first frame to avoid disappearing player bug.
-                else moveLocalPlayer();
-
                 fireLocalPlayer();
 
                 // Projectile movement
@@ -975,10 +985,13 @@ public class GameActivity extends AppCompatActivity {
                 advanceCounter();
 
                 // Prepare local data to send to server
-                float localPlayerDpX = Graphics.toDp(GameActivity.this, localPlayer.getX());
-                float localPlayerDpY = Graphics.toDp(GameActivity.this, localPlayer.getY());
-                localPosition.set((int) localPlayerDpX, (int) localPlayerDpY);
-                localAngle = (float) Math.toDegrees(localPlayer.getAngle());
+                prepareLocalPositionData();
+
+                // Starting position
+                if (currentFrame <= 10) setStartPositions();
+
+                // Joystick controls
+                else moveLocalPlayer();
 
                 // Move remote player
                 moveRemotePlayer();
@@ -996,6 +1009,28 @@ public class GameActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void prepareLocalPositionData() {
+
+        localAngle = (float) Math.toDegrees(localPlayer.getAngle());
+        Point next;
+
+        if (joystick.getCurrentIntensity() != 0) {
+            localPlayer.accelerate();
+            next = localPlayer.getFuturePosition(nextLocalPosition, joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+        } else {
+            localPlayer.decelerate();
+            next = localPlayer.getFuturePosition(nextLocalPosition, joystick.getCurrentAngle(), 0.4f);
+        }
+
+        int nextX = next.x;
+        int nextY = next.y;
+        localPlayer.setRotation(joystick.getCurrentAngle());
+        nextLocalPosition.set(nextX, nextY);
+
+        placePointer(nextLocalPosition);
+
     }
 
     private void fireLocalPlayer() {
@@ -1187,23 +1222,22 @@ public class GameActivity extends AppCompatActivity {
      */
     private void moveLocalPlayer() {
 
-        if (localPlayer.isAlive()) {
+        localCurve.set(localPlayer.getPosition(), localPosition, localPlayer.getRotation(), localAngle);
 
-            if (joystick.getCurrentIntensity() != 0) {
-                localPlayer.accelerate();
-                localPlayer.move(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
-            } else {
-                localPlayer.decelerate();
-                localPlayer.move(joystick.getCurrentAngle(), 0.4f);
-            }
+        // If localPlayer is in a range of 10px from the destination, consider it reached
+        boolean reached = (Math.abs(localPosition.x - localPlayer.getPosition().x) < 10
+                && Math.abs(localPosition.y - localPlayer.getPosition().y) < 10);
 
-            keepInBounds(localPlayer);
-
-        } else {
-            localPlayer.setX((layout.getWidth() - localPlayer.getWidth()) / 2);
-            localPlayer.setY(layout.getHeight() - localPlayer.getHeight());
-            joystick.resetCurrentAngle();
+        if (!reached){
+            localPlayer.restoreMovement();
+            localPlayer.setMoving(true);
+        }else{
+            localPlayer.setMoving(false);
+            localPlayer.restoreMovement();
         }
+
+        //nextAICurve.set(localPlayer.getPosition(), nextAIPosition, (float) Math.toDegrees(localPlayer.getRotation()), localAngle);
+        if(localPlayer.isMoving()) localPlayer.moveInCurve(localCurve);
 
     }
 
@@ -1261,6 +1295,8 @@ public class GameActivity extends AppCompatActivity {
             localPlayer.setStartPosition(new Point(centerX, layout.getHeight() - localPlayer.getHeight()));
             localPlayer.toStartPosition();
 
+            nextLocalPosition.set(centerX, layout.getHeight() - localPlayer.getHeight());
+
             // Spawn remote player at top position
             remotePlayer.setStartPosition(new Point(centerX, 0));
             remotePlayer.toStartPosition();
@@ -1274,6 +1310,8 @@ public class GameActivity extends AppCompatActivity {
             // Spawn remote player at top position
             localPlayer.setStartPosition(new Point(centerX, 0));
             localPlayer.toStartPosition();
+
+            nextLocalPosition.set(centerX, 0);
 
         }
 
@@ -1583,6 +1621,7 @@ public class GameActivity extends AppCompatActivity {
 
                         // Retrieve position & angle data
                         retrieveRemotePositionData();
+                        retrieveLocalPositionData();
 
                         // Send event flag data
                         sendLocalEventData();
@@ -1707,8 +1746,10 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalPositionData() {
 
-            byte[] bytesX = ByteBuffer.allocate(4).putInt(localPosition.x).array();
-            byte[] bytesY = ByteBuffer.allocate(4).putInt(localPosition.y).array();
+            System.out.println("Sending local position: " + nextLocalPosition);
+
+            byte[] bytesX = ByteBuffer.allocate(4).putInt(nextLocalPosition.x).array();
+            byte[] bytesY = ByteBuffer.allocate(4).putInt(nextLocalPosition.y).array();
 
             if (assignedPlayer == 1) {
                 sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER1POS;
@@ -1752,6 +1793,32 @@ public class GameActivity extends AppCompatActivity {
             System.out.println(x + ", " + y);
 
             remotePosition.set(Graphics.toPixels(getApplicationContext(), x), Graphics.toPixels(getApplicationContext(), y));
+            System.out.println("Retrieved remote position: " + remotePosition);
+
+        }
+
+        private void retrieveLocalPositionData() {
+
+            byte[] response;
+
+            if (assignedPlayer == 1) {
+                sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER1POS;
+            } else {
+                sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER2POS;
+            }
+
+            response = sendDataPacket();
+
+            byte[] bytesX = {response[1], response[2], response[3], response[4]};
+            byte[] bytesY = {response[5], response[6], response[7], response[8]};
+
+            int x = java.nio.ByteBuffer.wrap(bytesX).getInt();
+            int y = java.nio.ByteBuffer.wrap(bytesY).getInt();
+
+            System.out.println(x + ", " + y);
+
+            localPosition.set(Graphics.toPixels(getApplicationContext(), x), Graphics.toPixels(getApplicationContext(), y));
+            System.out.println("Retrieved local position: " + localPosition);
 
         }
 

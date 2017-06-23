@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import com.example.lluismontabes.gameofboatsandcards.Interface.GameActivity;
 import com.example.lluismontabes.gameofboatsandcards.Model.Collider;
 import com.example.lluismontabes.gameofboatsandcards.Model.CubicBezierCurve;
+import com.example.lluismontabes.gameofboatsandcards.Model.Graphics;
 import com.example.lluismontabes.gameofboatsandcards.Model.RectangularCollider;
 import com.example.lluismontabes.gameofboatsandcards.R;
 
@@ -35,8 +36,10 @@ public class Player extends RectangularCollider {
      * MOVEMENT & POSITIONING
      */
     // Velocity
-    private final float MAX_VELOCITY = 40;
-    private final float REMOTE_VELOCITY = MAX_VELOCITY;
+    private final float MAX_VELOCITY_DP = 15;
+    private final float MAX_VELOCITY;
+    private final float REMOTE_VELOCITY;
+    private final float REMOTE_VELOCITY_OFFSET = 0;
     private final float MAX_ROTATION_SPEED = 45;
     private float velocity, idleVelocity;
     private float acceleration;
@@ -85,6 +88,9 @@ public class Player extends RectangularCollider {
     public Player(Context context, boolean local) {
         super(context, 34, 59, 40, 45);
 
+        MAX_VELOCITY = Graphics.toPixels(context, MAX_VELOCITY_DP);
+        REMOTE_VELOCITY = MAX_VELOCITY + REMOTE_VELOCITY_OFFSET;
+
         this.local = local;
 
         LayoutInflater.from(context).inflate(R.layout.player, this);
@@ -95,19 +101,19 @@ public class Player extends RectangularCollider {
         if (!local) boatImageView.setImageResource(R.drawable.basicboat_enemy);
         shadowImageView.setColorFilter(getResources().getColor(R.color.shadow), android.graphics.PorterDuff.Mode.MULTIPLY);
 
-        velocity = 0;               // 10 pixels per frame
-        rotationSpeed = 0;          // 10 degrees per frame
+        velocity = 0;                      // 10 pixels per frame
+        rotationSpeed = 0;                 // 10 degrees per frame
 
-        acceleration = 2;           // Velocity increments 2 pixels/frame per frame (2px / frame^2)
+        acceleration = 2;                  // Velocity increments 2 pixels/frame per frame (2px / frame^2)
         rotationAcceleration = 1;
         friction = 1.5f;                   // friction further decelerates the player on deceleration.
 
         currentMaxAngle = rotationSpeed;
         currentMinAngle = -rotationSpeed;
 
-        health = MAX_HEALTH;        // 100 units of current health
+        health = MAX_HEALTH;               // 100 units of current health
 
-        fireCooldown = 0;           // 0 frames of current fire cooldown
+        fireCooldown = 0;                  // 0 frames of current fire cooldown
         timeToRespawn = 0;
 
         stunned = false;
@@ -215,6 +221,46 @@ public class Player extends RectangularCollider {
 
     public void restoreRotationSpeed() {
         this.rotationSpeed = 0;
+    }
+
+    /**
+     * Returns the position the player would move to in the specified angle.
+     *
+     * @param a         Angle in which to move the Player.
+     * @param intensity Multiplier (from 0.0 to 1.0) of the velocity.
+     */
+    public Point getFuturePosition(Point startPosition, float a, float intensity) {
+
+        if (!stunned && alive) {
+
+            this.angle = a;
+
+            x = startPosition.x;
+            y = startPosition.y;
+
+            float scaleX = (float) Math.cos(a);
+            float scaleY = (float) Math.sin(a);
+
+            float modifier = 1;
+
+            if (speedUp) {
+                modifier *= 2;
+            }
+            if (backwards) {
+                modifier = -modifier;
+            }
+
+            float velocityX = scaleX * this.velocity * intensity * modifier;
+            float velocityY = scaleY * this.velocity * intensity * modifier;
+
+            this.setX(x + velocityX);
+            this.setY(y + velocityY);
+            return new Point((int) (x + velocityX), (int) (y + velocityY));
+
+        }
+
+        return getPosition();
+
     }
 
     /**
