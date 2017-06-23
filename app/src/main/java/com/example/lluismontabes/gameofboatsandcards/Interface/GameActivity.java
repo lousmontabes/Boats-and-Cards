@@ -53,6 +53,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Timer;
@@ -78,7 +79,7 @@ public class GameActivity extends AppCompatActivity {
     // Connection
     RemoteDataTask remoteTask;
     boolean connectionActive = true;
-    int connectionFrequency = 1;
+    int connectionFrequency = 2;
     int lastFrameChecked = 0;
     float latency;
     boolean lastCheckSuccessful = false;
@@ -976,7 +977,7 @@ public class GameActivity extends AppCompatActivity {
                 // Prepare local data to send to server
                 float localPlayerDpX = Graphics.toDp(GameActivity.this, localPlayer.getX());
                 float localPlayerDpY = Graphics.toDp(GameActivity.this, localPlayer.getY());
-                localPosition.set((int) localPlayerDpX * 1000, (int) localPlayerDpY * 1000);
+                localPosition.set((int) localPlayerDpX, (int) localPlayerDpY);
                 localAngle = (float) Math.toDegrees(localPlayer.getAngle());
 
                 // Move remote player
@@ -1575,7 +1576,7 @@ public class GameActivity extends AppCompatActivity {
                         sendLocalScoreData();
 
                         // Retrieve both players' scoring data
-                        retrieveScoreData();
+                        retrieveRemoteScoreData();
 
                         // Send position & angle data
                         sendLocalPositionData();
@@ -1601,38 +1602,31 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalScoreData() {
 
-            byte param1, param2;
-
-            if (assignedPlayer == 1) {
-                param1 = (byte) localScore;
-                param2 = (byte) remoteScore;
-            }else{
-                param1 = (byte) remoteScore;
-                param2 = (byte) localScore;
+            if (assignedPlayer == 1){
+                sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER1SCORE;
+            } else {
+                sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER2SCORE;
             }
 
-            sendData[0] = ServerMessage.MESSAGE_SENDING_SCORE;
-            sendData[1] = param1;
-            sendData[2] = param2;
-
+            sendData[1] = (byte) localScore;
             sendDataPacket();
 
         }
 
-        private void retrieveScoreData() {
-
-            sendData[0] = ServerMessage.MESSAGE_REQUESTING_SCORE;
-            receiveData = sendDataPacket();
-
-            System.out.println(receiveData[1] + ", " + receiveData[2]);
+        private void retrieveRemoteScoreData() {
 
             if (assignedPlayer == 1) {
-                localScore = receiveData[1];
-                remoteScore = receiveData[2];
+                sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER2SCORE;
             }else{
-                remoteScore = receiveData[1];
-                localScore = receiveData[2];
+                sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER1SCORE;
             }
+
+            receiveData = sendDataPacket();
+
+            System.out.println(receiveData[1]);
+            remoteScore = receiveData[1];
+
+            remoteScore = receiveData[1];
 
         }
 
@@ -1716,8 +1710,12 @@ public class GameActivity extends AppCompatActivity {
             byte[] bytesX = ByteBuffer.allocate(4).putInt(localPosition.x).array();
             byte[] bytesY = ByteBuffer.allocate(4).putInt(localPosition.y).array();
 
-            if (assignedPlayer == 1) sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER1POS;
-            else sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER2POS;
+            if (assignedPlayer == 1) {
+                sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER1POS;
+            }
+            else {
+                sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER2POS;
+            }
 
             sendData[1] = bytesX[0];
             sendData[2] = bytesX[1];
@@ -1729,11 +1727,13 @@ public class GameActivity extends AppCompatActivity {
             sendData[7] = bytesY[2];
             sendData[8] = bytesY[3];
 
-            receiveData = sendDataPacket();
+            sendDataPacket();
 
         }
 
         private void retrieveRemotePositionData() {
+
+            byte[] response;
 
             if (assignedPlayer == 1) {
                 sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER2POS;
@@ -1741,38 +1741,45 @@ public class GameActivity extends AppCompatActivity {
                 sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER1POS;
             }
 
-            receiveData = sendDataPacket();
+            response = sendDataPacket();
 
-            byte[] bytesX = {receiveData[1], receiveData[2], receiveData[3], receiveData[4]};
-            byte[] bytesY = {receiveData[5], receiveData[6], receiveData[7], receiveData[8]};
+            byte[] bytesX = {response[1], response[2], response[3], response[4]};
+            byte[] bytesY = {response[5], response[6], response[7], response[8]};
 
             int x = java.nio.ByteBuffer.wrap(bytesX).getInt();
             int y = java.nio.ByteBuffer.wrap(bytesY).getInt();
 
-            System.out.println("(" + x + ", " + y + ")");
-            remotePosition.set(x, y);
+            System.out.println(x + ", " + y);
+
+            remotePosition.set(Graphics.toPixels(getApplicationContext(), x), Graphics.toPixels(getApplicationContext(), y));
 
         }
 
         private byte[] sendDataPacket() {
 
             long startTime = System.currentTimeMillis();
+            byte[] response = new byte[1024];
 
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, AWS_EC2_PORT);
-            try{
-                clientSocket.send(sendPacket);
-            } catch(IOException e){
-                System.out.println(e.getMessage());
+            while (response[0] != 1){
+
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, AWS_EC2_PORT);
+                try{
+                    clientSocket.send(sendPacket);
+                } catch(IOException e){
+                    System.out.println(e.getMessage());
+                }
+
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                try{
+                    clientSocket.receive(receivePacket);
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+
+                response = receivePacket.getData();
+                //System.out.println((int) response[0]);
+
             }
-
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            try{
-                clientSocket.receive(receivePacket);
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-
-            byte[] response = receivePacket.getData();
 
             long finishTime = System.currentTimeMillis();
             latency = finishTime - startTime;

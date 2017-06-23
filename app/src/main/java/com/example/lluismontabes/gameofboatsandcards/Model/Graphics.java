@@ -45,6 +45,17 @@ public final class Graphics {
     }
 
     /**
+     * Converts from density-independent units (dp) to real pixels.
+     * @param c     Window context.
+     * @param dp    Density-independent units.
+     * @return      (int) Converted unit.
+     */
+    public static int toPixels(Context c, int dp){
+        final float scale = c.getResources().getDisplayMetrics().density;
+        return (int) (dp * scale);
+    }
+
+    /**
      * Converts from pixels to density-independent units (dp).
      * @param c     Window context.
      * @param px    Pixels.
@@ -56,16 +67,14 @@ public final class Graphics {
     }
 
     /**
-     * Returns parametric equations (y = n1 * parameter; x = n2 * parameter) of the
-     * Bezier curve defined by 4 points.
-     * @param p1 Point 1.
-     * @param p2 Point 2.
-     * @param p3 Point 3.
-     * @param p4 Point 4.
-     * @return
+     * Converts from pixels to density-independent units (dp).
+     * @param c     Window context.
+     * @param px    Pixels.
+     * @return      (int) Converted unit.
      */
-    public static Point getBezierCurve(Point p1, Point p2, Point p3, Point p4){
-        return new Point();
+    public static int toDp(Context c, int px){
+        final float scale = c.getResources().getDisplayMetrics().density;
+        return (int) (px / scale);
     }
 
 }

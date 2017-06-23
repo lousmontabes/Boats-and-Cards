@@ -352,8 +352,6 @@ public class Player extends RectangularCollider {
 
         p += 0.015f;
 
-        System.out.println("p: " + p);
-
     }
 
     public void toStartPosition(){
