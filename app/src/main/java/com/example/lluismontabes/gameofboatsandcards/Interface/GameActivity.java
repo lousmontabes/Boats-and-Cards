@@ -1018,18 +1018,19 @@ public class GameActivity extends AppCompatActivity {
 
         if (joystick.getCurrentIntensity() != 0) {
             localPlayer.accelerate();
-            next = localPlayer.getFuturePosition(nextLocalPosition, joystick.getCurrentAngle(), joystick.getCurrentIntensity());
+            next = localPlayer.getFuturePosition(joystick.getCurrentAngle(), joystick.getCurrentIntensity());
         } else {
             localPlayer.decelerate();
-            next = localPlayer.getFuturePosition(nextLocalPosition, joystick.getCurrentAngle(), 0.4f);
+            next = localPlayer.getFuturePosition(joystick.getCurrentAngle(), 0.4f);
         }
 
-        int nextX = next.x;
-        int nextY = next.y;
-        localPlayer.setRotation(joystick.getCurrentAngle());
+        int nextX = Graphics.toDp(this, next.x);
+        int nextY = Graphics.toDp(this, next.y);
         nextLocalPosition.set(nextX, nextY);
 
-        placePointer(nextLocalPosition);
+        System.out.println("Next local position: " + nextLocalPosition);
+
+        placePointer(Graphics.toPixels(this, nextX), Graphics.toPixels(this, nextY));
 
     }
 
@@ -1038,6 +1039,30 @@ public class GameActivity extends AppCompatActivity {
         if (joystick2.getCurrentIntensity() >= 0.25) {
             spawnProjectile(localPlayer, joystick2.getCurrentAngle());
         }
+
+    }
+
+    /**
+     * Move local player according to server data.
+     */
+    private void moveLocalPlayer() {
+
+        localCurve.set(localPlayer.getPosition(), localPosition, localPlayer.getRotation(), localAngle);
+
+        // If localPlayer is in a range of 10px from the destination, consider it reached
+        boolean reached = (Math.abs(localPosition.x - localPlayer.getPosition().x) < 10
+                && Math.abs(localPosition.y - localPlayer.getPosition().y) < 10);
+
+        if (!reached){
+            localPlayer.restoreMovement();
+            localPlayer.setMoving(true);
+        }else{
+            localPlayer.setMoving(false);
+            localPlayer.restoreMovement();
+        }
+
+        //nextAICurve.set(localPlayer.getPosition(), nextAIPosition, (float) Math.toDegrees(localPlayer.getRotation()), localAngle);
+        if(localPlayer.isMoving()) localPlayer.moveInCurve(localCurve);
 
     }
 
@@ -1214,30 +1239,6 @@ public class GameActivity extends AppCompatActivity {
             lastReadRemoteEventIndex = remoteEventIndex;
 
         }
-
-    }
-
-    /**
-     * Move local player according to joystick input.
-     */
-    private void moveLocalPlayer() {
-
-        localCurve.set(localPlayer.getPosition(), localPosition, localPlayer.getRotation(), localAngle);
-
-        // If localPlayer is in a range of 10px from the destination, consider it reached
-        boolean reached = (Math.abs(localPosition.x - localPlayer.getPosition().x) < 10
-                && Math.abs(localPosition.y - localPlayer.getPosition().y) < 10);
-
-        if (!reached){
-            localPlayer.restoreMovement();
-            localPlayer.setMoving(true);
-        }else{
-            localPlayer.setMoving(false);
-            localPlayer.restoreMovement();
-        }
-
-        //nextAICurve.set(localPlayer.getPosition(), nextAIPosition, (float) Math.toDegrees(localPlayer.getRotation()), localAngle);
-        if(localPlayer.isMoving()) localPlayer.moveInCurve(localCurve);
 
     }
 
@@ -1746,7 +1747,7 @@ public class GameActivity extends AppCompatActivity {
 
         private void sendLocalPositionData() {
 
-            System.out.println("Sending local position: " + nextLocalPosition);
+            System.out.println("Sending next local position: " + nextLocalPosition);
 
             byte[] bytesX = ByteBuffer.allocate(4).putInt(nextLocalPosition.x).array();
             byte[] bytesY = ByteBuffer.allocate(4).putInt(nextLocalPosition.y).array();

@@ -51,6 +51,7 @@ public class Player extends RectangularCollider {
 
     // Position
     private Point startPosition;
+    private Point virtualPosition;
     private float x;
     private float y;
     private float angle;
@@ -90,6 +91,8 @@ public class Player extends RectangularCollider {
 
         MAX_VELOCITY = Graphics.toPixels(context, MAX_VELOCITY_DP);
         REMOTE_VELOCITY = MAX_VELOCITY + REMOTE_VELOCITY_OFFSET;
+
+        virtualPosition = new Point(0, 0);
 
         this.local = local;
 
@@ -229,14 +232,14 @@ public class Player extends RectangularCollider {
      * @param a         Angle in which to move the Player.
      * @param intensity Multiplier (from 0.0 to 1.0) of the velocity.
      */
-    public Point getFuturePosition(Point startPosition, float a, float intensity) {
+    public Point getFuturePosition(float a, float intensity) {
 
         if (!stunned && alive) {
 
             this.angle = a;
 
-            x = startPosition.x;
-            y = startPosition.y;
+            int virtualX = virtualPosition.x;
+            int virtualY = virtualPosition.y;
 
             float scaleX = (float) Math.cos(a);
             float scaleY = (float) Math.sin(a);
@@ -253,9 +256,9 @@ public class Player extends RectangularCollider {
             float velocityX = scaleX * this.velocity * intensity * modifier;
             float velocityY = scaleY * this.velocity * intensity * modifier;
 
-            this.setX(x + velocityX);
-            this.setY(y + velocityY);
-            return new Point((int) (x + velocityX), (int) (y + velocityY));
+            virtualPosition.set((int) (virtualX + velocityX), (int) (virtualY + velocityY));
+
+            return virtualPosition;
 
         }
 
@@ -290,12 +293,12 @@ public class Player extends RectangularCollider {
                 modifier = -modifier;
             }
 
-            float velocityX = scaleX * this.velocity * intensity * modifier;
-            float velocityY = scaleY * this.velocity * intensity * modifier;
+            float velocityX = scaleX * MAX_VELOCITY * intensity * modifier;
+            float velocityY = scaleY * MAX_VELOCITY * intensity * modifier;
 
             this.setX(x + velocityX);
             this.setY(y + velocityY);
-            if (moving) this.setRotation((float) Math.toDegrees(a) + 90);
+            this.setRotation((float) Math.toDegrees(a) + 90);
 
             // Move shadow with player
             shadowImageView.setY(-45 * (float) Math.sin(a));
