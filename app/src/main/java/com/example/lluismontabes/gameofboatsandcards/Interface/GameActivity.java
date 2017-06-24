@@ -361,6 +361,8 @@ public class GameActivity extends AppCompatActivity {
                 //if (cardUsed == 0) spawnProjectile(localPlayer);
                 // UNIMPLEMENTED: Point-and-click movement
                 //moveObjectTo(localPlayer, event.getX(), event.getY());
+
+                spawnProjectile(localPlayer);
                 return false;
 
             }
@@ -530,11 +532,11 @@ public class GameActivity extends AppCompatActivity {
      * Makes a new Projectile appear at the coordinates and angle of the specified Player.
      * @param player Player to appear next to.
      */
-    private void spawnProjectile(Player player, float angle) {
+    private void spawnProjectile(Player player) {
 
         if (player.canShoot()) {
 
-            //float angle = (float) Math.toRadians(player.getRotation() - 90); // Radians
+            float angle = (float) Math.toRadians(player.getRotation() - 90); // Radians
 
             float pW = player.getWidth();
             float pH = player.getHeight();
@@ -943,8 +945,6 @@ public class GameActivity extends AppCompatActivity {
                 // Garbage collector
                 destroyExcessiveViews();
 
-                fireLocalPlayer();
-
                 // Projectile movement
                 for (Projectile p : activeProjectiles) p.move();
 
@@ -1028,8 +1028,6 @@ public class GameActivity extends AppCompatActivity {
         int nextY = Graphics.toDp(this, next.y);
         nextLocalPosition.set(nextX, nextY);
 
-        System.out.println("Next local position: " + nextLocalPosition);
-
         placePointer(Graphics.toPixels(this, nextX), Graphics.toPixels(this, nextY));
 
     }
@@ -1037,7 +1035,7 @@ public class GameActivity extends AppCompatActivity {
     private void fireLocalPlayer() {
 
         if (joystick2.getCurrentIntensity() >= 0.25) {
-            spawnProjectile(localPlayer, joystick2.getCurrentAngle());
+            spawnProjectile(localPlayer);
         }
 
     }
@@ -1165,7 +1163,7 @@ public class GameActivity extends AppCompatActivity {
 
                 case LOCAL_PLAYER_FIRED:
                     // remotePlayer fired
-                    //spawnProjectile(remotePlayer);
+                    spawnProjectile(remotePlayer);
                     break;
 
                 case LOCAL_PLAYER_WON:
@@ -1596,6 +1594,7 @@ public class GameActivity extends AppCompatActivity {
 
         protected Void doInBackground(String... params) {
 
+            requestMatchReset();
             notifyLocalPlayerReady();
 
             while (connectionActive) {
@@ -1640,6 +1639,13 @@ public class GameActivity extends AppCompatActivity {
 
         }
 
+        private void requestMatchReset() {
+
+            sendData[0] = ServerMessage.MESSAGE_RESTORE_MATCH;
+            sendDataPacket();
+
+        }
+
         private void sendLocalScoreData() {
 
             if (assignedPlayer == 1){
@@ -1662,10 +1668,6 @@ public class GameActivity extends AppCompatActivity {
             }
 
             receiveData = sendDataPacket();
-
-            System.out.println(receiveData[1]);
-            remoteScore = receiveData[1];
-
             remoteScore = receiveData[1];
 
         }
@@ -1706,14 +1708,23 @@ public class GameActivity extends AppCompatActivity {
                 int eventIndex = eventIndexPair.eventIndex;
                 int eventNumber = event.ordinal();
 
-                System.out.println("EVENT: " + event);
-                System.out.println("INDEX: " + eventIndex);
+                byte[] bytesEventIndex = ByteBuffer.allocate(4).putInt(eventIndex).array();
 
-                getJSON("https://pis04-ub.herokuapp.com/send_local_event.php?matchId=" + matchId
-                                + "&player=" + assignedPlayer
-                                + "&event=" + eventNumber
-                                + "&eventIndex=" + eventIndex,
-                        2000);
+                if (assignedPlayer == 1){
+                    sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER1EVENT;
+                } else {
+                    sendData[0] = ServerMessage.MESSAGE_SENDING_PLAYER2EVENT;
+                }
+
+                sendData[1] = (byte) eventNumber;
+                // sendData [2] - [4] reserved for int space
+
+                sendData[5] = bytesEventIndex[0];
+                sendData[6] = bytesEventIndex[1];
+                sendData[7] = bytesEventIndex[2];
+                sendData[8] = bytesEventIndex[3];
+
+                sendDataPacket();
 
                 lastSentLocalEventIndex = eventIndex;
                 localUnsentEvents.remove(0);
@@ -1724,30 +1735,30 @@ public class GameActivity extends AppCompatActivity {
 
         private void retrieveRemoteEventData(){
 
-            //This returns a JSON object with a {"eventIndex": int, "event": int} pattern.
-            String data = getJSON("https://pis04-ub.herokuapp.com/retrieve_remote_event.php?matchId=" + matchId
-                    + "&player=" + oppositePlayer, 2000);
+            if (assignedPlayer == 1){
+                sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER2EVENT;
+            } else {
+                sendData[0] = ServerMessage.MESSAGE_REQUESTING_PLAYER1EVENT;
+            }
 
-            // Parse the JSON information into an EventIndexPair object.
-            EventIndexPair p = new Gson().fromJson(data, EventIndexPair.class);
+            receiveData = sendDataPacket();
 
-            // Set event and eventIndex variables retrieved from JSON to the remoteActiveEvent and
-            // remoteEventIndex global variables.
-            // These variables will be used to process events locally on the next frame.
-            if (p != null){
-                if (p.eventIndex > remoteEventIndex){
+            byte eventNumber = receiveData[1];
 
-                    remoteActiveEvent = p.event;
-                    remoteEventIndex = p.eventIndex;
+            byte[] bytesEventIndex = {receiveData[5], receiveData[6], receiveData[7], receiveData[8]};
+            int eventIndex = java.nio.ByteBuffer.wrap(bytesEventIndex).getInt();
 
-                }
+            if (eventIndex > remoteEventIndex){
+                remoteActiveEvent = Event.values()[eventNumber];
+                remoteEventIndex = eventIndex;
+
+                System.out.println("EVENT: " + remoteActiveEvent);
+                System.out.println("INDEX: " + remoteEventIndex);
             }
 
         }
 
         private void sendLocalPositionData() {
-
-            System.out.println("Sending next local position: " + nextLocalPosition);
 
             byte[] bytesX = ByteBuffer.allocate(4).putInt(nextLocalPosition.x).array();
             byte[] bytesY = ByteBuffer.allocate(4).putInt(nextLocalPosition.y).array();
@@ -1819,7 +1830,6 @@ public class GameActivity extends AppCompatActivity {
             System.out.println(x + ", " + y);
 
             localPosition.set(Graphics.toPixels(getApplicationContext(), x), Graphics.toPixels(getApplicationContext(), y));
-            System.out.println("Retrieved local position: " + localPosition);
 
         }
 
